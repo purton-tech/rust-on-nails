@@ -1,0 +1,60 @@
+version: '3.4'
+services:
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_USER: vscode
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vscode"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  #auth:
+  #  image: contorsystems/contor
+  #  environment:
+  #    DATABASE_URL: postgresql://vscode:testpassword@db:5432
+  #    SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
+  #    FORWARD_URL: development
+  #    FORWARD_PORT: 8080
+  #    SKIP_AUTH_FOR: /,/contact/*,/static/*,/images/*
+  #    REDIRECT_URL: /
+  #  ports:
+  #    - "9090:9090"
+  #  depends_on:
+  #    db:
+  #      condition: service_healthy
+
+  development:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    
+    volumes:
+      - ..:/vscode:cached
+      # Give access to ssh keys on the host (Is there a better way to do this?)
+      - ~/.ssh:/home/host-ssh:cached
+      # We need this so docker in docker works (Check this)
+      - /var/run/docker.sock:/var/run/docker.sock
+      - target:/vscode/target # Set target as a volume for performance. 
+      #- node_modules:/vscode/node_modules # Set target as a volume for performance. 
+
+    environment:
+      DATABASE_URL: postgresql://vscode:testpassword@db:5432
+
+    #env_file:
+    #  - ../.env
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    working_dir: /vscode
+    
+    depends_on:
+      - db
+
+volumes:
+  target:
+  node_modules:

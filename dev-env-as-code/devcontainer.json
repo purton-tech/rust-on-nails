@@ -1,0 +1,46 @@
+{
+	"name": "Rust",
+	"dockerComposeFile": [
+		"docker-compose.yml"
+	],
+	"service": "development",
+    	"workspaceFolder": "/vscode",
+	//"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"lldb.executable": "/usr/bin/lldb",
+		// VS Code don't watch files under ./target
+		"files.watcherExclude": {
+			"**/target/**": true
+		}
+	},
+
+	"remoteEnv": {
+		// Used by gitsetup to set name and email.
+		"EMAIL": "${localEnv:WORK_EMAIL}",
+		"NAME": "${localEnv:NAME}",
+		// Pass in the host directory for Docker mount commands from inside the container
+		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
+	},
+
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"bungcip.better-toml",
+		"vadimcn.vscode-lldb",
+		"mutantdino.resourcemonitor",
+		"matklad.rust-analyzer",
+		"zxh404.vscode-proto3"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// Make sure all the volumes belong to vscode user
+	//"postCreateCommand": "sudo chown -R vscode . && sudo chmod 777 /var/run/docker.sock",
+
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}
