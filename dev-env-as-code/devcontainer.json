@@ -17,9 +17,6 @@
 	},
 
 	"remoteEnv": {
-		// Used by gitsetup to set name and email.
-		"EMAIL": "${localEnv:WORK_EMAIL}",
-		"NAME": "${localEnv:NAME}",
 		// Pass in the host directory for Docker mount commands from inside the container
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
 	},
