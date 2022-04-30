@@ -22,4 +22,5 @@ alias mre='diesel migration redo'
 alias ml='diesel migration list'
 alias db='psql $DATABASE_URL'
 
+
 # Leave a line below or the files will cat together
