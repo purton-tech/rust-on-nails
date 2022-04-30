@@ -1,0 +1,24 @@
+name: Build Rust on Nails DevContainer
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'dev-env-as-code/**'
+
+jobs:
+  build:
+    # For this list of included software 
+    # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Build Docker file
+        run: |
+          docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+          docker login -u ${{ secrets.USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          docker push purtontech/rust-on-nails-devcontainer
