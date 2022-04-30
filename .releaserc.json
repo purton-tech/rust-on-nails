@@ -1,0 +1,15 @@
+{
+    "branches": ["main"],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      ["@semantic-release-plus/docker", {
+          "name": "purtontech/cloak-server:latest",
+          "skipLogin": true
+      }],
+      ["@semantic-release-plus/docker", {
+          "name": "purtontech/rust-on-nails-devcontainer:latest",
+          "skipLogin": true
+      }]
+    ]
+  }

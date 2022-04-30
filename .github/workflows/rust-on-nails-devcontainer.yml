@@ -16,13 +16,22 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-      - name: Docker Login
-        run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-      
-      - name: Build Docker file
-        run: |
-          docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
-          docker push purtontech/rust-on-nails-devcontainer:v0.1.0
+    - name: Docker Login
+      run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+    
+    - name: Build Docker file
+      run: docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+
+    # If this is a release
+    #   create release notes
+    #   set the docker version
+    #   
+    - name: Semantic Release
+      run: | 
+        npm i -D @semantic-release/exec
+        npm i -D @semantic-release-plus/docker
+        npm i -D @semantic-release/git
+        npx semantic-release
