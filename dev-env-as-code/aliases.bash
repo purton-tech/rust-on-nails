@@ -15,10 +15,7 @@ alias cw='mold -run cargo watch --no-gitignore -i "*.scss" -i "*.ts" -i node_mod
 # npm
 alias nrs='npm run start'
 
-# Database migrations
-alias mr='diesel migration run'
-alias mre='diesel migration redo'
-alias ml='diesel migration list'
+# Database
 alias db='psql $DATABASE_URL'
 
 # Leave a line below or the files will cat together

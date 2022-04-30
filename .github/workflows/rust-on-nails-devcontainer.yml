@@ -24,7 +24,9 @@ jobs:
       run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
     
     - name: Build Docker file
-      run: docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+      run: |
+        docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+        docker push purtontech/rust-on-nails-devcontainer
 
     # If this is a release
     #   create release notes
