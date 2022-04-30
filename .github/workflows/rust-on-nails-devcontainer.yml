@@ -13,12 +13,18 @@ jobs:
     # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
     runs-on: ubuntu-latest
 
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+    - name: Docker Login
+      run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       
       - name: Build Docker file
         run: |
           docker build -t purtontech/rust-on-nails-devcontainer dev-env-as-code
-          docker login -u ${{ secrets.USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-          docker push purtontech/rust-on-nails-devcontainer
+          docker push purtontech/rust-on-nails-devcontainer:v0.1.0
