@@ -4,7 +4,6 @@ COPY *.bash .
 
 RUN cat *.bash >> ~/.bashrc && sudo rm *.bash
 
-
 # Enable our git hooks and set the permisisons on docker sock.
 RUN echo 'git config core.hooksPath /vscode/.devcontainer/.githooks' >> ~/.bashrc \
     && echo 'sudo chmod 777 /var/run/docker.sock' >> ~/.bashrc
