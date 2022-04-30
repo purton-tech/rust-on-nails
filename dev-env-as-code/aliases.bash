@@ -23,6 +23,5 @@ alias mre='diesel migration redo'
 alias ml='diesel migration list'
 alias db='psql $DATABASE_URL'
 
-alias p='sudo chmod 777 /var/run/docker.sock'
 # Leave a line below or the files will cat together
 
