@@ -3,7 +3,7 @@ name: Build Rust on Nails DevContainer
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - 'dev-env-as-code/**'
 
