@@ -1,5 +1,8 @@
 # The URL the site will be built for
 base_url = "https://rustonnails.org"
+title = "Rust on Nails"
+description = "A full stack architecture for Rust web applications."
+
 
 theme = "adidoks"
 
