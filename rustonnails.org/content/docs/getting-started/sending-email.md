@@ -130,4 +130,4 @@ pub fn send_email(config: &crate::config::Config, email: Message) {
 
 We should now be able to form a message and call our helper function and see the results in Mailhog.
 
-![Email Developers View](./mailhog.png)
+![Email Developers View](/mailhog.png)

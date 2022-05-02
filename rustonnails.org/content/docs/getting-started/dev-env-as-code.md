@@ -1,6 +1,6 @@
 +++
 title = "Development Environment as Code"
-description = "AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme Doks for Zola."
+description = "T"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -9,12 +9,9 @@ sort_by = "weight"
 template = "docs/page.html"
 
 [extra]
-lead = 'AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme <a href="https://github.com/h-enk/doks">Doks</a> for Zola.'
 toc = true
 top = false
 +++
-
-## Development Environment as Code.
 
 The [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension lets you use a Docker container as a full-featured development environment. This fixes the following problems
 
@@ -24,11 +21,13 @@ The [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/
 
 Install the devcontainer extension in VSCode and then setup a Rust environment.
 
-![Creating a vault](./containers-extension.png)
+![Creating a vault](/containers-extension.png)
 
 The select *Open folder in container...* Select Rust and Postgres. Also select node on the next menu.
 
-![Creating a vault](./devcontainers.png)
+![Creating a vault](/devcontainers.png)
+
+## Folder Structure
 
 How you folder structure will look.
 
@@ -69,6 +68,8 @@ You should now have a folder structure like the following.
 ├── Cargo.toml
 └── Cargo.lock
 ```
+
+## Testing
 
 Test out you development environment with
 
