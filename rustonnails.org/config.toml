@@ -1,6 +1,6 @@
 # The URL the site will be built for
-base_url = "https://adidoks.netlify.com"
-title = "AdiDoks"
+base_url = "https://rust-on-nails.pages.dev"
+title = "Rust on Nails"
 description = "AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme Doks for Zola."
 
 # The site theme to use.
