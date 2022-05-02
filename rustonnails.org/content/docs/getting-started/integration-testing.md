@@ -1,6 +1,6 @@
 +++
 title = "Integration Testing"
-description = "AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme Doks for Zola."
+description = "Integration Testing"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -13,8 +13,6 @@ lead = 'AdiDoks is a Zola theme helping you build modern documentation websites,
 toc = true
 top = false
 +++
-
-## Integration Tests
 
 Integration tests are used to test application from top to bottom. That means simulating the browser across important workflows as if it was a real user. We will use [Selenium](https://www.selenium.dev/) as our headless browser.
 

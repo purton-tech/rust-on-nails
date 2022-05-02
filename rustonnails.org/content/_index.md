@@ -1,10 +1,10 @@
 +++
-title = "Modern Documentation Theme"
+title = "A Full Stack Web Architecture for Rust"
 
 
 # The homepage contents
 [extra]
-lead = '<b>AdiDoks</b> is a modern documentation theme, which is a port of the Hugo theme <a href="https://github.com/h-enk/">Doks</a> for Zola.'
+lead = '<b>Rust on Nails</b> is a full stack web architecture for building web products in Rust'
 url = "/docs/getting-started/introduction/"
 url_button = "Get started"
 repo_version = "GitHub v0.1.0"

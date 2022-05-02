@@ -1,6 +1,6 @@
 +++
 title = "Sending Email"
-description = "AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme Doks for Zola."
+description = "Sending Email"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -9,12 +9,9 @@ sort_by = "weight"
 template = "docs/page.html"
 
 [extra]
-lead = 'AdiDoks is a Zola theme helping you build modern documentation websites, which is a port of the Hugo theme <a href="https://github.com/h-enk/doks">Doks</a> for Zola.'
 toc = true
 top = false
 +++
-
-## Sending Email
 
 We can use the excellent library [Lettre](https://lettre.rs/) for sending emails. I recommend installing [Mailhog](https://github.com/mailhog/MailHog) into your `.devcontainer/docker-compose.yml` as an email catcher.
 
