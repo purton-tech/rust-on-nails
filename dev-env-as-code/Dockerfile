@@ -110,19 +110,19 @@ RUN sudo curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSIO
     && sudo chmod +x /usr/bin/mold
 
 # Docker Engine for Earthly. 
-#RUN  curl -fsSL "https://download.docker.com/linux/debian/gpg" | sudo apt-key add -
-#RUN sudo add-apt-repository \
-#        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian \
-#        $(lsb_release -cs) \
-#        stable" \
-#    && sudo apt-get update \
-#   && sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
+RUN  curl -fsSL "https://download.docker.com/linux/debian/gpg" | sudo apt-key add -
+RUN sudo add-apt-repository \
+        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian \
+        $(lsb_release -cs) \
+        stable" \
+    && sudo apt-get update \
+    && sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
     #
     #
     # Clean up
-#    && sudo apt-get autoremove -y \
-#    && sudo apt-get clean -y \
-#    && sudo rm -r /var/cache/* /var/lib/apt/lists/*
+    && sudo apt-get autoremove -y \
+    && sudo apt-get clean -y \
+    && sudo rm -r /var/cache/* /var/lib/apt/lists/*
 
 RUN sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly \
     && chmod +x /usr/local/bin/earthly \
