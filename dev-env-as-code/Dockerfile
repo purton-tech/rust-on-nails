@@ -126,7 +126,7 @@ RUN sudo add-apt-repository \
 
 # docker compose for earthly
 ARG DOCKER_COMPOSE_VERSION=1.29.2
-RUN sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose \
+RUN sudo curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
     && sudo chmod +x /usr/local/bin/docker-compose
 
 ARG EARTHLY_VERSION=0.6.14
