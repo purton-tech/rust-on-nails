@@ -130,5 +130,5 @@ RUN sudo curl -L https://github.com/docker/compose/releases/download/$DOCKER_COM
     && sudo chmod +x /usr/local/bin/docker-compose
 
 ARG EARTHLY_VERSION=0.6.14
-RUN sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
-    && chmod +x /usr/local/bin/earthly'
+RUN sudo wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
+    && sudo chmod +x /usr/local/bin/earthly
