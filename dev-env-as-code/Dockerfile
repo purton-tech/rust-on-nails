@@ -124,5 +124,11 @@ RUN sudo add-apt-repository \
     && sudo apt-get clean -y \
     && sudo rm -r /var/cache/* /var/lib/apt/lists/*
 
-RUN sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly \
+# docker compose for earthly
+ARG DOCKER_COMPOSE_VERSION=1.29.2
+RUN sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose \
+    && sudo chmod +x /usr/local/bin/docker-compose
+
+ARG EARTHLY_VERSION=0.6.14
+RUN sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/v$EARTHLY_VERSION/download/earthly-linux-amd64 -O /usr/local/bin/earthly \
     && chmod +x /usr/local/bin/earthly'
