@@ -72,4 +72,4 @@ $ cargo run
 
 Expose port 9090 from your devcontainer then go to `http://localhost:9090` and sign up.
 
-![Barricade](./login.png)
+![Barricade](/login.png)
