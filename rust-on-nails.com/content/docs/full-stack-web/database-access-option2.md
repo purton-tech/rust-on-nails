@@ -1,6 +1,6 @@
 +++
-title = "Database Access (Option 1)"
-description = "Database Access (Option 1)"
+title = "Database Access (Option 2)"
+description = "Database Access (Option 2)"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -13,7 +13,7 @@ toc = true
 top = false
 +++
 
-[SQLx](https://github.com/launchbadge/sqlx) is amazing. It's An async, pure Rust SQL crate featuring compile-time checked queries without a DSL. Supports PostgreSQL, MySQL, SQLite, and MSSQL.
+[SQLx](https://github.com/launchbadge/sqlx) is an async, pure Rust SQL crate featuring compile-time checked queries without a DSL. Supports PostgreSQL, MySQL, SQLite, and MSSQL.
 
 Add the following to your `app/Cargo.toml`
 
