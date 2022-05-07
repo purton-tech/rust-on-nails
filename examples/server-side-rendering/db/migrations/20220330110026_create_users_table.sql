@@ -21,5 +21,5 @@ CREATE TABLE sessions (
 );
 
 -- migrate:down
-DROP TABLE sessions;
-DROP TABLE users;
+DROP DATABASE users;
+DROP DATABASE sessions;
