@@ -2,9 +2,10 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/debian
 {
 	"name": "Debian",
-	"build": {
-		"dockerfile": "../dev-env-as-code/Dockerfile.devcontainer"
-	},
+	"dockerComposeFile": [
+		"docker-compose.yml"
+	],
+	"service": "development",
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {},

@@ -1,0 +1,30 @@
+version: '3.8'
+
+volumes:
+  postgres-data:
+  target:
+  node_modules:
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+        # Ensure that the variables in .env match the same variables in devcontainer.json
+        - .env
+    # Security Opt and cap_add for C++ based debuggers to work.
+    # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
+    # security_opt:
+    #   - seccomp:unconfined
+    # cap_add:
+    #   - SYS_PTRACE
+
+    volumes:
+      - ..:/workspace:cached
+      - target:/workspace/examples/server-side-rendering/target # Set target as a volume for performance. 
+      - node_modules:/workspace/examples/server-side-rendering/node_modules # Set node_modules as a volume for performance. 
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
