@@ -21,8 +21,6 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(handler))
-        //.merge(statics::asset_pipeline_routes())
-        //.merge(statics::image_routes())
         .route("/static/*path", get(static_path))
         .layer(Extension(pool))
         .layer(Extension(config));
