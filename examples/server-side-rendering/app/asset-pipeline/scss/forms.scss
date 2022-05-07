@@ -1,0 +1,63 @@
+.m_form {
+
+    fieldset {
+
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      border: 0;
+      margin: 0;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      > * {
+        width: 100%;
+      }
+      > label {
+        margin-top: 1rem;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: #1a1c21;
+        font-weight: 600;
+        padding-bottom: .25rem;
+        display: block;
+      }
+
+      > label:first-of-type {
+        margin-top: 0;
+      }
+
+      > span.a_help_text, span.error {
+        font-size: 0.75rem;
+        line-height: 1.5;
+        padding-top: 4px;
+        color: #69707D;
+      }
+
+      > span.error {
+        color: var(--geist-error);
+      }
+
+      &.action {
+        padding-top: 1.5rem;
+        > * {
+          width: 50%;
+          margin-left: auto;
+        }
+      }
+    }
+
+    input:not([type="submit"]), textarea, select {
+      font-size: 16px;
+      padding: 0.5em;
+      border-radius: 2px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: rgba(40, 47, 55, 0.1);
+      background-color: var(--accents-1);
+
+      &.error {
+        border-color: var(--geist-error);
+      }
+    }
+}

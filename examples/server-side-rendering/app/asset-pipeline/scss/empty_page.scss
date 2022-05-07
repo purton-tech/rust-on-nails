@@ -1,0 +1,11 @@
+.empty_page {
+    height: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    > div > form {
+        text-align: left;
+    }
+}

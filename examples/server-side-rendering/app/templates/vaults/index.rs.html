@@ -1,0 +1,49 @@
+@use super::super::layout_html;
+
+@(title: &str)
+
+@:layout_html(title, {
+<div class="m_card vault-card clickable" href="/app/vault/2/secrets">
+    <div class="body m-vault-card-body">
+        <div>
+            <h4 class="title">Cloak Deployment</h4>
+            <div class="created">Created <relative-time datetime="2022-02-08T13:47:10.140764Z">
+                </relative-time>
+            </div>
+        </div>
+        <div>
+            <h4 class="title">Team Members</h4>
+            <p>1</p>
+        </div>
+        <div>
+            <h4 class="title">Secrets</h4>
+            <p>2</p>
+        </div>
+        <div class="settings">
+            <button class="a_button ghost danger" id="delete-vault-2" href="#">Delete
+            </button>
+        </div>
+    </div>
+</div>
+<form class="m_form" method="post" action="/app/vaults/delete">
+    <side-drawer label="Delete Vault ?" id="delete-vault-drawer-2">
+        <template slot="body">
+            <p>Are you sure you want to delete this vault?</p>
+            <p>If so then type the name of the vault <strong>&quot;Cloak Deployment&quot;</strong>
+                into the input field</p>
+            <fieldset>
+                <label for="name">Name *</label>
+                <input type="text" required="" name="name" autocomplete="off"></input>
+                <span class="a_help_text">
+                    Please confirm the name of the vault you wish to delete
+                </span>
+            </fieldset>
+            <input type="hidden" name="vault_id" value="2"></input>
+        </template>
+        <template slot="footer">
+            <button class="a_button auto danger" slot="footer" type="submit">Delete
+                Vault</button>
+        </template>
+    </side-drawer>
+</form>
+})

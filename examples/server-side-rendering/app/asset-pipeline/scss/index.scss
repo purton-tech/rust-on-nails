@@ -1,0 +1,80 @@
+@import 'normalise';
+
+// https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
+        Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+}
+
+// Make images repsinsive
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+// Colours
+:root {
+    --foreground: #000;
+    --background: #fff;
+    --accents-1: #fafafa;
+    --accents-2: #EBEBEB;
+    --accents-3: #999999;
+    --accents-4: #888888;
+    --accents-5: #666666;
+    --accents-6: #444444;
+    --accents-7: #333333;
+    --accents-8: #111111;
+    --success: #031b4d;
+    --error: #ee0000;
+    --warning: #f5a623;
+    --dropdown-box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.02);
+    --dropdown-triangle-stroke: #fff;
+    --scroller-start: var(--background);
+    --scroller-end: rgba(255, 255, 255, 0);
+    --shadow-small: 0 5px 10px rgba(0, 0, 0, 0.12);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --shadow-large: 0 30px 60px rgba(0, 0, 0, 0.12);
+    --portal-opacity: 0.25;
+    --sidebar-bg: #031b4d;
+    --sidebar-border: rgba(180,188,199,.32);
+}
+
+:root {
+    --content-width: 1040px;
+    --content-padding: 30px 1em 30px 1em;
+}
+
+// Break points
+// https://www.freecodecamp.org/news/the-100-correct-way-to-do-css-breakpoints-88d6a5ba1862/
+@mixin for-phone-only {
+    @media (max-width: 599px) { @content; }
+}
+@mixin for-tablet-portrait-up {
+    @media (min-width: 600px) { @content; }
+}
+@mixin for-tablet-landscape-up {
+    @media (min-width: 900px) { @content; }
+}
+@mixin for-desktop-up {
+    @media (min-width: 1200px) { @content; }
+}
+@mixin for-big-desktop-up {
+    @media (min-width: 1800px) { @content; }
+}
+
+@import './app_layout';
+@import './content_layout';
+@import './cards';
+@import './buttons';
+@import './tables';
+@import './forms';
+@import './utilities';
+@import './empty_page';
+
