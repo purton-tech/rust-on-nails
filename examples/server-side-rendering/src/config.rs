@@ -1,8 +1,5 @@
 use std::env;
-
-use tokio_postgres::NoTls;
-use tokio_postgres_rustls::MakeRustlsConnect;
-use rustls::ClientConfig;
+use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -57,29 +54,9 @@ impl Config {
 
     pub fn create_pool(&self) -> deadpool_postgres::Pool {
 
-        // Example to parse
-        // APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak?sslmode=disable
-        let mut cfg = deadpool_postgres::Config::new();
-        let url: Vec<&str> = if self.database_url.starts_with("postgresql://") {
-            self.database_url.split("postgresql://").collect()
-        } else {
-            self.database_url.split("postgres://").collect()
-        };
-        let split_on_at: Vec<&str> = url[1].split("@").collect();
-        let user_and_pass: Vec<&str> = split_on_at[0].split(":").collect();
-    
-        let split_on_slash: Vec<&str> = split_on_at[1].split("/").collect();
-        let host_and_port: Vec<&str> = split_on_slash[0].split(":").collect();
-        let dbname_and_params: Vec<&str> = split_on_slash[1].split("?").collect();
-    
-        // we need to repalce %40 with @ so this works on Azure Postgres
-        cfg.user = Some(String::from(user_and_pass[0].replace("%40", "@")));
-        cfg.password = Some(String::from(user_and_pass[1]));
-        cfg.host = Some(String::from(host_and_port[0]));
-        cfg.port = Some(host_and_port[1].parse::<u16>().unwrap());
-        cfg.dbname = Some(String::from(dbname_and_params[0]));
-    
-        if self.database_url.contains("sslmode=require") {
+        let config = tokio_postgres::Config::from_str(&self.database_url).unwrap();
+
+        let manager = if self.database_url.contains("sslmode=require") {
             let mut root_store = rustls::RootCertStore::empty();
             root_store.add_server_trust_anchors(
                 webpki_roots::TLS_SERVER_ROOTS
@@ -94,15 +71,16 @@ impl Config {
                     })
             );
     
-            let tls_config = ClientConfig::builder()
+            let tls_config = rustls::ClientConfig::builder()
                 .with_safe_defaults()
                 .with_root_certificates(root_store)
                 .with_no_client_auth();
-            let tls = MakeRustlsConnect::new(tls_config);
-            return cfg.create_pool(Some(deadpool_postgres::Runtime::Tokio1), tls).unwrap();
+            let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
+            deadpool_postgres::Manager::new(config, tls)
         } else {
-            return cfg.create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls).unwrap();
-        }
-    }
+            deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
+        };
     
+        deadpool_postgres::Pool::builder(manager).build().unwrap()
+    }
 }
