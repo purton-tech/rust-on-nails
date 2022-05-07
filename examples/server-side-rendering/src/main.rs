@@ -1,6 +1,5 @@
 mod authentication;
 mod config;
-pub mod cornucopia;
 mod error;
 
 use axum::body::{self, Empty, Body};
@@ -9,22 +8,15 @@ use axum::http::{Response, StatusCode, header, HeaderValue};
 use axum::response::IntoResponse;
 use axum::{response::Html, routing::get, Router};
 use cornucopia::queries::users;
-use deadpool_postgres::{Config, Pool, Runtime};
+use deadpool_postgres::Pool;
 use std::net::SocketAddr;
-use tokio_postgres::NoTls;
 use crate::templates::statics::StaticFile;
 
 #[tokio::main]
 async fn main() {
     let config = config::Config::new();
 
-    let mut cfg = Config::new();
-    cfg.user = Some(String::from("postgres"));
-    cfg.password = Some(String::from("postgres"));
-    cfg.host = Some(String::from("db"));
-    cfg.port = Some(5432);
-    cfg.dbname = Some(String::from("postgres"));
-    let pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
+    let pool = config.create_pool();
 
     // build our application with a route
     let app = Router::new()
@@ -66,7 +58,7 @@ async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
 
 async fn handler(Extension(pool): Extension<Pool>) -> Result<Html<String>, error::CustomError> {
     let client = pool.get().await?;
-    let users = users::example_query(&client, &10).await?;
+    let _users = users::example_query(&client, &10).await?;
     
     let mut buf = Vec::new();
     crate::templates::vaults::index_html(&mut buf, "Your Vaults").unwrap();
@@ -77,3 +69,8 @@ async fn handler(Extension(pool): Extension<Pool>) -> Result<Html<String>, error
 }
 
 include!(concat!(env!("OUT_DIR"), "/templates.rs"));
+
+// Include the generated source code
+pub mod cornucopia {
+    include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
+}
