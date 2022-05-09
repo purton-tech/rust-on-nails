@@ -1,9 +1,12 @@
 # Do all the cargo install stuff
 FROM rust:slim as builder
 
+
+
 # Configure apt and install packages
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN sudo apt-get update \
+    && sudo apt-get install -y --no-install-recommends \
+        libpq-dev \
         curl \
         xz-utils \
         unzip
