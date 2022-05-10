@@ -1,6 +1,6 @@
 # Git aliases.
 alias gst='git status'
-alias gcm='git checkout master'
+alias gcm='git checkout main'
 alias c=clear
 alias gp='git push'
 alias gcam='git commit -a -m'
