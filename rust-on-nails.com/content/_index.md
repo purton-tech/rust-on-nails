@@ -5,7 +5,7 @@ title = "A Full Stack Web Architecture for Rust"
 # The homepage contents
 [extra]
 lead = '<b>Rust on Nails</b> is a full stack web architecture for building web products in Rust'
-url = "/docs/full-stack-web/introduction/"
+url = "/docs/ide-setup/introduction/"
 url_button = "Get started"
 repo_version = "GitHub v0.1.0"
 repo_license = "Open-source MIT License."
@@ -15,7 +15,7 @@ repo_url = "https://github.com/aaranxu/adidoks"
 [[extra.menu.main]]
 name = "Docs"
 section = "docs"
-url = "/docs/full-stack-web/introduction/"
+url = "/docs/ide-setup/introduction/"
 weight = 10
 
 [[extra.menu.main]]
