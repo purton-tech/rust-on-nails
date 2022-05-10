@@ -2,7 +2,7 @@ services:
 
   # Postgres
   db:
-    image: postgres:alpine
+    image: postgres:14-alpine
     environment:
       POSTGRES_PASSWORD: testpassword
       POSTGRES_USER: postgres
