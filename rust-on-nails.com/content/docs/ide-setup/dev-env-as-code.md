@@ -71,8 +71,11 @@ How you folder structure will look.
 ```sh
 .
 └── .devcontainer/
+    └── .githooks/
+    │   └── precommit
     ├── devcontainer.json
     ├── docker-compose.yml
+    ├── docker-compose.postgres.yml
     └── Dockerfile
 ```
 
