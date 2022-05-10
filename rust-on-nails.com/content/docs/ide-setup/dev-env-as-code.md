@@ -19,13 +19,50 @@ The [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/
 * Stops issues such as "It works on my machine"
 * Allows you to check your development environment into git.
 
+## Installation
+
 Install the devcontainer extension in VSCode and then setup a Rust environment.
 
 ![Creating a vault](/containers-extension.png)
 
-The select *Open folder in container...* Select Rust and Postgres. Also select node on the next menu.
+## Install Rust on Nails
 
-![Creating a vault](/devcontainers.png)
+We have pre-configured a development environment with all the tools needed to create a full stack rust application.
+
+To get started create a folder for your project. Chnage directory into that folder then run.
+
+### MacOS and Linux
+
+```
+mkdir .devcontainer \
+  && curl -L https://github.com/purton-tech/rust-on-nails/archive/main.zip -O -J \
+  && tar -xf rust-on-nails-main.zip \
+  && mv rust-on-nails-main/dev-env-as-code/Dockerfile.devcontainer .devcontainer/Dockerfile \
+  && mv rust-on-nails-main/dev-env-as-code/docker-compose.yml .devcontainer \
+  && mv rust-on-nails-main/dev-env-as-code/docker-compose.postgres.yml .devcontainer \
+  && mv rust-on-nails-main/dev-env-as-code/devcontainer.json .devcontainer \
+  && mv rust-on-nails-main/dev-env-as-code/ps1.bash .devcontainer \
+  && mv rust-on-nails-main/dev-env-as-code/.bash_aliases .devcontainer \
+  && mv rust-on-nails-main/dev-env-as-code/.githooks .devcontainer \
+  && rm -rf rust-on-nails-main*
+```
+
+### Windows
+
+```
+mkdir .devcontainer 
+curl -L https://github.com/purton-tech/rust-on-nails/archive/main.zip -O -J \
+tar -xf rust-on-nails-main.zip \
+move rust-on-nails-main\dev-env-as-code\Dockerfile.devcontainer .devcontainer\Dockerfile
+move rust-on-nails-main\dev-env-as-code\docker-compose.yml .devcontainer 
+move rust-on-nails-main\dev-env-as-code\docker-compose.postgres.yml .devcontainer 
+move rust-on-nails-main\dev-env-as-code\devcontainer.json .devcontainer 
+move rust-on-nails-main\dev-env-as-code\ps1.bash .devcontainer 
+move rust-on-nails-main\dev-env-as-code\.bash_aliases .devcontainer 
+move rust-on-nails-main\dev-env-as-code\.githooks .devcontainer 
+del /S rust-on-nails-main.zip
+rmdir /S /Q rust-on-nails-main
+```
 
 ## Folder Structure
 
@@ -33,9 +70,7 @@ How you folder structure will look.
 
 ```sh
 .
-├── .cargo/
 └── .devcontainer/
-    ├── .env
     ├── devcontainer.json
     ├── docker-compose.yml
     └── Dockerfile
