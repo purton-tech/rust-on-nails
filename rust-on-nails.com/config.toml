@@ -1,7 +1,7 @@
 # The URL the site will be built for
 base_url = "https://rust-on-nails.com"
 title = "Rust on Nails"
-description = "A full stack web architetcure for rust"
+description = "A full stack web architecture for rust"
 
 # The site theme to use.
 theme = "adidoks"
@@ -106,7 +106,7 @@ site_links_search_box = false
 [[extra.menu.main]]
 name = "Docs"
 section = "docs"
-url = "/docs/full-stack-rust/introduction/"
+url = "/docs/ide-setup/introduction/"
 weight = 10
 
 [[extra.menu.main]]
