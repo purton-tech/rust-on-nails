@@ -44,7 +44,6 @@ mkdir .devcontainer \
   && tar -xf rust-on-nails-main.zip \
   && mv rust-on-nails-main/dev-env-as-code/Dockerfile.devcontainer .devcontainer/Dockerfile \
   && mv rust-on-nails-main/dev-env-as-code/docker-compose.yml .devcontainer \
-  && mv rust-on-nails-main/dev-env-as-code/docker-compose.postgres.yml .devcontainer \
   && mv rust-on-nails-main/dev-env-as-code/devcontainer.json .devcontainer \
   && mv rust-on-nails-main/dev-env-as-code/ps1.bash .devcontainer \
   && mv rust-on-nails-main/dev-env-as-code/.bash_aliases .devcontainer \
@@ -60,7 +59,6 @@ curl -L https://github.com/purton-tech/rust-on-nails/archive/main.zip -O -J \
 tar -xf rust-on-nails-main.zip \
 move rust-on-nails-main\dev-env-as-code\Dockerfile.devcontainer .devcontainer\Dockerfile
 move rust-on-nails-main\dev-env-as-code\docker-compose.yml .devcontainer 
-move rust-on-nails-main\dev-env-as-code\docker-compose.postgres.yml .devcontainer 
 move rust-on-nails-main\dev-env-as-code\devcontainer.json .devcontainer 
 move rust-on-nails-main\dev-env-as-code\ps1.bash .devcontainer 
 move rust-on-nails-main\dev-env-as-code\.bash_aliases .devcontainer 
