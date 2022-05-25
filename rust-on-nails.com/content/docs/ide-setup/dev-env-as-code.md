@@ -29,7 +29,12 @@ Install the devcontainer extension in VSCode and then setup a Rust environment.
 
 We have pre-configured a development environment with all the tools needed to create a full stack rust application.
 
-To get started create a folder for your project. Chnage directory into that folder then run.
+To get started create a folder for your project. Change directory into that folder then run.
+
+```
+mkdir project-name
+cd project-name
+```
 
 ### MacOS and Linux
 
