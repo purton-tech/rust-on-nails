@@ -20,7 +20,7 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
 RUN cargo install cornucopia
 RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-chef --locked
-RUN cargo install cargo-edit
+RUN cargo install cargo-edit --features vendored-openssl
 
 
 FROM rust:slim
