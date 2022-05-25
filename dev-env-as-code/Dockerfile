@@ -20,6 +20,7 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
 RUN cargo install cornucopia
 RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-chef --locked
+RUN cargo install cargo-edit
 
 
 FROM rust:slim
@@ -83,6 +84,7 @@ USER $USERNAME
 
 COPY --chown=$USERNAME --from=builder /home/cargo-make $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-edit $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/diesel* $CARGO_HOME/bin
