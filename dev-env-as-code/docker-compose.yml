@@ -23,7 +23,7 @@ services:
       - ~/.ssh:/home/host-ssh:cached
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
-      #- target:/app/workspace/target # Set target as a volume for performance. 
+      - target:/app/workspace/target # Set target as a volume for performance. 
       #- node_modules:/vscode/node_modules # Set target as a volume for performance. 
 
     environment:
