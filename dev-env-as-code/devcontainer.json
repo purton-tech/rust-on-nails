@@ -3,8 +3,7 @@
 {
 	"name": "Rust on Nails",
 	"dockerComposeFile": [
-		"docker-compose.yml",
-		"docker-compose.postgres.yml"
+		"docker-compose.yml"
 	],
 	"service": "development",
 	"workspaceFolder": "/workspace",
