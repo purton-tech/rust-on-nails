@@ -1,6 +1,6 @@
 +++
-title = "Build"
-description = "Build"
+title = "Build our Containers"
+description = "Build our Containers"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -15,7 +15,7 @@ top = false
 
 ## Earthly
 
-```
+```Dockerfile
 FROM purtontech/rust-on-nails-devcontainer:1.0.5
 
 # Proto compiler and web grpc.

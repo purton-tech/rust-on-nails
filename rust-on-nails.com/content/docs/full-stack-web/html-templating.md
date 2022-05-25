@@ -192,3 +192,8 @@ include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 
 include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
 ```
+
+## View the Results
+
+
+![Fortunes](/rendered-template.png)
