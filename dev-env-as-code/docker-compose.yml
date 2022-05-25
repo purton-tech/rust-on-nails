@@ -2,10 +2,10 @@ version: '3.4'
 services:
 
   db:
-    image: postgres:alpine
+    image: postgres:14-alpine
     environment:
       POSTGRES_PASSWORD: testpassword
-      POSTGRES_USER: vscode
+      POSTGRES_USER: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U vscode"]
       interval: 10s
@@ -23,14 +23,11 @@ services:
       - ~/.ssh:/home/host-ssh:cached
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
-      - target:/app/workspace/target # Set target as a volume for performance. 
+      - target:/workspace/target # Set target as a volume for performance. 
       #- node_modules:/vscode/node_modules # Set target as a volume for performance. 
 
     environment:
-      DATABASE_URL: postgresql://vscode:testpassword@db:5432
-
-    #env_file:
-    #  - ../.env
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/postgres?sslmode=disable
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
