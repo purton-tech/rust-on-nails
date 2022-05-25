@@ -1,6 +1,6 @@
 +++
-title = "Database Access (Option 1)"
-description = "Database Access (Option 1)"
+title = "Database Access"
+description = "Database Access"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
@@ -17,9 +17,14 @@ top = false
 
 ## Installation
 
-Add the following to your `app/Cargo.toml`
+Add the following to your `app/Cargo.toml` below the `[dependencies]` 
 
 ```toml
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
+
+# Used by cornucopia and the main app
+futures = "0.3"
+
 # Access to the database https://github.com/LouisGariepy/cornucopia
 deadpool-postgres = { version = "0", features = ["serde"] }
 #postgres-types = { version = "0", features = ["derive"] }
@@ -35,19 +40,17 @@ webpki-roots = "0"
 
 ## Creating a SQL definition
 
-In a folder called `queries` a file called `users.sql` and add the following content.
+In a folder called `queries` a file called `fortunes.sql` and add the following content.
 
 ```sql
---! get_users(id) { id, email }
+--! fortunes() { id, message } *
 SELECT 
-    id, email
+    id, message
 FROM 
-    users
-WHERE
-    id < $1
+    Fortune
 ```
 
-This will generate a function called `get_user` which will run the SQL query. Note cornucopia checks the query at code generation time against postgres.
+This will generate a function called `fortunes` which will run the SQL query. Note cornucopia checks the query at code generation time against postgres.
 
 ## Updating build.rs
 
@@ -102,41 +105,58 @@ fn cornucopia() -> Result<(), std::io::Error> {
 
 ## Updating our config handling
 
-Add a `create_pool` function to `app/src/config.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
+Add the following code to `app/src/config.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
 
 ```rust
+use std::env;
 use std::str::FromStr;
 
-pub fn create_pool(&self) -> deadpool_postgres::Pool {
+#[derive(Clone, Debug)]
+pub struct Config {
+    pub database_url: String,
+}
 
-    let config = tokio_postgres::Config::from_str(&self.database_url).unwrap();
+impl Config {
+    pub fn new() -> Config {
 
-    let manager = if self.database_url.contains("sslmode=require") {
-        let mut root_store = rustls::RootCertStore::empty();
-        root_store.add_server_trust_anchors(
-            webpki_roots::TLS_SERVER_ROOTS
-                .0
-                .iter()
-                .map(|ta| {
-                    rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-                        ta.subject,
-                        ta.spki,
-                        ta.name_constraints,
-                    )
-                })
-        );
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
 
-        let tls_config = rustls::ClientConfig::builder()
-            .with_safe_defaults()
-            .with_root_certificates(root_store)
-            .with_no_client_auth();
-        let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
-        deadpool_postgres::Manager::new(config, tls)
-    } else {
-        deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
-    };
+        Config {
+            database_url,
+        }
+    }
 
-    deadpool_postgres::Pool::builder(manager).build().unwrap()
+    pub fn create_pool(&self) -> deadpool_postgres::Pool {
+    
+        let config = tokio_postgres::Config::from_str(&self.database_url).unwrap();
+    
+        let manager = if self.database_url.contains("sslmode=require") {
+            let mut root_store = rustls::RootCertStore::empty();
+            root_store.add_server_trust_anchors(
+                webpki_roots::TLS_SERVER_ROOTS
+                    .0
+                    .iter()
+                    .map(|ta| {
+                        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
+                            ta.subject,
+                            ta.spki,
+                            ta.name_constraints,
+                        )
+                    })
+            );
+    
+            let tls_config = rustls::ClientConfig::builder()
+                .with_safe_defaults()
+                .with_root_certificates(root_store)
+                .with_no_client_auth();
+            let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
+            deadpool_postgres::Manager::new(config, tls)
+        } else {
+            deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
+        };
+    
+        deadpool_postgres::Pool::builder(manager).build().unwrap()
+    }
 }
 ```
 
@@ -165,13 +185,6 @@ You should now have a folder structure something like this.
 
 ```rust
 mod config;
-mod error;
-
-use axum::extract::Extension;
-use axum::{response::Html, routing::get, Router};
-use deadpool_postgres::Pool;
-use std::net::SocketAddr;
-use crate::cornucopia::queries;
 
 #[tokio::main]
 async fn main() {
@@ -179,31 +192,14 @@ async fn main() {
 
     let pool = config.create_pool();
 
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(handler))
-        .layer(Extension(pool.clone()))
-        .layer(Extension(config));
+    let client = pool.get().await.unwrap();
 
-    // run it
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
-}
+    let fortunes = queries::fortunes::fortunes(&client).await.unwrap();
 
-async fn handler(Extension(pool): Extension<Pool>) -> Result<Html<String>, error::CustomError> {
-    let users = queries::users::get_users(&pool, 10).await?;
-
-    let html = format!("<h1>Hello, World! We Have {} Users</h1>", users.len());
-
-    Ok(Html(html))
+    dbg!(fortunes);
 }
 
 // Include the generated source code
-pub mod cornucopia {
-    include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
-}
+include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
+
 ```

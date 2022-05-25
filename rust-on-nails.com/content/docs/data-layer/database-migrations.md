@@ -88,7 +88,7 @@ And check that it worked.
 $ psql $DATABASE_URL -c 'SELECT count(*) FROM Fortune;'
  count 
 -------
-     0
+     12
 (1 row)
 ```
 
