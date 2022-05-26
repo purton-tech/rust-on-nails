@@ -17,12 +17,6 @@ We will use [Ructe](https://github.com/kaj/ructe) for templating. It compiles HT
 
 ## Install Ructe
 
-Add the following to `app/Cargo.toml`.
-
-```toml
-ructe = { version="0.14.0", features = ["mime03"] }
-```
-
 Create a folder called `templates` in `app/src`. You should end up with a folder structure like the following.
 
 
@@ -112,14 +106,14 @@ fn cornucopia() -> Result<()> {
 
 ## Creating a template
 
-Create a file called `app/templates/fortunes.rs.html` with the following content.
+Create a file called `app/templates/fortunes/index.rs.html` with the following content.
 
 ```html
 @use crate::queries::Fortunes;
 
 @(title: &str, fortunes: Vec<Fortunes>)
 
-!<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head><title>@title</title></head>
     <body>
@@ -135,7 +129,7 @@ Create a file called `app/templates/fortunes.rs.html` with the following content
 
 ## Loading the template from the database
 
-We can chnage our `app/src/main.rs` so that it uses the template to render the page.
+We can change our `app/src/main.rs` so that it uses the template to render the page.
 
 ```rust
 mod config;
