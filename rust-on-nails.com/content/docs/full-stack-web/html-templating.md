@@ -17,7 +17,7 @@ We will use [Ructe](https://github.com/kaj/ructe) for templating. It compiles HT
 
 ## Install Ructe
 
-Create a folder called `templates` in `app/src`. You should end up with a folder structure like the following.
+Create a folder called `templates` in `app/`. You should end up with a folder structure like the following.
 
 
 ```sh
