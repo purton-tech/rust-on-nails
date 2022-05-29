@@ -19,7 +19,7 @@ In Nails a layout is just a function that takes HTML content and returns more HT
 
 ## Create a Layout
 
-Create `app/src/layout.rs` with the following
+Create `app/templates/layout.rs.html` with the following
 
 ```rust
 @(title: &str, content: Content, header: Content)
@@ -51,6 +51,17 @@ Create `app/src/layout.rs` with the following
 </body>
 </html>
 ```
+
+## Integrate assets from our asset pipeline
+
+Add the following to our `app/templates/layout.rs.html` just below the `<title>` node.
+
+```html
+<link rel="stylesheet" href="/static/@index_css.name" type="text/css" />
+<script src="/static/@index_js.name" type="text/javascript" async></script>
+```
+
+This will incude our styles and any javascript.
 
 ## Call the Layout
 
