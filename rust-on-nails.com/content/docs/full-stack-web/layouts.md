@@ -70,6 +70,6 @@ To use the layout from your template simply call it from another template. e.g.
     </table>
 },
 {
-    <h2>Side Content</h2>
+    <h2>Header Content</h2>
 })
 ```
