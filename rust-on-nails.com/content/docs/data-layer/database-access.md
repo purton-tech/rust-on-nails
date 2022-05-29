@@ -40,7 +40,7 @@ webpki-roots = "0"
 
 ## Creating a SQL definition
 
-In a folder called `queries` a file called `fortunes.sql` and add the following content.
+In a folder called `app/queries` a file called `fortunes.sql` and add the following content.
 
 ```sql
 --! fortunes() { id, message } *
