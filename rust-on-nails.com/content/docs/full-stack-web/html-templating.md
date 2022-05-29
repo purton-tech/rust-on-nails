@@ -60,9 +60,7 @@ fn main() -> Result<()> {
 
     cornucopia()?;
 
-    let out_dir = env::var_os("OUT_DIR").unwrap();
-    let path_buf = PathBuf::from(format!("{}/ructe", out_dir.into_string().unwrap()));
-    let mut ructe = Ructe::new(path_buf).unwrap();
+    let mut ructe = Ructe::from_env().unwrap();
     ructe.compile_templates("templates").unwrap();
 
     Ok(())

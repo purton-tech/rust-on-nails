@@ -20,97 +20,52 @@ In Nails a layout is just a function that takes HTML content and returns more HT
 Create `app/src/layout.rs` with the following
 
 ```rust
-use axum::response::Html;
+@(title: &str, content: Content, header: Content)
 
-pub fn layout(title: &str, content: &str) -> Html<String> {
-    let layout = Layout {
-        title,
-        content,
-    };
-    Html(layout.to_string())
-}
+<!DOCTYPE html>
+<html lang="en">
 
-markup::define! {
+<head>
+    <meta charset="utf-8">
+    </meta>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    </meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </meta>
+    <title>@title</title>
+</head>
 
-    Layout<'a>(
-        title: &'a str,
-        content: &'a str,
-    )
-    {
-        @markup::doctype()
-
-        html[lang="en"] {
-
-            head {
-                meta [ charset="utf-8" ] {}
-                meta [ "http-equiv"="X-UA-Compatible", content="IE=edge"] {}
-                meta [ name="viewport", content="width=device-width, initial-scale=1" ] {}
-                title { {title} }
-
-                script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
-
-                link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
-            }
-            body {
-                main {
-                    {markup::raw(content)}
-                }
-            }
-        }
-    }
-}
-
+<body>
+    <div>
+        <header>@:header()</header>
+        <main class="container">
+            <section class="content">
+                <div>
+                @:content()
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
 ```
 
-And we need to change our `app/src/main.rs` to include the routes for our asset pipeline and to call out to the new layout.
+To use the layout from your template simply call it from another template. e.g.
 
-```rust
-mod config;
-mod error;
-mod models;
-mod layout;
+```html
+@use crate::queries::Fortune;
 
-use axum::extract::Extension;
-use axum::{response::Html, routing::get, Router};
-use sqlx::PgPool;
-use std::net::SocketAddr;
+@(title: &str, fortunes: Vec<Fortune>)
 
-#[tokio::main]
-async fn main() {
-    let config = config::Config::new();
-
-    let db_pool = PgPool::connect(&config.database_url)
-        .await
-        .expect("Problem connecting to the database");
-
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(handler))
-        .merge(statics::asset_pipeline_routes())
-        .merge(statics::image_routes())
-        .layer(Extension(db_pool))
-        .layer(Extension(config));
-
-    // run it
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
-}
-
-async fn handler(Extension(pool): Extension<PgPool>) -> Result<Html<String>, error::CustomError> {
-    let users = models::user::User::get_users(&pool, 10).await?;
-
-    let html = format!("<h1>Hello, World! We Have {} Users</h1>", users.len());
-
-    Ok(layout::layout("Test", &html))
-}
-
-// Error here disabled with "rust-analyzer.diagnostics.disabled": ["macro-error"]
-// in .vscode/settings.json
-pub mod statics {
-    include!(concat!(env!("OUT_DIR"), "/statics.rs"));
-}
+@:layout_html(title, {
+    <table>
+        <tr><th>id</th><th>message</th></tr>
+        @for fortune in fortunes {
+            <tr><td>@fortune.id</td><td>@fortune.message</td></tr>
+        }
+    </table>
+},
+{
+    <h2>Side Content</h2>
+})
 ```
