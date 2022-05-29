@@ -69,20 +69,37 @@ del /S rust-on-nails-main.zip
 rmdir /S /Q rust-on-nails-main
 ```
 
-## Folder Structure
+## VS Code
+
+Load the folder into visual studio code. On the bottom left cornber of VS Code you should see a green icon. Click on this and select open in container.
+
+After the container is downloaded you will have a preconfigured development environment with the followign folder structure.
 
 How you folder structure will look.
 
 ```sh
 .
 └── .devcontainer/
-    └── .githooks/
+    ├── .bash_aliases
+    ├── .githooks/
     │   └── precommit
     ├── devcontainer.json
     ├── docker-compose.yml
-    ├── docker-compose.postgres.yml
     └── Dockerfile
+└── target
+└── .gitignore
 ```
+
+## Setting up Git
+
+Open up a terminal in VSCode (CTRL + `) and execute
+
+```sh
+$ git init
+Initialized empty Git repository in /workspace/.git/
+```
+
+## Add a Workspace
 
 We are going to create a workspace for our web application. Create a new `Cargo.toml` file in the root folder and add the following.
 
@@ -93,10 +110,11 @@ members = [
 ]
 ```
 
-The run the following command.
+Open up the terminal in VSCode again and run the following
 
 ```
 $ cargo new app
+     Created binary (application) `app` package
 ```
 
 You should now have a folder structure like the following.
@@ -122,4 +140,13 @@ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 1.16s
      Running `target/debug/app`
 Hello, world!
+```
+
+## Commit your code
+
+From the `/workspace` folder
+
+```
+$ git add .
+$ git commit -m"Initial Commit"
 ```
