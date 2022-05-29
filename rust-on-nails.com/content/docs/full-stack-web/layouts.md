@@ -17,6 +17,8 @@ Layouts are pieces that fit together (for example header, footer, menus, etc) to
 
 In Nails a layout is just a function that takes HTML content and returns more HTML content. Let's put together our cache busting strategy with our asset pipeline into a Layout we can use.
 
+## Create a Layout
+
 Create `app/src/layout.rs` with the following
 
 ```rust
@@ -49,6 +51,8 @@ Create `app/src/layout.rs` with the following
 </body>
 </html>
 ```
+
+## Call the Layout
 
 To use the layout from your template simply call it from another template. e.g.
 
