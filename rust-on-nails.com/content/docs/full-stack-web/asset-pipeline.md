@@ -17,6 +17,18 @@ The asset pipeline provides a framework to concatenate and minify or compress Ja
 
 I've used [Parcel](https://parceljs.org/) on several projects and before that [Webpack](https://webpack.js.org/). I've found Parcel to be easier to use and so that is the recommendation for Nails.
 
+## Setting up a Volume
+
+If you look at your `.devcontainer/docker-compose.yml` you'll see a line that is commented out.
+
+```yml
+#- node_modules:/vscode/node_modules # Set target as a volume for performance. 
+```
+
+Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performace during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
+
+## Installing Parcel
+
 To install parcel
 
 ```sh
@@ -47,6 +59,8 @@ Add a scripts section to your package.json
   },
 ```
 
+## npm run start
+
 And now when you run `npm run start` parcel will generate your assets into the dist folder. We should also update our `./.gitignore` to exclude the generated files.
 
 ```
@@ -55,6 +69,8 @@ And now when you run `npm run start` parcel will generate your assets into the d
 /app/dist
 node_modules
 ```
+
+## Adding Images
 
 Create an empty images folder in `app/asset-pipeline/images` then your project should now look something like this.
 
@@ -86,3 +102,7 @@ Create an empty images folder in `app/asset-pipeline/images` then your project s
 ├── Cargo.toml
 └── Cargo.lock
 ```
+
+## What we have
+
+We now have a pipeline to compile Typescript and SCSS assets and a place to store images.

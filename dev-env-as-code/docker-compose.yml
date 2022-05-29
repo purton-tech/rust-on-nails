@@ -24,7 +24,8 @@ services:
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/workspace/target # Set target as a volume for performance. 
-      #- node_modules:/vscode/node_modules # Set target as a volume for performance. 
+      # Uncomment the next line to improve performance when using node.
+      #- node_modules:/vscode/node_modules 
 
     environment:
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/postgres?sslmode=disable
