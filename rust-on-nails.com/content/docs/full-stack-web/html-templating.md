@@ -107,7 +107,8 @@ fn cornucopia() -> Result<()> {
 Create a file called `app/templates/fortunes/index.rs.html` with the following content.
 
 ```html
-@use crate::queries::Fortunes;
+@use crate::queries::fortunes::Fortunes;
+@use super::super::layout_html;
 
 @(title: &str, fortunes: Vec<Fortunes>)
 
@@ -182,7 +183,7 @@ where
 
 include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 
-include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
+include!(concat!(env!("OUT_DIR"), "/templates.rs"));
 ```
 
 ## View the Results
