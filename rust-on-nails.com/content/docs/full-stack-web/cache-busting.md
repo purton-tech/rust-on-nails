@@ -15,21 +15,70 @@ top = false
 
 Cache busting is where we invalidate a cached file and force the browser to retrieve the file from the server. We can instruct the browser to bypass the cache by simply changing the filename. To the browser, this is a completely new resource so it will fetch the resource from the server. The most common way to do this is to add the hash of the file to the URL.
 
-What we can do with Rust is take advantage of the `build.rs` mechanism which runs some code before each compile. We can generate a set of function that let us retrieve our assets and generate the necessary hashes at the same time. So for example to use the `index.css` in our code it would be nice to be able to call something like.
+## Using Ructe for Cache Busting
+
+Edit your `app/build.rs` so that the `main` method looks like the following.
 
 ```rust
-get_index_css() // Returns the URL with the hash.
+fn main() -> Result<()>  {
+
+    cornucopia()?;
+
+    let mut ructe = Ructe::from_env().unwrap();
+    let mut statics = ructe.statics().unwrap();
+    statics.add_files("dist").unwrap();
+    statics.add_files("asset-pipeline/images").unwrap();
+    ructe.compile_templates("templates").unwrap();
+
+    Ok(())
+}
 ```
 
-The code for this is quite large so I won't publish it here. Please check out [https://github.com/purton-tech/cloak/blob/main/app/build.rs](https://github.com/purton-tech/cloak/blob/main/app/build.rs) for a full implementation.
+And add the following to `app/Cargo.toml` in the dependencies section.
 
-You'll also need to add the following to your `app/Cargo.toml`
-
-```
-tower-http = { version = "0", default-features = false, features = ["fs", "trace"] }
-
-[build-dependencies]
-sha1 = "0"  # Use by build.rs for cache busting.
+```toml
+# Used by ructe for image mime type detection
+mime = "0.3.0"
 ```
 
-Now when your build your project a helper class will be created which we will use in the next section.
+Ructe will now take our assets and turn them into rust functions. It handles creating a hash for the assets so we get good browser cache busting.
+
+## Using the Assets
+
+```
+use super::statics::*;
+
+dbg!(index_css.name) -> index.234532455.css
+```
+
+## Configuring a route for our assets
+
+In `app/main.rs` create the following function.
+
+```rust
+async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
+    let path = path.trim_start_matches('/');
+
+    if let Some(data) = StaticFile::get(path) {
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(
+                header::CONTENT_TYPE,
+                HeaderValue::from_str(data.mime.as_ref()).unwrap(),
+            )
+            .body(body::boxed(Body::from(data.content)))
+            .unwrap()
+    } else {
+        Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(body::boxed(Empty::new()))
+            .unwrap()
+    }
+}
+```
+
+And add the following route also in `app/main.rs`
+
+```rust
+.route("/static/*path", get(static_path))
+```
