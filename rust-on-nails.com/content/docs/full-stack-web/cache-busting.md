@@ -82,3 +82,16 @@ And add the following route also in `app/main.rs`
 ```rust
 .route("/static/*path", get(static_path))
 ```
+
+And change the `use` section so it looks like the following.
+
+```rust
+use crate::errors::CustomError;
+use axum::extract::{Extension, Path};
+use axum::{response::Html, response::IntoResponse, routing::get, Router};
+use deadpool_postgres::Pool;
+use std::net::SocketAddr;
+use axum::body::{self, Body, Empty};
+use axum::http::{header, HeaderValue, Response, StatusCode};
+use crate::templates::statics::StaticFile;
+```
