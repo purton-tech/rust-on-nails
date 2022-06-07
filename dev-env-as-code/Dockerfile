@@ -44,6 +44,8 @@ RUN apt-get update \
         sudo \
         # required by parcel or you can't npm install 
         build-essential \
+        # cmake is needed for https://github.com/tokio-rs/prost
+        cmake \
         # For musl builds
         musl-dev \
         musl-tools \
