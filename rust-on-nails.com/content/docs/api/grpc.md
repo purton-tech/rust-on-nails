@@ -57,6 +57,8 @@ Create a folder called `protos` and a file called `api.proto`
 
 ## Defining the API
 
+Add this to your `api.proto`
+
 ```proto
 syntax = "proto3";
 
@@ -124,12 +126,14 @@ impl crate::api::fortunes_server::Fortunes for FortunesService {
         &self,
         _request: Request<GetFortunesRequest>,
     ) -> Result<Response<GetFortunesResponse>, Status> {
+        // Get a client from our database pool
         let client = self
             .pool
             .get()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
+        // Get the fortunes from the database
         let fortunes = queries::fortunes::fortunes(&client)
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
