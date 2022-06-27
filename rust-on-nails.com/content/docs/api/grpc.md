@@ -105,14 +105,6 @@ Everything should compile at this point.
 
 ## Implementing our API End Point
 
-Add the following to the end of your `src/main.rs`
-
-```rust
-pub mod api {
-    tonic::include_proto!("api");
-}
-```
-
 Create a file called `app/api_service.rs` and add the following implemetation for our gRPC service.
 
 ```rust
