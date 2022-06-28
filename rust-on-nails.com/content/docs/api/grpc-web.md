@@ -43,4 +43,31 @@ Now the server will respond to gRPC and gRPC web calls. We can test with with Bl
 
 ![BloomRPC](/bloom-rpc-web.png)
 
-## Generating a Typescript Client
+## Generating Typescript Client Stubs
+
+To generate gRPC client stubs in your asset pipeline we can use the [protobuf-ts](https://github.com/timostamm/protobuf-ts) project. Run the following from the `app` folder.
+
+```sh
+npm install @protobuf-ts/plugin
+npm install @protobuf-ts/grpcweb-transport
+```
+
+Update the `scripts` section to your `app/package.json` i.e.
+
+```json
+...
+"scripts": {
+    "start": "parcel watch ./asset-pipeline/index.ts",
+    "release": "parcel build ./asset-pipeline/index.ts",
+    "protoc": "npx protoc --ts_out ./asset-pipeline --proto_path ../protos ../protos/api.proto"
+},
+...
+```
+
+Now the grpc client will be build and you can import it into your front end code.
+
+```typescript
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+```
+
+For more read the docs on [https://github.com/timostamm/protobuf-ts](https://github.com/timostamm/protobuf-ts)
