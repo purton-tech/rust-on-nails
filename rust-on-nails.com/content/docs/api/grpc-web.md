@@ -41,4 +41,6 @@ let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 
 Now the server will respond to gRPC and gRPC web calls. We can test with with Bloom RPC by clicking on the GRPC button and setting it to WEB.
 
+![BloomRPC](/bloom-rpc-web.png)
+
 ## Generating a Typescript Client
