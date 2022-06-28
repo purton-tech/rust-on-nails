@@ -137,3 +137,7 @@ RUN sudo curl -L https://github.com/docker/compose/releases/download/$DOCKER_COM
 ARG EARTHLY_VERSION=0.6.14
 RUN sudo wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
     && sudo chmod +x /usr/local/bin/earthly
+    
+# Pulumi for infrastructure as code
+RUN curl -fsSL https://get.pulumi.com | sudo -E bash -
+RUN sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
