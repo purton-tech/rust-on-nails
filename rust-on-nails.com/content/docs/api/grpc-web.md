@@ -39,7 +39,9 @@ let grpc_service = tonic::transport::Server::builder()
 let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 ```
 
-Now the server will respond to gRPC and gRPC web calls. We can test with with Bloom RPC by clicking on the GRPC button and setting it to WEB.
+## BloomRPC
+
+Now the server will respond to gRPC and gRPC web calls. We can test this with Bloom RPC by clicking on the GRPC button and setting it to WEB.
 
 ![BloomRPC](/bloom-rpc-web.png)
 
@@ -64,7 +66,7 @@ Update the `scripts` section to your `app/package.json` i.e.
 ...
 ```
 
-Now the grpc client will be build and you can import it into your front end code.
+Now the grpc client will be built and you can import it into your front end code.
 
 ```typescript
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
