@@ -266,7 +266,6 @@ where
 
     fn call(&mut self, req: Request<Body>) -> Self::Future {
         let content_type = req.headers().get("content-type").map(|x| x.as_bytes());
-        dbg!(req.headers().get("content-type"));
         if content_type == Some(b"application/grpc") || content_type == Some(b"application/grpc-web-text")
             || content_type == Some(b"application/grpc-web") {
             HybridFuture::Grpc(self.grpc.call(req))
