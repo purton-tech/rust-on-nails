@@ -18,5 +18,3 @@ RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSI
 
 # all the volumes configured in the docker-compose.yml
 ARG USERNAME=vscode
-RUN sudo mkdir -p /workspace/examples/server-side-rendering/target && sudo chown $USERNAME:$USERNAME /workspace/examples/server-side-rendering/target
-RUN sudo mkdir -p /workspace/examples/server-side-rendering/node_modules && sudo chown $USERNAME:$USERNAME /workspace/examples/server-side-rendering/node_modules

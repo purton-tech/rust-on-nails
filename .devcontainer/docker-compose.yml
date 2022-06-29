@@ -23,8 +23,6 @@ services:
 
     volumes:
       - ..:/workspace:cached
-      - target:/workspace/examples/server-side-rendering/target # Set target as a volume for performance. 
-      - node_modules:/workspace/examples/server-side-rendering/node_modules # Set node_modules as a volume for performance. 
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
