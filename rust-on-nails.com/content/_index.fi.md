@@ -4,12 +4,12 @@ title = "Nykyaikainen teema dokumentaatiolle"
 
 # The homepage contents
 [extra]
-lead = '<b>AdiDoks</b> on nykyaikainen teema dokumentaatiosivustoille. Se on portattu Zolalle Hugo-teemasta nimeltä <a href="https://github.com/h-enk/">Doks</a>.'
+lead = '<b>Rust on Nails</b>'
 url = "/docs/getting-started/introduction/"
 url_button = "Aloita"
-repo_version = "GitHub v0.1.0"
+repo_version =  "Github v1.0.9"
 repo_license = "Open-source MIT License."
-repo_url = "https://github.com/aaranxu/adidoks"
+repo_url = "https://github.com/purton-tech/rust-on-nails"
 
 # Menu items
 [[extra.menu.main]]

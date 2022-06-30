@@ -7,6 +7,10 @@
       ["@semantic-release-plus/docker", {
           "name": "purtontech/rust-on-nails-devcontainer:latest",
           "skipLogin": true
+      }],
+      ["@semantic-release/exec", {
+        "publishCmd": "./release.sh",
+        "execCwd": "./"
       }]
     ]
   }
