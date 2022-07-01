@@ -13,9 +13,11 @@ toc = true
 top = false
 +++
 
-> If you're not sure which database to use then, use Postgres.
+## Why Postgres?
 
-The architecture doesn't stop you using MySQL (MariaDB?) or other relational databases. However a relational database is the recommendation.
+* Postgres supports RLS (Row Level Security) this allows us to implement authorization over our data at the lowest level.
+* Support for unstructured data. Postgres can store and search JSON and other types of data.
+* PostgreSQL has earned a strong reputation for its proven architecture, reliability, data integrity, robust feature set, extensibility, and the dedication of the open source community behind the software to consistently deliver performant and innovative solutions.
 
 ## Test out your Postgres installation
 
