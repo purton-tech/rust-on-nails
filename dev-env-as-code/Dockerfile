@@ -78,11 +78,9 @@ RUN groupadd --gid $USER_GID $USERNAME \
     
 USER $USERNAME
 
-COPY --chown=$USERNAME --from=builder /home/cargo-make $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/diesel* $CARGO_HOME/bin
 
 # Essential tools
 RUN rustup component add rustfmt clippy
