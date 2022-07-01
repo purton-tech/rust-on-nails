@@ -7,7 +7,7 @@ title = "Nykyaikainen teema dokumentaatiolle"
 lead = '<b>Rust on Nails</b>'
 url = "/docs/getting-started/introduction/"
 url_button = "Aloita"
-repo_version =  "Github v1.0.9"
+repo_version =  "Github "
 repo_license = "Open-source MIT License."
 repo_url = "https://github.com/purton-tech/rust-on-nails"
 
