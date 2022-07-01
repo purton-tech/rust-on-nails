@@ -17,5 +17,3 @@ alias nrs='npm run start'
 
 # Database
 alias db='psql $DATABASE_URL'
-
-# Leave a line below or the files will cat together
