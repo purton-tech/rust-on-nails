@@ -6,6 +6,8 @@ on:
     - main
     paths:
     - 'dev-env-as-code/**'
+    # Exclude this as it is set by semantic release
+    - '!dev-env-as-code/Dockerfile.devcontainer'
 
 jobs:
   build:

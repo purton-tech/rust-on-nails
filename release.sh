@@ -5,5 +5,5 @@ sed -i "s/repo_version = .*$/repo_version =  \"Github $1\"/" ./rust-on-nails.com
 sed -i "s/purtontech\/rust-on-nails-devcontainer:.*$/purtontech\/rust-on-nails-devcontainer:$1 AS development/" ./dev-env-as-code/Dockerfile.devcontainer
 
 git add .
-git commit -am "chore(deployment): Update files with new version $1 [ci skip]"
+git commit -am "chore(deployment): Update files with new version $1"
 git push
