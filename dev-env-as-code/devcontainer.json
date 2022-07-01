@@ -18,6 +18,7 @@
 	},
 
 	"remoteEnv": {
+		// You can create env vars on your local machine and they will get passed into your container.
 		"EMAIL": "${localEnv:EMAIL}",
 		"NAME": "${localEnv:NAME}",
 		// Pass in the host directory for Docker mount commands from inside the container

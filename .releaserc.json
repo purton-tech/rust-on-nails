@@ -9,7 +9,7 @@
           "skipLogin": true
       }],
       ["@semantic-release/exec", {
-        "publishCmd": "./release.sh",
+        "publishCmd": "./release.sh ${nextRelease.version}",
         "execCwd": "./"
       }]
     ]
