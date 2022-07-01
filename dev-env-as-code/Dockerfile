@@ -9,16 +9,11 @@ RUN apt-get update \
         xz-utils \
         unzip
 
-RUN curl https://github.com/sagiegurari/cargo-make/releases/download/0.34.0/cargo-make-v0.34.0-x86_64-unknown-linux-musl.zip -L -o cargo-make.zip \
-    && unzip cargo-make.zip \
-    && mv cargo-make-v0.34.0-x86_64-unknown-linux-musl/cargo-make /home
-
 RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo-watch-v7.8.0-x86_64-unknown-linux-musl.tar.xz -L -o cargo-watch.tar.xz \
     && tar -xf cargo-watch.tar.xz \
     && mv cargo-watch-v7.8.0-x86_64-unknown-linux-musl/cargo-watch /home
 
 RUN cargo install cornucopia
-RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-chef --locked
 
 
@@ -44,8 +39,8 @@ RUN apt-get update \
         sudo \
         # required by parcel or you can't npm install 
         build-essential \
-        # cmake is needed for https://github.com/tokio-rs/prost
-        cmake \
+        # Needed so that prost builds
+        protobuf-compiler \
         # For musl builds
         musl-dev \
         musl-tools \
