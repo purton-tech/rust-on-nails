@@ -15,7 +15,7 @@ top = false
 
 We looked at [Actix Web](https://actix.rs/), [Tokio Axum](https://github.com/tokio-rs/axum) and [Rocket](https://rocket.rs/). Axum was chosen as it's very actively maintained and has the fastest incremental build times. 
 
-Most rust web server project operate in a similar way. That is you configure a route and a function that will respond to that route.
+Most rust web server projects operate in a similar way. That is you configure a route and a function that will respond to that route.
 
 The functions that respond to routes can have parameters. These parameters which might be `structs`, database pools or form data are passed to the function by the framework. 
 
