@@ -170,7 +170,7 @@ You should now have a folder structure something like this.
 │   └── ...
 ├── app
 │   ├── queries/
-│   │   └── users.sql
+│   │   └── fortunes.sql
 │   ├── src/
 │   │   ├── main.rs
 │   │   └── config.rs
