@@ -40,8 +40,8 @@ cd project-name
 
 ```
 mkdir .devcontainer \
-  && curl -L https://github.com/purton-tech/rust-on-nails/archive/main.zip -O -J \
-  && tar -xf rust-on-nails-main.zip \
+  && curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz -O -J \
+  && tar -xf rust-on-nails-main.tar.gz \
   && mv rust-on-nails-main/dev-env-as-code/Dockerfile.devcontainer .devcontainer/Dockerfile \
   && mv rust-on-nails-main/dev-env-as-code/docker-compose.yml .devcontainer \
   && mv rust-on-nails-main/dev-env-as-code/devcontainer.json .devcontainer \
