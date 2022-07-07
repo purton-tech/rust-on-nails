@@ -108,7 +108,6 @@ Create a file called `app/templates/fortunes/index.rs.html` with the following c
 
 ```html
 @use crate::queries::fortunes::Fortunes;
-@use super::super::layout_html;
 
 @(title: &str, fortunes: Vec<Fortunes>)
 
