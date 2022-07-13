@@ -1,0 +1,27 @@
+@use crate::crud::NEW;
+
+@()
+
+<form class="m_form" method="post" action=@NEW>
+    <side-drawer id="new-crud-drawer" label="Add Vault">
+        <template slot="body">
+            <p>
+                Vaults keep related secrets together.
+                For example you could have a vault called My Project with all
+                the secrets related to your project.
+            </p>
+
+            <fieldset>
+                <label for="name">Name *</label>
+                <input type="text" required name="name" />
+                <span class="a_help_text">Give your vault a name</span>
+                <input type="hidden" required name="encrypted_vault_key" id="new-vault-key" />
+                <input type="hidden" required name="public_key" id="public-key" />
+            </fieldset>
+        </template>
+
+        <template slot="footer">
+            <button class="a_button auto success" type="submit">Create Vault</button>
+        </template>
+    </side-drawer>
+</form>

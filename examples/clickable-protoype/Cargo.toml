@@ -1,0 +1,17 @@
+[package]
+name = "workspace"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0"
+hyper = { version = "0", features = ["server"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
+
+# Used by ructe for image mime type detection
+mime = "0.3.0"
+
+[build-dependencies]
+ructe = { version="0.14.0", features = ["mime03"] }

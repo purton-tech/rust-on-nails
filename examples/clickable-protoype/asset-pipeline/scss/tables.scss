@@ -1,0 +1,43 @@
+.m_table {
+    background-color: var(--background);
+    width: 100%; 
+    border-spacing: 0;
+    
+    th {
+        text-align: left;
+    }
+
+    > tbody {
+        > tr {
+
+            > td:last-child {
+                text-align: right;
+            }
+            
+            > td {
+                padding: 0.5rem 0;
+                border-bottom: 1px solid var(--accents-2);
+            }
+
+            &.clickable {
+                cursor: pointer;
+            }
+        }
+    }
+
+    > thead {
+
+        > tr {
+
+            > th:last-child {
+                text-align: right;
+            }
+        
+            > th {
+                line-height: 1.5;
+                font-weight: 600;
+                border-bottom: 1px solid var(--accents-3);
+            }
+        }
+    }
+}

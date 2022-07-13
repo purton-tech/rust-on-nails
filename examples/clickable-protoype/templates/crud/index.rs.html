@@ -1,0 +1,18 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+
+@()
+
+@:layout_html("Crud", {
+    <div class="m_card">
+        <div class="header">
+            Crud Table
+        </div>
+        <div class="body">
+
+        </div>
+    </div>
+},
+{
+    <h2>Header Content</h2>
+}, SideBar::Crud)
