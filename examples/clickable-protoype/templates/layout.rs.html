@@ -32,7 +32,19 @@
         <div class="meat"></div>
         <div class="bottom_bun"></div>
       </label>
-      @:header()
+
+      <div>
+        @:header()
+      </div>
+
+      @* The icon to bring up the profile page *@
+      <a class="profile" data-drawer-target="logout-drawer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="48px">
+          <circle cx="32" cy="32" r="32"/>
+          <text style="font: 2rem sans-serif" stroke="white" fill="white" text-anchor="middle" dominant-baseline="central" x="50%" y="50%">IP</text> 
+        </svg>
+      </a>
+
     </header>
 
     @* Navigation shown as a side menu *@
@@ -54,7 +66,6 @@
 
       @* A user profile drawer *@
       <div class="profile">
-        <button class="a_button ghost" data-drawer-target="logout-drawer">Logout</button>
         <form class="m_form" method="post" action="/auth/sign_out">
           <side-drawer label="Logout ?" id="logout-drawer">
             <template slot="body">
