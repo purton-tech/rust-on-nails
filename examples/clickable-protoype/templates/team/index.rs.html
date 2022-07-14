@@ -1,0 +1,44 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+@use crate::templates::team::new_html;
+@use crate::templates::team::view_html;
+
+@()
+
+@:layout_html("Team", {
+    <div class="m_card">
+        <div class="header">
+            <span>Team</span>
+            <button class="a_button primary mini" data-drawer-target="new-team-member-drawer">+ Invite a New Team Member</button>
+        </div>
+        <div class="body">
+            <table class="m_table team_table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>user2 at gmail.com</td>
+                        <td><span class="a_badge a_badge--success">Administrator</span></td>
+                        <td>
+                            <a href="#" data-drawer-target="view-team-member-drawer">Details</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>user1 at gmail.com</td>
+                        <td><span class="a_badge a_badge--success">Invitation Accepted</span></td>
+                        <td>
+                            Details
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @:new_html()
+    @:view_html()
+}, SideBar::Team)

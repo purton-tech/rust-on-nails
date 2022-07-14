@@ -5,14 +5,14 @@
 @()
 
 @:layout_html("Crud", {
-    <div class="empty_page">
-        <div>
+    <div class="m_card m_card__empty">
+        <div class="header">
+        </div>
+        <div class="body">
             <h2>No Vaults Created</h2>
             <h3>Create your first vault to get started with Cloak</h3>
-            @:new_html()
             <button class="a_button mini primary" data-drawer-target="new-crud-drawer">Create A New Vault</button>
         </div>
     </div> 
-},
-{
+    @:new_html()
 }, SideBar::Crud)

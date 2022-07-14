@@ -49,6 +49,7 @@ body {
 
         > main {
             grid-area: main;
+            height: 100%;
 
             > section.content {
                 padding: var(--content-padding);
@@ -89,9 +90,8 @@ body {
                 color: var(--accents-4);
                 font-size: 0.8rem;
                 font-weight: 250;
-                padding: 1rem;
+                padding: 0 0.5rem;
                 padding-bottom: 0;
-                border-top: 1px solid var(--sidebar-border);
                 text-transform: uppercase;
             }
             > ul {
@@ -102,9 +102,9 @@ body {
                 > li {
                     display: flex;
                     align-items: center;
-                    padding: .75rem 1rem;
+                    padding: 0.25rem .5rem;
                     font-weight: 300;
-                    border-bottom: 1px solid var(--sidebar-border);
+                    //border-bottom: 1px solid var(--sidebar-border);
     
                     > a {
                         color: white;

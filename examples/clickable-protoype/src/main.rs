@@ -1,5 +1,8 @@
 mod errors;
 mod dashboard;
+mod team;
+mod api_keys;
+mod subscriptions;
 mod crud;
 mod layout;
 
@@ -16,6 +19,9 @@ async fn main() {
     let app = Router::new()
         .route(dashboard::INDEX, get(dashboard::index))
         .merge(crud::routes())
+        .merge(subscriptions::routes())
+        .merge(team::routes())
+        .merge(api_keys::routes())
         .route("/static/*path", get(static_path));
 
     // run it

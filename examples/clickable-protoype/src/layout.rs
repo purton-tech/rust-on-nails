@@ -6,6 +6,11 @@ use hyper::{Body, StatusCode};
 pub enum SideBar {
     Dashboard,
     Crud,
+    Team,
+    NewTeam,
+    ApiKeys,
+    Subscriptions,
+    None
 }
 
 pub fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool) -> String {
