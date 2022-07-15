@@ -86,13 +86,21 @@ body {
                     text-decoration: none;
                 }
             }
-            > h2 {
+            > h2, .team-name {
                 color: var(--accents-4);
                 font-size: 0.8rem;
                 font-weight: 250;
                 padding: 0 0.5rem;
                 padding-bottom: 0;
                 text-transform: uppercase;
+            }
+            .team-name {
+                border-bottom: 1px solid var(--sidebar-border);
+                padding: .5rem;
+
+                a {
+                    color: var(--accents-4);
+                }
             }
             > ul {
                 padding: 0;

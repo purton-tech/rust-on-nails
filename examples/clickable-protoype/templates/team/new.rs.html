@@ -1,8 +1,35 @@
 @()
 
 <form class="m_form" method="post" action="">
-    <side-drawer id="new-team-member-drawer" label="Invite Member">
+    <side-drawer id="new-team-member-drawer" label="New Invitation Details">
         <template slot="body">
+            <p>We'll email them a link where they can sign up to join your team.</p>
+
+            <fieldset>
+                <label for="email">Email Address *</label>
+                <input type="email" required name="email" />
+                <span class="a_help_text">A valid email address is required</span>
+
+                <label for="first_name">First Name *</label>
+                <input type="text" required name="first_name" />
+                <span class="a_help_text">A first name is required</span>
+
+                <label for="last_name">Last Name *</label>
+                <input type="text" required name="last_name" />
+                <span class="a_help_text">A last name is required</span>
+
+                <label for="last_name">
+                    <input type="checkbox" name="editor" />
+                    Invite as Editor
+                </label>
+                <span class="a_help_text">Can edit all resources on this team and allow others to do the same</span>
+           
+                <label for="last_name">
+                    <input type="checkbox" name="editor" />
+                    Invite as Team Administrator
+                </label>
+                <span class="a_help_text">Team Administrators can manage billing and manage special privelages for other team members</span>
+            </fieldset>
         </template>
 
         <template slot="footer">
