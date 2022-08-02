@@ -13,7 +13,7 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
     && tar -xf cargo-watch.tar.xz \
     && mv cargo-watch-v7.8.0-x86_64-unknown-linux-musl/cargo-watch /home
 
-RUN cargo install cornucopia
+RUN cargo install cornucopia --version 0.8
 RUN cargo install cargo-chef --locked
 
 
