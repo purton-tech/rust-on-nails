@@ -16,7 +16,6 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
 RUN cargo install --version 0.8.1 cornucopia 
 RUN cargo install cargo-chef --locked
 
-
 FROM rust:slim
 
 ARG CLOAK_VERSION=1.17.0
