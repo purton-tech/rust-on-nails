@@ -1,3 +1,9 @@
+ARG CLOAK_VERSION=1.17.0
+ARG DBMATE_VERSION=1.15.0
+ARG MOLD_VERSION=1.4.0
+ARG EARTHLY_VERSION=0.6.21
+ARG DOCKER_COMPOSE_VERSION=1.29.2
+
 # Do all the cargo install stuff
 FROM rust:slim as builder
 
@@ -90,17 +96,14 @@ RUN rustup target add x86_64-unknown-linux-musl
 
 
 # Install secrets management
-ARG CLOAK_VERSION=1.10.0
 RUN sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
 
 # Database migrations   
-ARG DBMATE_VERSION=1.15.0
 RUN sudo curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
     && sudo mv ./dbmate-linux-amd64 /usr/bin/dbmate \
     && sudo chmod +x /usr/bin/dbmate
 
 # mold
-ARG MOLD_VERSION=1.1.1
 RUN sudo curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz \
     && sudo tar -xf mold-$MOLD_VERSION-x86_64-linux.tar.gz \
     && sudo mv ./mold-$MOLD_VERSION-x86_64-linux/bin/mold /usr/bin/ \
@@ -123,11 +126,9 @@ RUN sudo add-apt-repository \
     && sudo rm -r /var/cache/* /var/lib/apt/lists/*
 
 # docker compose for earthly
-ARG DOCKER_COMPOSE_VERSION=1.29.2
 RUN sudo curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
     && sudo chmod +x /usr/local/bin/docker-compose
 
-ARG EARTHLY_VERSION=0.6.14
 RUN sudo wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
     && sudo chmod +x /usr/local/bin/earthly
     
