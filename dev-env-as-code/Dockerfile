@@ -1,9 +1,3 @@
-ARG CLOAK_VERSION=1.17.0
-ARG DBMATE_VERSION=1.15.0
-ARG MOLD_VERSION=1.4.0
-ARG EARTHLY_VERSION=0.6.21
-ARG DOCKER_COMPOSE_VERSION=1.29.2
-
 # Do all the cargo install stuff
 FROM rust:slim as builder
 
@@ -24,6 +18,13 @@ RUN cargo install cargo-chef --locked
 
 
 FROM rust:slim
+
+ARG CLOAK_VERSION=1.17.0
+ARG DBMATE_VERSION=1.15.0
+ARG MOLD_VERSION=1.4.0
+ARG EARTHLY_VERSION=0.6.21
+ARG DOCKER_COMPOSE_VERSION=1.29.2
+
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
 # with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
