@@ -16,5 +16,5 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Spell Check
-      run: docker run --rm -ti -v rust-on-nails.com/content:/workdir tmaier/markdown-spellcheck:latest --report "**/*.md"
+      run: docker run --rm -v rust-on-nails.com/content:/workdir tmaier/markdown-spellcheck:latest --report "**/*.md"
     

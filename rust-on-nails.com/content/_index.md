@@ -41,7 +41,7 @@ title = "Type Safety"
 content = "Get less errors in production with type safety from the database to the front end."
 
 [[extra.list]]
-title = "Development Env as Code"
+title = "Development Environment as Code"
 content = "Don't spend hours installing tools, our devcontainer gets you running in minutes."
 
 [[extra.list]]
