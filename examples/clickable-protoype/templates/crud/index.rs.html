@@ -1,15 +1,149 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
+@use crate::templates::crud::new_html;
+@use crate::templates::crud::filter_html;
 
 @()
 
 @:layout_html("Crud", {
     <div class="m_card">
         <div class="header">
-            Crud Table
+            <span>Crud Table</span>
+            <div>    
+                <button class="a_button mini primary" data-drawer-target="new-crud-drawer">+ Create A Item</button>
+                <button class="a_button mini primary" data-drawer-target="new-filter-drawer">~ Filter Columns</button>
+            </div>
         </div>
         <div class="body">
-
+            <table class="m_table">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Customer</th>
+                        <th>Due</th>
+                        <th>Service</th>
+                        <th>Worked</th>
+                        <th>Rate</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>INV-0001</td>
+                        <td>Aug 12, 2022</td>
+                        <td>Outstanding</td>
+                        <td>AC Accounting</td>
+                        <td>Sept 12, 2023</td>
+                        <td>UI Design</td>
+                        <td>10 hrs</td>
+                        <td>$100/hr</td>
+                        <td>$1000</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+    @:new_html()
+    @:filter_html()
 }, SideBar::Crud)
