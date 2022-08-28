@@ -26,7 +26,7 @@ weight = 20
 
 [[extra.list]]
 title = "Everything you need"
-content = 'Nails is a full-stack architecture. It ships with all the tools needed to build amazing web apps on both the front and back end.'
+content = 'Nails is a full-stack architecture. It ships with all the tools needed to build amazing web apps.'
 
 [[extra.list]]
 title = "Fast by default ⚡️"
