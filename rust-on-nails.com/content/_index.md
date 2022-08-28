@@ -33,7 +33,7 @@ title = "Fast by default ⚡️"
 content = 'Compiles to a full async executable that utilizes all cores.'
 
 [[extra.list]]
-title = "Technologies you know"
+title = "Technologies you already know"
 content = "Leverages your existing knowledge of SQL, Docker, HTML, JS and CSS."
 
 [[extra.list]]
