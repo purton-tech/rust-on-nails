@@ -41,7 +41,7 @@ Create a folder called `templates` in `app/`. You should end up with a folder st
 └── Cargo.lock
 ```
 
-Install ructe as a build dependency, add the following to the end of `app/Cargo.toml`
+Install Ructe as a build dependency, add the following to the end of `app/Cargo.toml`
 
 ```toml
 [build-dependencies]

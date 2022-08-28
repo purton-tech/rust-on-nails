@@ -15,7 +15,7 @@ top = false
 
 ## Introduction
 
-The ideal output from any CI/CD pipeline is one or more Docker containers. This allows us to separate deployment from build ina clean way. Once we have our containers we are free to choose how we deply them wether that is Kubernetes in the cloud or on or with any other deployment service that support containers.
+The ideal output from any CI/CD pipeline is one or more Docker containers. This allows us to separate deployment from build in a clean way. Once we have our containers we are free to choose how we deploy them whether that is Kubernetes in the cloud or on or with any other deployment service that support containers.
 
 ## Earthly
 
@@ -103,7 +103,7 @@ From the command line run
 earthly -P +all
 ```
 
-The build will happend and you should see the executable being created.
+The build will happened and you should see the executable being created.
 
 ## Building Containers
 

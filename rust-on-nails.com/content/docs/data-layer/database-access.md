@@ -54,7 +54,7 @@ This will generate a function called `fortunes` which will run the SQL query. No
 
 ## Updating build.rs
 
-Create a `app/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they chnage.
+Create a `app/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they change.
 
 ```rust
 use std::env;

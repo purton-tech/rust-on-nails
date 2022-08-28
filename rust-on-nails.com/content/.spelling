@@ -1,0 +1,163 @@
+# markdown-spellcheck spelling configuration file
+# Format - lines beginning # are comments
+# global dictionary is at the start, file overrides afterwards
+# one word per line, to define a file override use ' - filename'
+# where filename is relative to this configuration file
+Kubernetes
+Dockerfile
+Earthfile
+72
+Mold
+VSCode
+color
+ - _index.md
+url
+ide-setup
+url_button
+repo_version
+Github
+1.0.15
+repo_license
+repo_url
+extra.menu.main
+10
+20
+extra.list
+async
+JS
+Env
+devcontainer
+eco
+ - authors/_index.md
+2021-04-01T08
+00
+extra.author_pages
+aaran-xu
+md
+ - authors/aaran-xu.md
+Aaran
+Xu
+AdiDoks
+50
+45
+aaranxu
+ - blog/_index.md
+sort_by
+paginate_by
+2
+section.html
+ - blog/hello-world.md
+Doks
+2021-05-01T09
+19
+42
+page.html
+Rustaceans
+ - docs/_index.md
+2025-05-01T08
+2021-05-01T08
+1
+ - docs/api/_index.md
+gRPC
+35
+ - docs/api/grpc-web.md
+toc
+Cargo.toml
+BloomRPC
+RPC
+GRPC
+protobuf-ts
+grpc
+ - docs/api/grpc.md
+Protobuf
+build.rs
+Axum
+api
+main.rs
+ - docs/auxiliary-services/authentication.md
+140
+Postgres
+db
+9090
+ - docs/auxiliary-services/database-backups.md
+BackupSheep
+BackupSheep.com
+3
+ - docs/auxiliary-services/sending-email.md
+130
+Lettre
+Mailhog
+config
+env
+vars
+ - docs/continous-deployment/_index.md
+60
+ - docs/continous-deployment/cloudflare-as-ingress.md
+Cloudflare
+30
+ - docs/continous-deployment/infra-as-code.md
+Pulumi
+Heroku
+www.pulumi.com
+ - docs/continuous-integration/_index.md
+40
+ - docs/continuous-integration/integration-testing.md
+VNC
+ThirtyFour
+WebDriver
+yml
+ - docs/data-layer/database-access.md
+55
+postgres
+sql
+ - docs/data-layer/database-migrations.md
+Dbmate
+ - docs/data-layer/the-database.md
+RLS
+PostgreSQL
+ - docs/full-stack-web/asset-pipeline.md
+90
+Sass
+Webpack
+node_modules
+package.json
+npm
+dist
+SCSS
+ - docs/full-stack-web/cache-busting.md
+100
+Ructe
+ - docs/full-stack-web/forms.md
+80
+struct
+FruitPreferences
+ - docs/full-stack-web/front-end.md
+120
+ - docs/full-stack-web/html-templating.md
+70
+ - docs/full-stack-web/json.md
+75
+ - docs/full-stack-web/layouts.md
+110
+ - docs/full-stack-web/partials-and-components.md
+markup.rs
+ - docs/full-stack-web/web-server.md
+Actix
+Tokio
+ - docs/ide-setup/introduction.md
+Django
+ - docs/spa/webassembly.md
+Webassembly
+ - privacy-policy/_index.md
+2020-05-01T08
+TLDR
+1st
+2021
+ - themes/adidoks/CODE_OF_CONDUCT.md
+4
+2.0
+www.contributor
+covenant.org
+0
+code_of_conduct.html
+faq

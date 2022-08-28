@@ -21,7 +21,7 @@ The functions that respond to routes can have parameters. These parameters which
 
 ## Handling Errors
 
-Now is a good time to think about how we will handle errros so we don't have to `unwrap` all the time.
+Now is a good time to think about how we will handle errors so we don't have to `unwrap` all the time.
 
 Create a file called `app/src/errors.rs` and add the following code.
 
@@ -139,11 +139,11 @@ include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 
 ## Watch the Server
 
-We could use `cargo run` to start our server but Rust on Nails comes with a built in alias that will watch your code for chnages and restart your server.
+We could use `cargo run` to start our server but Rust on Nails comes with a built in alias that will watch your code for changes and restart your server.
 
 It also uses a very fast linker called (Mold)[https://github.com/rui314/mold] to speed up our incremental build times.
 
-Iss ue the following command in your `app` folder.
+Issue the following command in your `app` folder.
 
 ```sh
 cw

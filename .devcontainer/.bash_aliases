@@ -17,3 +17,6 @@ alias nrs='npm run start'
 
 # Database
 alias db='psql $DATABASE_URL'
+
+# Spellcheck
+alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/rust-on-nails.com/content:/workdir tmaier/markdown-spellcheck:latest "**/*.md"'

@@ -107,7 +107,7 @@ Everything should compile at this point.
 
 ## Implementing our API End Point
 
-Create a file called `app/api_service.rs` and add the following implemetation for our gRPC service.
+Create a file called `app/api_service.rs` and add the following implementation for our gRPC service.
 
 ```rust
 use crate::api::*;
@@ -160,7 +160,7 @@ impl crate::api::fortunes_server::Fortunes for FortunesService {
 
 ## Integrating Tonic and Axum
 
-The last thing we need to do is add our API to the Axum server. Tonic uses [Hyper](https://github.com/hyperium/hyper) as the underlying server for it's gRPC implemenation. Axum uses Hyper too so we can get our server to run both our web pages and our api.
+The last thing we need to do is add our API to the Axum server. Tonic uses [Hyper](https://github.com/hyperium/hyper) as the underlying server for it's gRPC implementation. Axum uses Hyper too so we can get our server to run both our web pages and our api.
 
 Create the following file `app/src/hybrid.rs`.
 

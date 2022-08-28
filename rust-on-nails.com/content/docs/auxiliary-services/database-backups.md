@@ -9,14 +9,14 @@ sort_by = "weight"
 template = "docs/page.html"
 
 [extra]
-lead = 'Ideally we want to take regular backups of our database and also make those backups offsite. We can achieve this by using a backup service. This is how we set it up.'
+lead = 'Ideally we want to take regular backups of our database and also make those backups off site. We can achieve this by using a backup service. This is how we set it up.'
 toc = true
 top = false
 +++
 
-## Creating a Readonly Database User
+## Creating a read only Database User
 
-Our offsite backup provider needs readonly access to our database.
+Our off site backup provider needs read only access to our database.
 
 ```
 CREATE ROLE readonly LOGIN ENCRYPTED PASSWORD '****************';
@@ -35,7 +35,7 @@ GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly;
 
 Here we will update your local database.
 
-1. Download one of the backups from BlackSheep.
+1. Download one of the backups from BackupSheep.
 1. `sudo apt-get install zip`
 1. unzip the backup download i.e. `unzip bs*`
 1. Drop the database `dbmate drop`

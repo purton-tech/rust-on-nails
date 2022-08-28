@@ -61,7 +61,7 @@ Add the following to our `app/templates/layout.rs.html` just below the `<title>`
 <script src="/static/@index_js.name" type="text/javascript" async></script>
 ```
 
-This will incude our styles and any javascript.
+This will include our styles and any JavaScript.
 
 ## Call the Layout
 

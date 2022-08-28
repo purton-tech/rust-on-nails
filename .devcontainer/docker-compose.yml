@@ -23,6 +23,8 @@ services:
 
     volumes:
       - ..:/workspace:cached
+      # We need this so docker in docker works 
+      - /var/run/docker.sock:/var/run/docker.sock
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity

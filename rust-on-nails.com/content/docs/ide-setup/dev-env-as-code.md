@@ -71,9 +71,9 @@ rmdir /S /Q rust-on-nails-main
 
 ## VS Code
 
-Load the folder into visual studio code. On the bottom left cornber of VS Code you should see a green icon. Click on this and select open in container.
+Load the folder into visual studio code. On the bottom left corner of VS Code you should see a green icon. Click on this and select open in container.
 
-After the container is downloaded you will have a preconfigured development environment with the followign folder structure.
+After the container is downloaded you will have a preconfigured development environment with the following folder structure.
 
 How you folder structure will look.
 

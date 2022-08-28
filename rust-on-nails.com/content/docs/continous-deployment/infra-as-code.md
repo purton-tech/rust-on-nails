@@ -17,7 +17,7 @@ top = false
 
 However we decide to deploy our application "Infrastructure as Code" is a best practice. That means we have the ability to reproduce or duplicate our deployment environment from code stored in git. 
 
-We will use [Pulumi](https://www.pulumi.com/) as this gives us the ability to code how we deploy our infrastructure wether that be with Heroku, Digital Ocean, Google Cloud, Azure and on and on.
+We will use [Pulumi](https://www.pulumi.com/) as this gives us the ability to code how we deploy our infrastructure whether that be with Heroku, Digital Ocean, Google Cloud, Azure and on and on.
 
 Basically, rather than learning the providers tools, we get good at one tool and use it across providers.
 
@@ -27,7 +27,7 @@ We will use Pulumi with Typescript. They don't have a Rust option and we are alr
 
 Everything you need to use Pulumi is installed into our `devcontainer`.
 
-We'll creat a folder called infra at the top level then set the folder up.
+We'll create a folder called infra at the top level then set the folder up.
 
 ```
 mkdir infra && cd infra

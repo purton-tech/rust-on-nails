@@ -21,7 +21,7 @@ services:
       - ..:/workspace:cached
       # Give access to ssh keys on the host (Is there a better way to do this?)
       - ~/.ssh:/home/host-ssh:cached
-      # We need this so docker in docker works (Check this)
+      # We need this so docker in docker works
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/workspace/target # Set target as a volume for performance. 
       # Uncomment the next line to improve performance when using node.

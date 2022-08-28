@@ -13,7 +13,7 @@ toc = true
 top = false
 +++
 
-Browsers have support for client side [validation of form data built in](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation). We can use this along with server side validation to give the user a nice experience and ensure security on the backend.
+Browsers have support for client side [validation of form data built in](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation). We can use this along with server side validation to give the user a nice experience and ensure security on the back end.
 
 
 ## Browser Validation
@@ -56,7 +56,7 @@ let app = Router::new().route("/sign_up", post(accept_form));
 
 ## Handling validation server side
 
-We can use [Validator](https://github.com/Keats/validator) which will allow us to add validation to the strjuct that we use to process form requests.
+We can use [Validator](https://github.com/Keats/validator) which will allow us to add validation to the struct that we use to process form requests.
 
 In your app/Cargo.toml add the following
 
@@ -64,7 +64,7 @@ In your app/Cargo.toml add the following
 validator = { version = "0", features = ["derive"] }
 ```
 
-And then we can chnage our FruitPreferences to
+And then we can change our FruitPreferences to
 
 ```rust
 #[derive(Deserialize, Validate)]

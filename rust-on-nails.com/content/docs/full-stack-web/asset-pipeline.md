@@ -25,7 +25,7 @@ If you look at your `.devcontainer/docker-compose.yml` you'll see a line that is
 #- node_modules:/vscode/node_modules # Set target as a volume for performance. 
 ```
 
-Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performace during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
+Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performance during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
 
 ## Installing Parcel
 
