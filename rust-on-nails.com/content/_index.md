@@ -38,7 +38,7 @@ content = "Leverages your existing knowledge of SQL, Docker, HTML, JS and CSS."
 
 [[extra.list]]
 title = "Type Safety"
-content = "Get less errors in production with type safety form the database to the front end."
+content = "Get less errors in production with type safety from the database to the front end."
 
 [[extra.list]]
 title = "Development Env as Code"
