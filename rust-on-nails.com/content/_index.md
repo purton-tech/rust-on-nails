@@ -7,7 +7,7 @@ title = "A Full Stack Web Architecture for Rust"
 lead = '<b>Rust on Nails</b> is a full stack web architecture for building web products in Rust'
 url = "/docs/ide-setup/introduction/"
 url_button = "Get started"
-repo_version =  "Github 1.0.15"
+repo_version =  "Github 1.0.16"
 repo_license = "Open-source MIT License."
 repo_url = "https://github.com/purton-tech/rust-on-nails"
 
