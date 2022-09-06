@@ -10,6 +10,11 @@ Earthfile
 Mold
 VSCode
 color
+DBMate
+RLS
+Casbin
+Oso
+RBAC
  - _index.md
 url
 ide-setup
@@ -28,6 +33,7 @@ JS
 Env
 devcontainer
 eco
+1.0.16
  - authors/_index.md
 2021-04-01T08
 00
@@ -161,3 +167,11 @@ covenant.org
 0
 code_of_conduct.html
 faq
+ - docs/database-part-1/database-access.md
+55
+sql
+ - docs/database-part-2/_index.md
+70
+ - docs/database-part-2/authorization.md
+user_id
+SystemAdministrator

@@ -17,7 +17,7 @@ top = false
 
 * Postgres supports RLS (Row Level Security) this allows us to implement authorization over our data at the lowest level.
 * Support for unstructured data. Postgres can store and search JSON and other types of data.
-* PostgreSQL has earned a strong reputation for its proven architecture, reliability, data integrity, robust feature set, extensibility, and the dedication of the open source community behind the software to consistently deliver performant and innovative solutions.
+* Postgres has earned a strong reputation for its proven architecture, reliability, data integrity, robust feature set, extensibility, and the dedication of the open source community behind the software to consistently deliver performant and innovative solutions.
 
 ## Test out your Postgres installation
 

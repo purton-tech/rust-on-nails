@@ -13,7 +13,7 @@ toc = true
 top = false
 +++
 
-[Dbmate](https://github.com/amacneil/dbmate) is a database migration tool, to keep your database schema in sync across multiple developers and your production servers. We have pre-installed it in your `devcontainer`
+[DBMate](https://github.com/amacneil/dbmate) is a database migration tool, to keep your database schema in sync across multiple developers and your production servers. We have pre-installed it in your `devcontainer`
 
 After that we can setup our migrations folder and the create a users migration.
 
