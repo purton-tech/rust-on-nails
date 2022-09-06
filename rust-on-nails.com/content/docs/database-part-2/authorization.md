@@ -58,8 +58,7 @@ SELECT * FROM customers WHERE organisation_id = ?
 ```
 
 That's multi tenancy. With Row Level Security we can add this restriction in one place and then all queries to the customer table going forward will have the restriction automatically applied.
-
-That's going to look something like.
+We need to pass the current user_id to Postgres using something like
 
 ```sql
 SET LOCAL row_level_security.user_id = 1234
@@ -73,8 +72,6 @@ USING (
     organisation_id IN (SELECT get_orgs_for_app_user())
 );
 ```
-
-We need to pass the current user_id to Postgres using something like
 
 And then in our app we can shorten our query to
 
