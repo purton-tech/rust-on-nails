@@ -44,6 +44,10 @@ include_content = true
 highlight_code = true
 
 [extra]
+
+# Google anlytics code
+ganalytics = "G-VV6DM0NF2G"
+
 # Put all your custom variables here
 author = "Ian Purton"
 github = "https://github.com/purton-tech/rust-on-nails"
