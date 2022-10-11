@@ -13,29 +13,14 @@ toc = true
 top = false
 +++
 
-[Cornucopia](https://github.com/LouisGariepy/cornucopia) is a code generator that takes small snippets of SQL and turns them into Rust functions.
+[Cornucopia](https://github.com/cornucopia-rs/cornucopia) is a code generator that takes small snippets of SQL and turns them into Rust functions.
 
 ## Installation
 
-Add the following to your `app/Cargo.toml` below the `[dependencies]` 
+Install `cornucopia` into your project.
 
-```toml
-tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
-
-# Used by cornucopia and the main app
-futures = "0.3"
-
-# Access to the database https://github.com/LouisGariepy/cornucopia
-deadpool-postgres = { version = "0", features = ["serde"] }
-#postgres-types = { version = "0", features = ["derive"] }
-tokio-postgres = { version = "0.7", features = [
-    "with-time-0_3",
-] }
-tokio-postgres-rustls = "0"
-time = { version = "0", default-features = false,  features = ["formatting"] }
-cornucopia_client = "0"
-rustls = "0"
-webpki-roots = "0"
+```sh
+cargo add cornucopia_async
 ```
 
 ## Creating a SQL definition
@@ -43,11 +28,11 @@ webpki-roots = "0"
 In a folder called `app/queries` create a file called `fortunes.sql` and add the following content.
 
 ```sql
---! fortunes() { id, message } *
+--! fortunes
 SELECT 
     id, message
 FROM 
-    Fortune
+    Fortune;
 ```
 
 This will generate a function called `fortunes` which will run the SQL query. Note cornucopia checks the query at code generation time against Postgres.
@@ -68,29 +53,22 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn cornucopia() -> Result<(), std::io::Error> {
-    // For the sake of simplicity, this example uses the defaults.
+
     let queries_path = "queries";
-
-    // Again, for simplicity, we generate the module in our project, but
-    // we could've also generated it elsewhere if we wanted to.
-    // For example, you could make the destination the `target` folder
-    // and include the generated file with a `include_str` statement in your project.
-
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let file_path = Path::new(&out_dir).join("cornucopia.rs");
-
     let db_url = env::var_os("DATABASE_URL").unwrap();
 
     // Rerun this build script if the queries or migrations change.
     println!("cargo:rerun-if-changed={queries_path}");
 
-    // Call cornucopia. Use whatever CLI command you need.
     let output = std::process::Command::new("cornucopia")
-        .arg("generate")
+        .arg("-q")
+        .arg(queries_path)
+        .arg("--derive_ser")
         .arg("-d")
-        .arg(file_path)
+        .arg(&file_path)
         .arg("live")
-        .arg("--url")
         .arg(db_url)
         .output()?;
 
@@ -183,6 +161,22 @@ You should now have a folder structure something like this.
 
 ## Calling the Database from main.rs
 
+First add the client side dependecies to our project
+
+```sh
+cargo add tokio_postgres
+cargo add deadpool_postgres
+cargo add tokio_postgres_rustls
+cargo add postgres_types
+cargo add tokio --features macros,rt-multi-thread
+cargo add rustls
+cargo add webpki_roots
+cargo add futures
+cargo add serde --features derive
+```
+
+And then update the `main.rs` so it looks like the following.
+
 ```rust
 mod config;
 
@@ -194,7 +188,11 @@ async fn main() {
 
     let client = pool.get().await.unwrap();
 
-    let fortunes = queries::fortunes::fortunes(&client).await.unwrap();
+    let fortunes = queries::fortunes::fortunes()
+        .bind(&client)
+        .all()
+        .await
+        .unwrap();
 
     dbg!(fortunes);
 }
@@ -202,4 +200,59 @@ async fn main() {
 // Include the generated source code
 include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 
+```
+
+Call `cargo run` and you should see
+
+```sh
+[src/main.rs:13] fortunes = [
+    Fortunes {
+        id: 1,
+        message: "fortune: No such file or directory",
+    },
+    Fortunes {
+        id: 2,
+        message: "A computer scientist is someone who fixes things that aren't broken.",
+    },
+    Fortunes {
+        id: 3,
+        message: "After enough decimal places, nobody gives a damn.",
+    },
+    Fortunes {
+        id: 4,
+        message: "A bad random number generator: 1, 1, 1, 1, 1, 4.33e+67, 1, 1, 1",
+    },
+    Fortunes {
+        id: 5,
+        message: "A computer program does what you tell it to do, not what you want it to do.",
+    },
+    Fortunes {
+        id: 6,
+        message: "Emacs is a nice operating system, but I prefer UNIX. — Tom Christaensen",
+    },
+    Fortunes {
+        id: 7,
+        message: "Any program that runs right is obsolete.",
+    },
+    Fortunes {
+        id: 8,
+        message: "A list is only as strong as its weakest link. — Donald Knuth",
+    },
+    Fortunes {
+        id: 9,
+        message: "Feature: A bug with seniority.",
+    },
+    Fortunes {
+        id: 10,
+        message: "Computers make very fast, very accurate mistakes.",
+    },
+    Fortunes {
+        id: 11,
+        message: "<script>alert(\"This should not be displayed in a browser alert box.\");</script>",
+    },
+    Fortunes {
+        id: 12,
+        message: "フレームワークのベンチマーク",
+    },
+]
 ```
