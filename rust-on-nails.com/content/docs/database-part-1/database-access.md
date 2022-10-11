@@ -161,7 +161,7 @@ You should now have a folder structure something like this.
 
 ## Calling the Database from main.rs
 
-First add the client side dependecies to our project
+First add the client side dependencies to our project
 
 ```sh
 cargo add tokio_postgres
