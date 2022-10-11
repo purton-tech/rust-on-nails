@@ -85,11 +85,10 @@ impl From<deadpool_postgres::PoolError> for CustomError {
 
 ## Install Axum
 
-Add the following to your `app/Cargo.toml`.
+Add Axum to your `Cargo.toml` using the following command.
 
-```toml
-[dependencies]
-axum = "0"
+```sh
+cargo add axum
 ```
 
 And replace your `app/src/main.rs` with the following
@@ -99,9 +98,10 @@ mod config;
 mod errors;
 
 use crate::errors::CustomError;
-use axum::{extract::Extension, response::Html, routing::get, Router};
+use axum::{extract::Extension, response::Json, routing::get, Router};
 use deadpool_postgres::Pool;
 use std::net::SocketAddr;
+use queries::fortunes::Fortunes;
 
 #[tokio::main]
 async fn main() {
@@ -123,14 +123,15 @@ async fn main() {
         .await.unwrap();
 }
 
-async fn fortunes(Extension(pool): Extension<Pool>) -> Result<Html<String>, CustomError> {
+async fn fortunes(Extension(pool): Extension<Pool>) -> Result<Json<Vec<Fortunes>>, CustomError> {
     let client = pool.get().await?;
 
-    let fortunes = queries::fortunes::fortunes(&client).await?;
+    let fortunes = queries::fortunes::fortunes()
+        .bind(&client)
+        .all()
+        .await?;
 
-    let fortunes = format!("{:?}", fortunes);
-
-    Ok(Html(fortunes))
+    Ok(Json(fortunes))
 }
 
 // Include the generated source code
