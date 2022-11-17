@@ -58,7 +58,6 @@ RUN apt-get update \
         gnupg \
         software-properties-common \
     #
-    #
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
