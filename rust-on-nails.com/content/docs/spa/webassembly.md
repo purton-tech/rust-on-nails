@@ -6,7 +6,7 @@ updated = 2021-05-01T08:00:00+00:00
 draft = false
 weight = 30
 sort_by = "weight"
-template = "docs/page.html"
+
 
 [extra]
 toc = true

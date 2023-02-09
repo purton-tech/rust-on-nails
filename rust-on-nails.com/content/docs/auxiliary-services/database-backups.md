@@ -6,7 +6,7 @@ updated = 2021-05-01T08:00:00+00:00
 draft = false
 weight = 140
 sort_by = "weight"
-template = "docs/page.html"
+
 
 [extra]
 lead = 'Ideally we want to take regular backups of our database and also make those backups off site. We can achieve this by using a backup service. This is how we set it up.'

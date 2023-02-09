@@ -6,7 +6,7 @@ updated = 2021-05-01T08:00:00+00:00
 draft = false
 weight = 55
 sort_by = "weight"
-template = "docs/page.html"
+
 
 [extra]
 toc = true
@@ -25,21 +25,42 @@ cargo add cornucopia_async
 
 ## Creating a SQL definition
 
-In a folder called `app/queries` create a file called `fortunes.sql` and add the following content.
+In a folder called `db/queries` create a file called `organisations.sql` and add the following content.
 
 ```sql
---! fortunes
+--: User(first_name?, last_name?)
+
+--! get_users : User
 SELECT 
-    id, message
+    u.id, 
+    ou.organisation_id, 
+    u.email, 
+    u.first_name,
+    u.last_name,
+    u.ecdh_public_key, 
+    ou.roles
 FROM 
-    Fortune;
+    organisation_users ou
+LEFT JOIN users u ON u.id = ou.user_id
+WHERE
+    ou.organisation_id = :organisation_id;
 ```
 
-This will generate a function called `fortunes` which will run the SQL query. Note cornucopia checks the query at code generation time against Postgres.
+Cornucopia will use the above definition to generata a Rust function called `get_users` to access the database. Note cornucopia checks the query at code generation time against Postgres.
+
+## Turning our `db` folder into a crate.
+
+We can turn out `db` folder into a rust crate. This is a separate compilation unit which will help both spee up compile times and also enforce a nice separation of copncerns.
+
+From within the db folder run
+
+```
+cargo init --lib --force
+```
 
 ## Updating build.rs
 
-Create a `app/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they change.
+Create a `db/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they change.
 
 ```rust
 use std::env;
@@ -83,59 +104,46 @@ fn cornucopia() -> Result<(), std::io::Error> {
 
 ## Updating our config handling
 
-Add the following code to `app/src/config.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
+Add the following code to `db/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
 
 ```rust
-use std::env;
 use std::str::FromStr;
 
-#[derive(Clone, Debug)]
-pub struct Config {
-    pub database_url: String,
+pub use deadpool_postgres::{Pool, Transaction, PoolError};
+pub use tokio_postgres::Error as TokioPostgresError;
+pub use cornucopia_async::Params;
+
+pub use queries::organisations::Organisation;
+
+pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
+    let config = tokio_postgres::Config::from_str(database_url).unwrap();
+
+    let manager = if database_url.contains("sslmode=require") {
+        let mut root_store = rustls::RootCertStore::empty();
+        root_store.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(
+            |ta| {
+                rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
+                    ta.subject,
+                    ta.spki,
+                    ta.name_constraints,
+                )
+            },
+        ));
+
+        let tls_config = rustls::ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(root_store)
+            .with_no_client_auth();
+        let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
+        deadpool_postgres::Manager::new(config, tls)
+    } else {
+        deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
+    };
+
+    deadpool_postgres::Pool::builder(manager).build().unwrap()
 }
 
-impl Config {
-    pub fn new() -> Config {
-
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
-
-        Config {
-            database_url,
-        }
-    }
-
-    pub fn create_pool(&self) -> deadpool_postgres::Pool {
-    
-        let config = tokio_postgres::Config::from_str(&self.database_url).unwrap();
-    
-        let manager = if self.database_url.contains("sslmode=require") {
-            let mut root_store = rustls::RootCertStore::empty();
-            root_store.add_server_trust_anchors(
-                webpki_roots::TLS_SERVER_ROOTS
-                    .0
-                    .iter()
-                    .map(|ta| {
-                        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-                            ta.subject,
-                            ta.spki,
-                            ta.name_constraints,
-                        )
-                    })
-            );
-    
-            let tls_config = rustls::ClientConfig::builder()
-                .with_safe_defaults()
-                .with_root_certificates(root_store)
-                .with_no_client_auth();
-            let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
-            deadpool_postgres::Manager::new(config, tls)
-        } else {
-            deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
-        };
-    
-        deadpool_postgres::Pool::builder(manager).build().unwrap()
-    }
-}
+include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 ```
 
 ## Folder Structure
@@ -147,14 +155,17 @@ You should now have a folder structure something like this.
 ├── .devcontainer/
 │   └── ...
 ├── app
-│   ├── queries/
-│   │   └── fortunes.sql
 │   ├── src/
 │   │   ├── main.rs
 │   │   └── config.rs
 │   ├── build.rs
 ├── db/
-│   └── ...
+│   ├── migrations/
+│   │   └── organisations.sql
+│   ├── queries/
+│   │   └── fortunes.sql
+│   ├── build.rs
+│   └── lib.rs
 ├── Cargo.toml
 └── Cargo.lock
 ```
