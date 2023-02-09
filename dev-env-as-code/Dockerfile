@@ -18,10 +18,10 @@ RUN cargo install cargo-chef --locked
 
 FROM rust:slim
 
-ARG CLOAK_VERSION=1.17.7
-ARG DBMATE_VERSION=1.15.0
-ARG MOLD_VERSION=1.4.2
-ARG EARTHLY_VERSION=0.6.23
+ARG CLOAK_VERSION=1.17.15
+ARG DBMATE_VERSION=1.16.0
+ARG MOLD_VERSION=1.7.0
+ARG EARTHLY_VERSION=0.6.29
 ARG DOCKER_COMPOSE_VERSION=1.29.2
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
@@ -57,7 +57,6 @@ RUN apt-get update \
         gnupg-agent \
         gnupg \
         software-properties-common \
-    #
     #
     # Clean up
     && apt-get autoremove -y \

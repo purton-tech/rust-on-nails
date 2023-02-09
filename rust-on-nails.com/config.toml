@@ -46,11 +46,9 @@ github_repo = "https://github.com/purton-tech/cloak"
 resources_1 = [
     {name = "Blog", url = "/blog"},
     {name = "Documentation", url = "/documentation"},
-    {name = "FAQ", url = "/blog"},
 ]
 
 resources_2 = [
-    {name = "Pricing", url = "/pricing"},
     {name = "Mission", url = "/blog"},
     {name = "Careers", url = "/blog"},
 ]
