@@ -23,23 +23,17 @@ highlight_themes_css = [
 # Put all your custom variables here
 #ga_analytics = "G-NSK5LPX8EN"
 
-goat_counter = "https://cloak.goatcounter.com/count"
+goat_counter = "https://rust-on-nails.goatcounter.com/count"
 
 first_doc_page = "/docs/ide-setup/introduction/"
 
 copyright = "Copyright 2021 - 2023"
 
 # Every page CTA. At the bottom of every blog post we have a cta
-every_page_cta = { title = "It takes 30 seconds to sign up for our free plan", cta_button = "Sign Up" }
+every_page_cta = { cta_url = "/docs/ide-setup/introduction/", title = "Take a look at our architecture", cta_button = "Get Started" }
 
 # On the footer we have a signup button and a call to action, set the text here
-footer_cta = { title = "Sign Up for Free", prompt = "Take control of your application config and secrets", cta_button = "Check it Out" }
-
-# Where shall we point the sign in and sign up buttons.
-authentication = { sign_up = "https://app.cloak.software/auth/sign_up", sign_in = "https://app.cloak.software/auth/sign_in" }
-# When running on localhost you can set the sign up and sign links to somewhere else.
-localhost = "http://localhost:7104"
-authentication_development = { sign_up = "/auth/sign_up", sign_in = "/auth/sign_in" }
+footer_cta = { cta_url = "/docs/ide-setup/introduction/", title = "Get Started", prompt = "Take control of your application config and secrets", cta_button = "Check it Out" }
 
 # Information required by terms and privacy pages.
 support_email = "support@cloak.software"
@@ -70,5 +64,5 @@ doc_sections = [
 ]
 
 # Blog tile and subtitle
-blog_title = "The Cloak Blog"
-blog_subtitle = "Defence in Depth For Full Stack Web Applications"
+blog_title = "Rust on Nails"
+blog_subtitle = "Updates and advice on product development"
