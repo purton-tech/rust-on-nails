@@ -106,15 +106,15 @@ We are going to create a workspace for our web application. Create a new `Cargo.
 ```toml
 [workspace]
 members = [
-    "app",
+    "crates/axum-server",
 ]
 ```
 
 Open up the terminal in VSCode again and run the following
 
 ```
-$ cargo new app
-     Created binary (application) `app` package
+$ cargo new crates/actix-server
+     Created binary (application) `crates/axum-server` package
 ```
 
 You should now have a folder structure like the following.
@@ -122,10 +122,10 @@ You should now have a folder structure like the following.
 ```sh
 ├── .devcontainer/
 │   └── ...
-└── app/
-│   ├──src/
-│   │  └── main.rs
-│   └── Cargo.toml
+└── crates/
+│         axum-server/
+│         │  └── main.rs
+│         └── Cargo.toml
 ├── Cargo.toml
 └── Cargo.lock
 ```

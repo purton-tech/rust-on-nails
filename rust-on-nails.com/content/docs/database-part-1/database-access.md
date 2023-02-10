@@ -15,11 +15,31 @@ top = false
 
 [Cornucopia](https://github.com/cornucopia-rs/cornucopia) is a code generator that takes small snippets of SQL and turns them into Rust functions.
 
-## Installation
+We'll trun our `crates/db` folder into a crate so we can keep all our database logic in one place.
 
-Install `cornucopia` into your project.
+Edit your `Cargo.toml` so it now looks like.
+
+```toml
+[workspace]
+members = [
+    "crates/actix-server",
+    "crates/db",
+]
+```
+
+and run 
 
 ```sh
+$ cargo init --lib crates/db
+Created library package
+```
+
+## Installation
+
+Install `cornucopia` into your project `cd` into your `crates/db` folder.
+
+```sh
+cd crates/db
 cargo add cornucopia_async
 ```
 
@@ -48,19 +68,9 @@ WHERE
 
 Cornucopia will use the above definition to generata a Rust function called `get_users` to access the database. Note cornucopia checks the query at code generation time against Postgres.
 
-## Turning our `db` folder into a crate.
-
-We can turn out `db` folder into a rust crate. This is a separate compilation unit which will help both spee up compile times and also enforce a nice separation of copncerns.
-
-From within the db folder run
-
-```
-cargo init --lib --force
-```
-
 ## Updating build.rs
 
-Create a `db/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they change.
+Create a `crates/db/build.rs` file and add the following content. This file we compile our .sql files into rust code whenever they change.
 
 ```rust
 use std::env;
@@ -104,7 +114,7 @@ fn cornucopia() -> Result<(), std::io::Error> {
 
 ## Updating our config handling
 
-Add the following code to `db/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
+Add the following code to `crates/db/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
 
 ```rust
 use std::str::FromStr;

@@ -20,8 +20,8 @@ After that we can setup our migrations folder and the create a users migration.
 ## Create a Migration
 
 ```
-$ dbmate new initial_tables
-Creating migration: db/migrations/20220330110026_initial_tables.sql
+$ dbmate -d crates/db/migrations new initial_tables
+Creating migration: crates/db/migrations/20220330110026_initial_tables.sql
 ```
 
 Edit the SQL file that was generated for you and add the following.
@@ -71,7 +71,7 @@ DROP TABLE sessions;
 List the migrations so we can see which have run.
 
 ```
-$ dbmate status
+$ dbmate -d crates/db/migrations status
 [ ] 20220330110026_initial_tables.sql
 
 Applied: 0
@@ -81,7 +81,7 @@ Pending: 1
 Run our new migration.
 
 ```
-$ dbmate up
+$ dbmate -d crates/db/migrations  up
 Applying: 20220330110026_initial_tables.sql
 ```
 
@@ -98,15 +98,16 @@ $ psql $DATABASE_URL -c 'SELECT count(*) FROM Fortune;'
 Your project folders should now look like this.
 
 ```sh
-.
 ├── .devcontainer/
 │   └── ...
-├── app/
-│   └── ...
-├── db/
-│   ├── migrations
-│   │   └── 20220330110026_initial_tables.sql
-│   └── schema.sql
+└── crates/
+│         axum-server/
+│         │  └── main.rs
+│         └── Cargo.toml
+│         db/
+│         ├── migrations
+│         │   └── 20220330110026_initial_tables.sql
+│         └── schema.sql
 ├── Cargo.toml
 └── Cargo.lock
 ```
