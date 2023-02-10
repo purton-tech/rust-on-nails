@@ -16,6 +16,7 @@ alias zs='zola serve --interface 0.0.0.0'
 alias nrs='npm run start'
 
 # Database
+alias dbmate='dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations'
 alias db='psql $DATABASE_URL'
 
 # Spellcheck
