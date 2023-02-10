@@ -20,8 +20,8 @@ After that we can setup our migrations folder and the create a users migration.
 ## Create a Migration
 
 ```
-$ dbmate -d crates/db/migrations new initial_tables
-Creating migration: crates/db/migrations/20220330110026_initial_tables.sql
+$ dbmate new user_tables
+Creating migration: crates/db/migrations/20220330110026_user_tables.sql
 ```
 
 Edit the SQL file that was generated for you and add the following.
@@ -32,15 +32,17 @@ Edit the SQL file that was generated for you and add the following.
 CREATE TABLE users (
     id SERIAL PRIMARY KEY, 
     email VARCHAR NOT NULL UNIQUE, 
-    first_name VARCHAR, 
-    last_name VARCHAR, 
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    hashed_password VARCHAR NOT NULL, 
+    reset_password_selector VARCHAR,
+    reset_password_sent_at TIMESTAMP,
+    reset_password_validator_hash VARCHAR,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-COMMENT ON TABLE users IS 'Contains users and their private and public keys';
-COMMENT ON COLUMN users.first_name IS 'The first name, not captured on registration for faster on boarding.';
-COMMENT ON COLUMN users.last_name IS 'The last name, not captured on registration for faster on boarding.';
+INSERT INTO users(email, hashed_password) VALUES('test1@test1.com', 'aasdsaddasad');
+INSERT INTO users(email, hashed_password) VALUES('test2@test1.com', 'aasdsaddasad');
+INSERT INTO users(email, hashed_password) VALUES('test3@test1.com', 'aasdsaddasad');
 
 CREATE TABLE sessions (
     id SERIAL PRIMARY KEY, 
@@ -71,8 +73,8 @@ DROP TABLE sessions;
 List the migrations so we can see which have run.
 
 ```
-$ dbmate -d crates/db/migrations status
-[ ] 20220330110026_initial_tables.sql
+$ dbmate status
+[ ] 20220330110026_user_tables.sql
 
 Applied: 0
 Pending: 1
@@ -81,17 +83,17 @@ Pending: 1
 Run our new migration.
 
 ```
-$ dbmate -d crates/db/migrations  up
-Applying: 20220330110026_initial_tables.sql
+$ dbmate up
+Applying: 20220330110026_user_tables.sql
 ```
 
 And check that it worked.
 
 ```
-$ psql $DATABASE_URL -c 'SELECT count(*) FROM Fortune;'
+$ psql $DATABASE_URL -c 'SELECT count(*) FROM users;'
  count 
 -------
-     12
+      0
 (1 row)
 ```
 
@@ -106,7 +108,7 @@ Your project folders should now look like this.
 │         └── Cargo.toml
 │         db/
 │         ├── migrations
-│         │   └── 20220330110026_initial_tables.sql
+│         │   └── 20220330110026_user_tables.sql
 │         └── schema.sql
 ├── Cargo.toml
 └── Cargo.lock

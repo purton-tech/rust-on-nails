@@ -45,25 +45,16 @@ cargo add cornucopia_async
 
 ## Creating a SQL definition
 
-In a folder called `db/queries` create a file called `organisations.sql` and add the following content.
+In a folder called `db/queries` create a file called `users.sql` and add the following content.
 
 ```sql
---: User(first_name?, last_name?)
+--: User()
 
 --! get_users : User
 SELECT 
-    u.id, 
-    ou.organisation_id, 
-    u.email, 
-    u.first_name,
-    u.last_name,
-    u.ecdh_public_key, 
-    ou.roles
-FROM 
-    organisation_users ou
-LEFT JOIN users u ON u.id = ou.user_id
-WHERE
-    ou.organisation_id = :organisation_id;
+    id, 
+    email
+FROM users;
 ```
 
 Cornucopia will use the above definition to generata a Rust function called `get_users` to access the database. Note cornucopia checks the query at code generation time against Postgres.
@@ -76,45 +67,49 @@ Create a `crates/db/build.rs` file and add the following content. This file we c
 use std::env;
 use std::path::Path;
 
-fn main() -> Result<(), std::io::Error> {
-
-    cornucopia()?;
-
-    Ok(())
+fn main() {
+    // Compile our SQL
+    cornucopia();
 }
 
-fn cornucopia() -> Result<(), std::io::Error> {
-
+fn cornucopia() {
+    // For the sake of simplicity, this example uses the defaults.
     let queries_path = "queries";
+
+    // Again, for simplicity, we generate the module in our project, but
+    // we could've also generated it elsewhere if we wanted to.
+    // For example, you could make the destination the `target` folder
+    // and include the generated file with a `include_str` statement in your project.
+
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let file_path = Path::new(&out_dir).join("cornucopia.rs");
+
     let db_url = env::var_os("DATABASE_URL").unwrap();
 
     // Rerun this build script if the queries or migrations change.
     println!("cargo:rerun-if-changed={queries_path}");
 
+    // Call cornucopia. Use whatever CLI command you need.
     let output = std::process::Command::new("cornucopia")
         .arg("-q")
         .arg(queries_path)
-        .arg("--derive_ser")
         .arg("-d")
         .arg(&file_path)
         .arg("live")
         .arg(db_url)
-        .output()?;
+        .output()
+        .unwrap();
 
     // If Cornucopia couldn't run properly, try to display the error.
     if !output.status.success() {
         panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
     }
-
-    Ok(())
 }
 ```
 
-## Updating our config handling
+## Add a function to do connection pooling
 
-Add the following code to `crates/db/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
+Add the following code to `crates/db/src/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
 
 ```rust
 use std::str::FromStr;
@@ -123,7 +118,7 @@ pub use deadpool_postgres::{Pool, Transaction, PoolError};
 pub use tokio_postgres::Error as TokioPostgresError;
 pub use cornucopia_async::Params;
 
-pub use queries::organisations::Organisation;
+pub use queries::users::User;
 
 pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
     let config = tokio_postgres::Config::from_str(database_url).unwrap();
@@ -164,23 +159,25 @@ You should now have a folder structure something like this.
 .
 ├── .devcontainer/
 │   └── ...
-├── app
-│   ├── src/
-│   │   ├── main.rs
-│   │   └── config.rs
-│   ├── build.rs
-├── db/
-│   ├── migrations/
-│   │   └── organisations.sql
-│   ├── queries/
-│   │   └── fortunes.sql
-│   ├── build.rs
-│   └── lib.rs
+└── crates/
+│         axum-server/
+│         │  └── main.rs
+│         └── Cargo.toml
+│         db/
+│         ├── migrations
+│         │   └── 20220330110026_user_tables.sql
+│         ├── queries
+│         │   └── users.sql
+│         ├── src
+│         │   └── lib.rs
+│         └── build.rs
 ├── Cargo.toml
 └── Cargo.lock
 ```
 
-## Calling the Database from main.rs
+## Testing our database crate
+
+Make sure you're in the `crates/db` folder.
 
 First add the client side dependencies to our project
 
@@ -196,84 +193,56 @@ cargo add futures
 cargo add serde --features derive
 ```
 
-And then update the `main.rs` so it looks like the following.
-
-```rust
-mod config;
-
-#[tokio::main]
-async fn main() {
-    let config = config::Config::new();
-
-    let pool = config.create_pool();
-
-    let client = pool.get().await.unwrap();
-
-    let fortunes = queries::fortunes::fortunes()
-        .bind(&client)
-        .all()
-        .await
-        .unwrap();
-
-    dbg!(fortunes);
-}
-
-// Include the generated source code
-include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
-
-```
-
-Call `cargo run` and you should see
+Make sure everything builds.
 
 ```sh
-[src/main.rs:13] fortunes = [
-    Fortunes {
+cargo build
+```
+
+Add the following code to the bottom of your `crates/db/src/lib.rs`.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[tokio::test]
+    async fn load_users() {
+
+        let db_url = std::env::var("DATABASE_URL").unwrap();
+        let pool = create_pool(&db_url);
+
+        let client = pool.get().await.unwrap();
+    
+        let users = crate::queries::users::get_users()
+            .bind(&client)
+            .all()
+            .await
+            .unwrap();
+    
+        dbg!(users);
+    }
+}
+```
+
+Run `cargo test -- --nocapture` and you should see
+
+```sh
+Running unittests src/lib.rs (/workspace/target/debug/deps/db-1a59f4c51c8578ce)
+
+running 1 test
+[crates/db/src/lib.rs:56] users = [
+    User {
         id: 1,
-        message: "fortune: No such file or directory",
+        email: "test1@test1.com",
     },
-    Fortunes {
+    User {
         id: 2,
-        message: "A computer scientist is someone who fixes things that aren't broken.",
+        email: "test2@test1.com",
     },
-    Fortunes {
+    User {
         id: 3,
-        message: "After enough decimal places, nobody gives a damn.",
-    },
-    Fortunes {
-        id: 4,
-        message: "A bad random number generator: 1, 1, 1, 1, 1, 4.33e+67, 1, 1, 1",
-    },
-    Fortunes {
-        id: 5,
-        message: "A computer program does what you tell it to do, not what you want it to do.",
-    },
-    Fortunes {
-        id: 6,
-        message: "Emacs is a nice operating system, but I prefer UNIX. — Tom Christaensen",
-    },
-    Fortunes {
-        id: 7,
-        message: "Any program that runs right is obsolete.",
-    },
-    Fortunes {
-        id: 8,
-        message: "A list is only as strong as its weakest link. — Donald Knuth",
-    },
-    Fortunes {
-        id: 9,
-        message: "Feature: A bug with seniority.",
-    },
-    Fortunes {
-        id: 10,
-        message: "Computers make very fast, very accurate mistakes.",
-    },
-    Fortunes {
-        id: 11,
-        message: "<script>alert(\"This should not be displayed in a browser alert box.\");</script>",
-    },
-    Fortunes {
-        id: 12,
-        message: "フレームワークのベンチマーク",
+        email: "test3@test1.com",
     },
 ]
+test tests::load_users ... ok
 ```
