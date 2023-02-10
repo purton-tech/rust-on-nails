@@ -169,6 +169,6 @@ Issue the following command in your `app` folder.
 cw
 ```
 
-And you should be able to point your browser at `http://localhost:3000` and see the web server deliver a plain text list of fortunes.
+And you should be able to point your browser at `http://localhost:3000` and see the web server deliver a plain text list of users.
 
 ![Users](/axum-screenshot.png)
