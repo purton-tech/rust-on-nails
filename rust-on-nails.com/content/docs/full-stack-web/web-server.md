@@ -52,6 +52,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use std::fmt;
+use db::{TokioPostgresError, PoolError};
 
 #[derive(Debug)]
 pub enum CustomError {
@@ -90,18 +91,17 @@ impl From<axum::http::uri::InvalidUri> for CustomError {
     }
 }
 
-impl From<tokio_postgres::Error> for CustomError {
-    fn from(err: tokio_postgres::Error) -> CustomError {
+impl From<TokioPostgresError> for CustomError {
+    fn from(err: TokioPostgresError) -> CustomError {
         CustomError::Database(err.to_string())
     }
 }
 
-impl From<deadpool_postgres::PoolError> for CustomError {
-    fn from(err: deadpool_postgres::PoolError) -> CustomError {
+impl From<PoolError> for CustomError {
+    fn from(err: PoolError) -> CustomError {
         CustomError::Database(err.to_string())
     }
 }
-
 ```
 
 ## Install Axum

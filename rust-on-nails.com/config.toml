@@ -33,14 +33,14 @@ copyright = "Copyright 2021 - 2023"
 every_page_cta = { cta_url = "/docs/ide-setup/introduction/", title = "Take a look at our architecture", cta_button = "Get Started" }
 
 # On the footer we have a signup button and a call to action, set the text here
-footer_cta = { cta_url = "/docs/ide-setup/introduction/", title = "Get Started", prompt = "Take control of your application config and secrets", cta_button = "Check it Out" }
+footer_cta = { cta_url = "/docs/ide-setup/introduction/", title = "Get Started", prompt = "Learn Something New", cta_button = "Check it Out" }
 
 # Information required by terms and privacy pages.
 support_email = "support@cloak.software"
 company_address = "71-75 Shelton Street, London, LND, WC2H 9JQ, United Kingdom"
 
 # Social icons (shown on the footer)
-github_repo = "https://github.com/purton-tech/cloak"
+github_repo = "https://github.com/purton-tech/rust-on-nails"
 
 # Resources on the footer (LHS)
 resources_1 = [
