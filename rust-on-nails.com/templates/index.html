@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content d-flex flex-content-center flex-column mt-4 mt-md-12 text-center">
+  <h1 class="h3-mktg mb-4">A guide to full stack web development in Rust</h1>
+  <h2 class="h6-mktg color-fg-muted mb-4">Super fast secure applications in a language you love</h2>
+  <div class="mb-4">
+    <a class="btn-mktg mr-1" href="{{config.extra.every_page_cta.cta_url}}">Get Started</a>
+  </div>
+  <div class="border-left border-right border-top">
+    <img alt="Your on Nails" src="yay-your-on-nails.png"></img>
+  </div>
+</section>
+
+<section class="text-center color-bg-accent-emphasis p-4">
+  <h3 class="color-fg-on-emphasis">Developed by The Digital Agency @ Airbus Innovations</h3>
+  <div class="d-flex flex-content-center flex-justify-center pt-4">
+    <img class="mr-3" width="200" alt="Airbus Logo" src="airbus-logo.svg"></img>
+  </div>
+</section>
+
+<section>
+  <div class="content d-md-flex flex-row pt-12 pb-6">
+    <div class="col-md-6 pr-4">
+      <h2 class="h5-mktg mb-6">Code generate your data access layer</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">We use Cornucopia to Generate type-checked Rust from your PostgreSQL.</h4>
+    </div>
+    <img class="col-md-6 ml-4 color-shadow-large" alt="Cream" src="cornucopia.png"></img>
+  </div>
+</section>
+
+<section>
+  <div class="content d-md-flex flex-row pt-6 pb-6">
+    <img class="col-md-6 mr-4 color-shadow-large" alt="Cream" src="dioxus.png"></img>
+    <div class="col-md-6 pl-4">
+      <h2 class="h5-mktg mb-6">Server side rendered components</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">
+        Better than templates, build your server side code out of re-usable UI components.
+      </h4>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="content d-md-flex flex-row pt-6 pb-12">
+    <div class="col-md-6 pr-4">
+      <h2 class="h5-mktg mb-6">Progressive enhancement using Web Components</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">
+        Only write Typescript when you really need to.
+      </h4>
+    </div>
+    <img class="col-md-6 ml-4 color-shadow-large" alt="Cream" src="web-components.png"></img>
+  </div>
+</section>
+
+<section class="color-bg-success p-6">
+  <h2 class="text-center mb-4 h5-mktg">Features</h2>
+  <div class="container-lg clearfix">
+    <div class="col-sm-12 col-md-6 float-left p-4">
+      <h4 class="h5-mktg">Super fast page loads</h4>
+      <p class="mt-3">Most of our pages come in a just a few kb's</p>
+      <p>This means fast page loads and better SEO.</p>
+    </div>
+    <div class="col-sm-12 col-md-6 float-left p-4">
+      <h4 class="h5-mktg">Configurable</h4>
+      <p class="mt-3">All colours are configurable with CSS variables.</p>
+      <p>The landing pahe is HTML and can be built exactly how you want it.</p>
+    </div>
+    <div class="col-sm-12 col-md-6 float-left p-4">
+      <h4 class="h5-mktg">Blog built with Markdown</h4>
+      <p class="mt-3">Create pages quickly and add them to your git workflow.</p>
+      <p>A blog is essential in the modern day to attract a constant stream of traffic.</p>
+    </div>
+    <div class="col-sm-12 col-md-6 float-left p-4">
+      <h4 class="h5-mktg">Pre-populated privacy and terms</h4>
+      <p class="mt-3">No one reads them anyway so why waste time. Use our preconfigured pages.</p>
+      <p>You can set the product name and configure the product real world address. </p>
+    </div>
+  </div>
+</section>
+
+{% if config.extra.footer_cta %}
+<section class="d-flex flex-content-center flex-column mt-8 mb-8 text-center pl-1 pr-1">
+  <h3 class="mb-3">{{config.extra.every_page_cta.title}}</h3>
+  {% if config.extra.every_page_cta.cta_url %}
+  <p><a class="btn-mktg"
+      href="{{config.extra.every_page_cta.cta_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  {% else %}
+  <p><a class="btn-mktg" href="{{sign_up_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock content %}

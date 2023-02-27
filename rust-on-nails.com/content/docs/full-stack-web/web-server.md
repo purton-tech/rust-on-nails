@@ -6,7 +6,7 @@ updated = 2021-05-01T08:00:00+00:00
 draft = false
 weight = 30
 sort_by = "weight"
-template = "docs/page.html"
+
 
 [extra]
 toc = true
@@ -19,11 +19,32 @@ Most rust web server projects operate in a similar way. That is you configure a 
 
 The functions that respond to routes can have parameters. These parameters which might be `structs`, database pools or form data are passed to the function by the framework. 
 
+## Handling Configuration
+
+We'll separate our configuartion into it's own file. create `crates/axum-server/src/config.rs`
+
+```rust
+#[derive(Clone, Debug)]
+pub struct Config {
+    pub database_url: String,
+}
+
+impl Config {
+    pub fn new() -> Config {
+        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
+
+        Config {
+            database_url,
+        }
+    }
+}
+```
+
 ## Handling Errors
 
 Now is a good time to think about how we will handle errors so we don't have to `unwrap` all the time.
 
-Create a file called `app/src/errors.rs` and add the following code.
+Create a file called `crates/axum-server/src/errors.rs` and add the following code.
 
 ```rust
 use axum::{
@@ -31,6 +52,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use std::fmt;
+use db::{TokioPostgresError, PoolError};
 
 #[derive(Debug)]
 pub enum CustomError {
@@ -69,29 +91,30 @@ impl From<axum::http::uri::InvalidUri> for CustomError {
     }
 }
 
-impl From<tokio_postgres::Error> for CustomError {
-    fn from(err: tokio_postgres::Error) -> CustomError {
+impl From<TokioPostgresError> for CustomError {
+    fn from(err: TokioPostgresError) -> CustomError {
         CustomError::Database(err.to_string())
     }
 }
 
-impl From<deadpool_postgres::PoolError> for CustomError {
-    fn from(err: deadpool_postgres::PoolError) -> CustomError {
+impl From<PoolError> for CustomError {
+    fn from(err: PoolError) -> CustomError {
         CustomError::Database(err.to_string())
     }
 }
-
 ```
 
 ## Install Axum
 
-Add Axum to your `Cargo.toml` using the following command.
+Make sure you're in the `crates/axum-server` folder and add Axum to your `Cargo.toml` using the following command.
 
 ```sh
 cargo add axum
+cargo add tokio --no-default-features -F tokio/macros,tokio/fs,tokio/rt-multi-thread
+cargo add --path ../db
 ```
 
-And replace your `app/src/main.rs` with the following
+And replace your `crates/axum-server/src/main.rs` with the following
 
 ```rust
 mod config;
@@ -99,19 +122,18 @@ mod errors;
 
 use crate::errors::CustomError;
 use axum::{extract::Extension, response::Json, routing::get, Router};
-use deadpool_postgres::Pool;
 use std::net::SocketAddr;
-use queries::fortunes::Fortunes;
+use db::User;
 
 #[tokio::main]
 async fn main() {
     let config = config::Config::new();
 
-    let pool = config.create_pool();
+    let pool = db::create_pool(&config.database_url);
 
     // build our application with a route
     let app = Router::new()
-        .route("/", get(fortunes))
+        .route("/", get(users))
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
 
@@ -123,26 +145,23 @@ async fn main() {
         .await.unwrap();
 }
 
-async fn fortunes(Extension(pool): Extension<Pool>) -> Result<Json<Vec<Fortunes>>, CustomError> {
+async fn users(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<User>>, CustomError> {
     let client = pool.get().await?;
 
-    let fortunes = queries::fortunes::fortunes()
+    let users = db::queries::users::get_users()
         .bind(&client)
         .all()
         .await?;
 
-    Ok(Json(fortunes))
+    Ok(Json(users))
 }
-
-// Include the generated source code
-include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 ```
 
 ## Watch the Server
 
 We could use `cargo run` to start our server but Rust on Nails comes with a built in alias that will watch your code for changes and restart your server.
 
-It also uses a very fast linker called (Mold)[https://github.com/rui314/mold] to speed up our incremental build times.
+It also uses a very fast linker called [Mold](https://github.com/rui314/mold) to speed up our incremental build times.
 
 Issue the following command in your `app` folder.
 
@@ -150,6 +169,6 @@ Issue the following command in your `app` folder.
 cw
 ```
 
-And you should be able to point your browser at `http://localhost:3000` and see the web server deliver a plain text list of fortunes.
+And you should be able to point your browser at `http://localhost:3000` and see the web server deliver a plain text list of users.
 
-![Fortunes](/plain-text.png)
+![Users](/axum-screenshot.png)

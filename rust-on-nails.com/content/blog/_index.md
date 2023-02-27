@@ -1,7 +1,9 @@
 +++
-title = "Blog"
-description = "Blog"
+title = "Blog Posts"
 sort_by = "date"
-paginate_by = 2
-template = "blog/section.html"
+template = "blog.html"
+page_template = "blog-page.html"
+
+[extra]
+class_name = "blog"
 +++

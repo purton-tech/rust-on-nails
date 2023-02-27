@@ -16,4 +16,5 @@ alias cw='mold -run cargo watch --no-gitignore -i "*.scss" -i "*.ts" -i node_mod
 alias nrs='npm run start'
 
 # Database
+alias dbmate='dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations'
 alias db='psql $DATABASE_URL'

@@ -6,7 +6,7 @@ updated = 2021-05-01T08:00:00+00:00
 draft = false
 weight = 50
 sort_by = "weight"
-template = "docs/page.html"
+
 
 [extra]
 toc = true
@@ -20,45 +20,52 @@ After that we can setup our migrations folder and the create a users migration.
 ## Create a Migration
 
 ```
-$ dbmate new initial_tables
-Creating migration: db/migrations/20220330110026_initial_tables.sql
+$ dbmate new user_tables
+Creating migration: crates/db/migrations/20220330110026_user_tables.sql
 ```
 
 Edit the SQL file that was generated for you and add the following.
 
 ```sql
 -- migrate:up
-CREATE TABLE  World (
-  id integer NOT NULL,
-  randomNumber integer NOT NULL default 0,
-  PRIMARY KEY  (id)
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY, 
+    email VARCHAR NOT NULL UNIQUE, 
+    hashed_password VARCHAR NOT NULL, 
+    reset_password_selector VARCHAR,
+    reset_password_sent_at TIMESTAMP,
+    reset_password_validator_hash VARCHAR,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO World (id, randomnumber)
-SELECT x.id, least(floor(random() * 10000 + 1), 10000) FROM generate_series(1,10000) as x(id);
+INSERT INTO users(email, hashed_password) VALUES('test1@test1.com', 'aasdsaddasad');
+INSERT INTO users(email, hashed_password) VALUES('test2@test1.com', 'aasdsaddasad');
+INSERT INTO users(email, hashed_password) VALUES('test3@test1.com', 'aasdsaddasad');
 
-CREATE TABLE Fortune (
-  id integer NOT NULL,
-  message varchar(2048) NOT NULL,
-  PRIMARY KEY  (id)
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY, 
+    session_verifier VARCHAR NOT NULL, 
+    user_id INT NOT NULL, 
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    otp_code_encrypted VARCHAR NOT NULL,
+    otp_code_attempts INTEGER NOT NULL DEFAULT 0,
+    otp_code_confirmed BOOLEAN NOT NULL DEFAULT false,
+    otp_code_sent BOOLEAN NOT NULL DEFAULT false
 );
 
-INSERT INTO Fortune (id, message) VALUES (1, 'fortune: No such file or directory');
-INSERT INTO Fortune (id, message) VALUES (2, 'A computer scientist is someone who fixes things that aren''t broken.');
-INSERT INTO Fortune (id, message) VALUES (3, 'After enough decimal places, nobody gives a damn.');
-INSERT INTO Fortune (id, message) VALUES (4, 'A bad random number generator: 1, 1, 1, 1, 1, 4.33e+67, 1, 1, 1');
-INSERT INTO Fortune (id, message) VALUES (5, 'A computer program does what you tell it to do, not what you want it to do.');
-INSERT INTO Fortune (id, message) VALUES (6, 'Emacs is a nice operating system, but I prefer UNIX. — Tom Christaensen');
-INSERT INTO Fortune (id, message) VALUES (7, 'Any program that runs right is obsolete.');
-INSERT INTO Fortune (id, message) VALUES (8, 'A list is only as strong as its weakest link. — Donald Knuth');
-INSERT INTO Fortune (id, message) VALUES (9, 'Feature: A bug with seniority.');
-INSERT INTO Fortune (id, message) VALUES (10, 'Computers make very fast, very accurate mistakes.');
-INSERT INTO Fortune (id, message) VALUES (11, '<script>alert("This should not be displayed in a browser alert box.");</script>');
-INSERT INTO Fortune (id, message) VALUES (12, 'フレームワークのベンチマーク');
+COMMENT ON TABLE sessions IS 'The users login sessions';
+COMMENT ON COLUMN sessions.session_verifier IS ' The session is a 32 byte random number stored in their cookie. This is the sha256 hash of that value.';
+COMMENT ON COLUMN sessions.otp_code_encrypted IS 'A 6 digit code that is encrypted here to prevent attackers with read access to the database being able to use it.';
+COMMENT ON COLUMN sessions.otp_code_attempts IS 'We count OTP attempts to prevent brute forcing.';
+COMMENT ON COLUMN sessions.otp_code_confirmed IS 'Once the user enters the correct value this gets set to true.';
+COMMENT ON COLUMN sessions.otp_code_sent IS 'Have we sent the OTP code?';
+
 
 -- migrate:down
-DROP TABLE World;
-DROP TABLE Fortune;
+DROP TABLE users;
+DROP TABLE sessions;
 ```
 
 ## Run the Migrations
@@ -67,7 +74,7 @@ List the migrations so we can see which have run.
 
 ```
 $ dbmate status
-[ ] 20220330110026_initial_tables.sql
+[ ] 20220330110026_user_tables.sql
 
 Applied: 0
 Pending: 1
@@ -77,31 +84,32 @@ Run our new migration.
 
 ```
 $ dbmate up
-Applying: 20220330110026_initial_tables.sql
+Applying: 20220330110026_user_tables.sql
 ```
 
 And check that it worked.
 
 ```
-$ psql $DATABASE_URL -c 'SELECT count(*) FROM Fortune;'
+$ psql $DATABASE_URL -c 'SELECT count(*) FROM users;'
  count 
 -------
-     12
+      0
 (1 row)
 ```
 
 Your project folders should now look like this.
 
 ```sh
-.
 ├── .devcontainer/
 │   └── ...
-├── app/
-│   └── ...
-├── db/
-│   ├── migrations
-│   │   └── 20220330110026_initial_tables.sql
-│   └── schema.sql
+└── crates/
+│         axum-server/
+│         │  └── main.rs
+│         └── Cargo.toml
+│         db/
+│         ├── migrations
+│         │   └── 20220330110026_user_tables.sql
+│         └── schema.sql
 ├── Cargo.toml
 └── Cargo.lock
 ```
