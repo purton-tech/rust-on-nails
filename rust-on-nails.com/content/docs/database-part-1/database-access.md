@@ -240,5 +240,7 @@ running 1 test
         email: "test3@test1.com",
     },
 ]
+
+```
 test tests::load_users ... ok
 ```
