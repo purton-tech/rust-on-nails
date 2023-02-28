@@ -113,7 +113,7 @@ members = [
 Open up the terminal in VSCode again and run the following
 
 ```
-$ cargo new crates/actix-server
+$ cargo new crates/axum-server
      Created binary (application) `crates/axum-server` package
 ```
 
