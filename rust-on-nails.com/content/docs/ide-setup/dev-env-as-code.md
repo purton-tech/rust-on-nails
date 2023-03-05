@@ -106,14 +106,14 @@ We are going to create a workspace for our web application. Create a new `Cargo.
 ```toml
 [workspace]
 members = [
-    "crates/axum-server",
+    "crates/*",
 ]
 ```
 
 Open up the terminal in VSCode again and run the following
 
 ```
-$ cargo new crates/actix-server
+$ cargo new crates/axum-server
      Created binary (application) `crates/axum-server` package
 ```
 

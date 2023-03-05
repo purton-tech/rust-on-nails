@@ -13,9 +13,9 @@ toc = true
 top = false
 +++
 
-The [Dioxus](https://dioxuslabs.com/) framework gives us the capability to build user interfaces out of components which can be rendered server isde. It's worth looking at their [components documenation](https://dioxuslabs.com/guide/components/index.html).
+The [Dioxus](https://dioxuslabs.com/) framework gives us the capability to build user interfaces out of components which can be rendered server side. It's worth looking at their [components documentation](https://dioxuslabs.com/guide/components/index.html).
 
-## Creating a ui-componenst crate
+## Creating a ui-components crate
 
 Edit your Cargo.toml so it now looks like.
 

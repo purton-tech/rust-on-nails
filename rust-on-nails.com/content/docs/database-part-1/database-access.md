@@ -15,7 +15,7 @@ top = false
 
 [Cornucopia](https://github.com/cornucopia-rs/cornucopia) is a code generator that takes small snippets of SQL and turns them into Rust functions.
 
-We'll trun our `crates/db` folder into a crate so we can keep all our database logic in one place.
+We'll run our `crates/db` folder into a crate so we can keep all our database logic in one place.
 
 Edit your `Cargo.toml` so it now looks like.
 
@@ -57,7 +57,7 @@ SELECT
 FROM users;
 ```
 
-Cornucopia will use the above definition to generata a Rust function called `get_users` to access the database. Note cornucopia checks the query at code generation time against Postgres.
+Cornucopia will use the above definition to generate a Rust function called `get_users` to access the database. Note cornucopia checks the query at code generation time against Postgres.
 
 ## Updating build.rs
 

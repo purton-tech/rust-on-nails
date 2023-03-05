@@ -16,12 +16,12 @@ top = false
 
 We can use a tool called [replibyte](https://www.replibyte.com/) to fix two problems in one go.
 
-1. We need to be able to backup our database. `replibyte` can backup data from postgres to S3 storage where S3 is a storage protocol supported by lots of providers.
-2. We sometimes want to use production data in our development environemnts. `replibyte` allows us to do this and gives us tools to manage the size of the data as well as obscure fields.
+1. We need to be able to backup our database. `replibyte` can backup data from Postgres to S3 storage where S3 is a storage protocol supported by lots of providers.
+2. We sometimes want to use production data in our development environments. `replibyte` allows us to do this and gives us tools to manage the size of the data as well as obscure fields.
 
 ## Creating a read only Database User
 
-Ideally we want our backups to run with minimum database privelages. You coukd add the following to your datbase migrations.
+Ideally we want our backups to run with minimum database privileges. You could add the following to your database migrations.
 
 ```
 CREATE ROLE readonly LOGIN ENCRYPTED PASSWORD '****************';
