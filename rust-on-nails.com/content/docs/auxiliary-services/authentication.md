@@ -15,6 +15,8 @@ top = false
 
 Probably the quickest way to add authentication to an application is with [Barricade](https://github.com/purton-tech/barricade). Barricade handles login and registration pages and connects to your Postgres database.
 
+## Installing Barricade
+
 We've already created the tables that Barricade needs in the migrations section. so we just need to add configuration `.devcontainer/docker-compose.yml`.
 
 ```yml
@@ -63,6 +65,8 @@ RESET_DOMAIN=http://localhost:7100
 RESET_FROM_EMAIL_ADDRESS=support@wedontknowyet.com
 ```
 
+## Testing Barricade
+
 After rebuilding your *devcontainer* you will need to register as a user. Make sure you server is running again i.e. 
 
 ```sh
@@ -73,3 +77,67 @@ $ cargo run
 Expose port 9090 from your devcontainer then go to `http://localhost:9090` and sign up.
 
 ![Barricade](/login.png)
+
+## Accessing the user from Axum
+
+We need to create a file called `crates/axum-server/src/authentification.rs` and add the following code.
+
+```rust
+// Extract the barricade 
+use axum::{
+    async_trait,
+    extract::FromRequestParts,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
+use http::request::Parts;
+
+#[derive(Debug)]
+pub struct Authentication {
+    pub user_id: i32,
+}
+
+// From a request extract our authentication token.
+#[async_trait]
+impl<S> FromRequestParts<S> for Authentication
+where
+    S: Send + Sync,
+{
+    type Rejection = Response;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        if let Some(user_id) = parts.headers.get("x-user-id") {
+            if let Ok(user_id) = user_id.to_str() {
+                if let Ok(user_id) = user_id.parse::<i32>() {
+                    return Ok(Authentication { user_id });
+                }
+            }
+        }
+        Err((
+            StatusCode::UNAUTHORIZED,
+            "x-user-id not found or unparseable as i32",
+        )
+            .into_response())
+    }
+}
+```
+
+Connect this into our `crates/axum-server/src/main.rs` by adding a line `mod authentication` at the top of the `main.rs`.
+
+## Using the Authentication Extractor
+
+Form within a handler you can access the user id like so...
+
+```rust
+
+pub async fn index(
+    Extension(pool): Extension<Pool>,
+    current_user: Authentication,
+) -> Result<Html<String>, CustomError> {
+  ...
+  dbg!(current_user.user_id);
+  ...
+}
+```
+
+The `user_id` is the database ID of the user in the `users` table.
