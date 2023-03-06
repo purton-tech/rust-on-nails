@@ -19,7 +19,7 @@ The data transfer protocol (Protobuf) is also useful if we want to do data stora
 
 ## Installation
 
-Let's create a crate for our api defination and code generator.
+Let's create a crate for our api definition and code generator.
 
 ```sh
 $ cargo init --lib crates/grpc-api
@@ -176,7 +176,7 @@ impl grpc_api::users_server::Fortunes for UsersService {
 
 ## Integrating Tonic and Axum
 
-We can modify our axum server so that it can respond to HTTP and gRPC requests.
+We can modify our Axum server so that it can respond to HTTP and gRPC requests.
 
 Our `crates/axum-server/src/main.rs` now needs to look like this.
 

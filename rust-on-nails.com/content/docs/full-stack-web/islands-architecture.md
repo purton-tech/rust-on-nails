@@ -13,11 +13,15 @@ toc = true
 top = false
 +++
 
-The [islands architecture](https://www.patterns.dev/posts/islands-architecture) encourages small, focused chunks of interactivity within server-rendered web pages. The output of islands is progressively enhanced HTML, with more specificity around how the enhancement occurs. Rather than a single application being in control of full-page rendering, there are multiple entry points. The script for these "islands" of interactivity can be delivered and hydrated independently, allowing the rest of the page to be just static HTML.
+The [islands architecture](https://www.patterns.dev/posts/islands-architecture) encourages small, focused chunks of interactivity within server-rendered web pages. The output of islands is progressively enhanced HTML, with more specificity around how the enhancement occurs. Rather than a single application being in control of full-page rendering, there are multiple entry points. The script for these "islands" of interactivity can be delivered with web components, allowing the rest of the page to be just static HTML.
 
-There are several ways to support the isalnds architecture for example [Stimulus](https://stimulus.hotwired.dev/), which I've used on multiple projects.
+## Implementing islands architecture
+
+There are several ways to support the islands architecture for example [Stimulus](https://stimulus.hotwired.dev/), which I've used on multiple projects.
 
 However all modern browser come with web components built in and as they are pretty simple to use it makes sense to implement client side enhancement using this technology.
+
+## Example WebComponent
 
 An example of a very simple component create the following in `crates/asset-pipelinse/components/hello_world.ts`.
 

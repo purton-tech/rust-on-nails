@@ -85,6 +85,7 @@ build.rs
 Axum
 api
 main.rs
+lib.rs
  - docs/auxiliary-services/authentication.md
 140
 Postgres
@@ -188,3 +189,6 @@ SystemAdministrator
  - docs/full-stack-web/server-side-components.md
 Dioxus
 ui-components
+ - docs/full-stack-web/islands-architecture.md
+120
+WebComponent
