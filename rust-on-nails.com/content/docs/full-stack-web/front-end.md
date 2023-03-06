@@ -1,5 +1,5 @@
 +++
-title = "Front end enhancement"
+title = "Islands Architecture"
 description = "Front End"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
@@ -13,11 +13,13 @@ toc = true
 top = false
 +++
 
-Sometimes you need to enhance server side generated HTML. There are many ways to do this for example [Stimulus](https://stimulus.hotwired.dev/), which I've used on multiple projects.
+The [islands architecture](https://www.patterns.dev/posts/islands-architecture) encourages small, focused chunks of interactivity within server-rendered web pages. The output of islands is progressively enhanced HTML, with more specificity around how the enhancement occurs. Rather than a single application being in control of full-page rendering, there are multiple entry points. The script for these "islands" of interactivity can be delivered and hydrated independently, allowing the rest of the page to be just static HTML.
+
+There are several ways to support the isalnds architecture for example [Stimulus](https://stimulus.hotwired.dev/), which I've used on multiple projects.
 
 However all modern browser come with web components built in and as they are pretty simple to use it makes sense to implement client side enhancement using this technology.
 
-An example of a very simple component create the following in `app/src/asset-pipelibne/components/hello_world.ts`.
+An example of a very simple component create the following in `crates/asset-pipelinse/components/hello_world.ts`.
 
 ```typescript
 //define a class extending HTMLElement
