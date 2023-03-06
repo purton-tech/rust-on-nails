@@ -15,19 +15,9 @@ top = false
 
 [Cornucopia](https://github.com/cornucopia-rs/cornucopia) is a code generator that takes small snippets of SQL and turns them into Rust functions.
 
-We'll run our `crates/db` folder into a crate so we can keep all our database logic in one place.
+We'll turn our `crates/db` folder into a crate so we can keep all our database logic in one place.
 
-Edit your `Cargo.toml` so it now looks like.
-
-```toml
-[workspace]
-members = [
-    "crates/actix-server",
-    "crates/db",
-]
-```
-
-and run 
+Run the following
 
 ```sh
 $ cargo init --lib crates/db
