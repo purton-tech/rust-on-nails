@@ -14,3 +14,8 @@ top = false
 +++
 
 ## Why Kubernetes
+
+We could learn how to deploy apps with Azure, Google cloud or other providers like fly.io or Heroku. The problem is we go up a learning curve and we can't re-use those skills on other providers.
+
+With Kubernetes, once we setup our cluster we are cloud agnostic. We are not tied to a single cloud provider and our skills are re-usable across projects and these skills will be useful for years to come.
+

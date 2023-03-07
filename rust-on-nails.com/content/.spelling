@@ -192,3 +192,5 @@ ui-components
  - docs/full-stack-web/islands-architecture.md
 120
 WebComponent
+ - docs/continous-deployment/kubernetes.md
+fly.io
