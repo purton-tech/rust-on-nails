@@ -6,8 +6,10 @@ on:
     - main
     paths:
     - 'dev-env-as-code/**'
+    - 'nails-devcontainer/**'
     # Exclude this as it is set by semantic release
     - '!dev-env-as-code/Dockerfile.devcontainer'
+    - '!nails-devcontainer/Dockerfile'
 
 jobs:
   build:
@@ -40,3 +42,19 @@ jobs:
         npm i -D @semantic-release-plus/docker
         npm i -D @semantic-release/git
         npx semantic-release
+
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Publish Templates"
+        uses: devcontainers/action@v1
+        with:
+          publish-templates: "true"
+          base-path-to-templates: "./nails-devcontainer"
+          generate-docs: "true"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
