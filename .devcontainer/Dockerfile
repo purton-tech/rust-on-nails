@@ -16,5 +16,7 @@ RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSI
     && sudo mv zola /usr/bin/zola \
     && sudo chmod +x /usr/bin/zola
 
+RUN sudo npm install -g @devcontainers/cli
+
 # all the volumes configured in the docker-compose.yml
 ARG USERNAME=vscode
