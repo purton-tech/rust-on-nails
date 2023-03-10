@@ -13,7 +13,7 @@ jobs:
         uses: devcontainers/action@v1
         with:
           publish-templates: "true"
-          base-path-to-templates: "./src"
+          base-path-to-templates: "./nails-devcontainer"
           generate-docs: "true"
 
         env:
