@@ -36,7 +36,7 @@ ARG USER_GID=$USER_UID
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Configure apt and install packages
-RUN apt-get update \
+RUN apt-get -y update \
     && apt-get install -y --no-install-recommends \
         curl \
         wget \
@@ -61,76 +61,75 @@ RUN apt-get update \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -r /var/cache/* /var/lib/apt/lists/*
-    
-
-# Install psql 14
-RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-   && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-   && apt-get -y update \
-   && apt-get -y install postgresql-client \
-   && apt-get autoremove -y && apt-get clean -y
-
-# Install node.
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-RUN sudo apt-get install -y nodejs
-
-# Create a non-root user
-RUN groupadd --gid $USER_GID $USERNAME \
+    && rm -r /var/cache/* /var/lib/apt/lists/* \
+    # Stuff that updates the package manager
+    # Postgres
+    && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
+    && add-apt-repository \
+        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian \
+        $(lsb_release -cs) \
+        stable" \
+    # Node
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get -y update \
+    && apt-get -y --no-install-recommends install \
+        postgresql-client \
+        # Docker Engine for Earthly. 
+        docker-ce docker-ce-cli containerd.io \
+        # Install node.
+        nodejs \
+    && apt-get autoremove -y && apt-get clean -y \
+    # Create a non-root user
+    && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
-    && chmod 0440 /etc/sudoers.d/$USERNAME 
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    # Rust tools
+    && rustup component add rustfmt clippy \
+    # Add the musl toolchain
+    && rustup target add x86_64-unknown-linux-musl \
+    # Install secrets management
+    && /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak" \
+    # Database migrations   
+    && curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
+    && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
+    && chmod +x /usr/bin/dbmate \
+    # Mold - Fast Rust Linker
+    && curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz \
+    && tar -xf mold-$MOLD_VERSION-x86_64-linux.tar.gz \
+    && mv ./mold-$MOLD_VERSION-x86_64-linux/bin/mold /usr/bin/ \
+    && mv ./mold-$MOLD_VERSION-x86_64-linux/lib/mold/mold-wrapper.so /usr/bin/ \
+    && rm mold-$MOLD_VERSION-x86_64-linux.tar.gz \
+    && rm -rf ./mold-$MOLD_VERSION-x86_64-linux \
+    && chmod +x /usr/bin/mold \
+    # Docker compose for Earthly
+    && curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose \
+    # Earthly
+    && wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
+    && chmod +x /usr/local/bin/earthly \
+    # K9s
+    && curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp \
+    && mv /tmp/k9s /usr/bin \
+    && rm -rf k9s_Linux_x86_64.tar.gz \
+    # Kind
+    && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64 \
+    && chmod +x ./kind \
+    && mv ./kind /usr/local/bin/kind \
+    # Kubectl
+    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     
 USER $USERNAME
 
+# Copy the binaries we built in builder container
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 
-# Essential tools
-RUN rustup component add rustfmt clippy
+# Pulumi
+RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
+    && sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
 
-# For musl builds
-RUN rustup target add x86_64-unknown-linux-musl
-
-
-# Install secrets management
-RUN sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
-
-# Database migrations   
-RUN sudo curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
-    && sudo mv ./dbmate-linux-amd64 /usr/bin/dbmate \
-    && sudo chmod +x /usr/bin/dbmate
-
-# mold
-RUN sudo curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz \
-    && sudo tar -xf mold-$MOLD_VERSION-x86_64-linux.tar.gz \
-    && sudo mv ./mold-$MOLD_VERSION-x86_64-linux/bin/mold /usr/bin/ \
-    && sudo mv ./mold-$MOLD_VERSION-x86_64-linux/lib/mold/mold-wrapper.so /usr/bin/ \
-    && sudo chmod +x /usr/bin/mold
-
-# Docker Engine for Earthly. 
-RUN  curl -fsSL "https://download.docker.com/linux/debian/gpg" | sudo apt-key add -
-RUN sudo add-apt-repository \
-        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) \
-        stable" \
-    && sudo apt-get update \
-    && sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
-    #
-    #
-    # Clean up
-    && sudo apt-get autoremove -y \
-    && sudo apt-get clean -y \
-    && sudo rm -r /var/cache/* /var/lib/apt/lists/*
-
-# docker compose for earthly
-RUN sudo curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
-    && sudo chmod +x /usr/local/bin/docker-compose
-
-RUN sudo wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
-    && sudo chmod +x /usr/local/bin/earthly
-    
-# Pulumi for infrastructure as code.
-RUN curl -fsSL https://get.pulumi.com | sudo -E bash -
-RUN sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
