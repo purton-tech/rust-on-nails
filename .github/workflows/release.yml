@@ -1,0 +1,20 @@
+name: "Release Dev Container Templates & Generate Documentation"
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Publish Templates"
+        uses: devcontainers/action@v1
+        with:
+          publish-templates: "true"
+          base-path-to-templates: "./src"
+          generate-docs: "true"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
