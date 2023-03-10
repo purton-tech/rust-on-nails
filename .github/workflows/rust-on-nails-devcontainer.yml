@@ -43,18 +43,12 @@ jobs:
         npm i -D @semantic-release/git
         npx semantic-release
 
-  deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    - name: "Publish Templates"
+      uses: devcontainers/action@v1
+      with:
+        publish-templates: "true"
+        base-path-to-templates: "./nails-devcontainer"
+        generate-docs: "true"
 
-      - name: "Publish Templates"
-        uses: devcontainers/action@v1
-        with:
-          publish-templates: "true"
-          base-path-to-templates: "./nails-devcontainer"
-          generate-docs: "true"
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

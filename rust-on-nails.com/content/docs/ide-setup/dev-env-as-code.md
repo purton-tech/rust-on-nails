@@ -38,35 +38,18 @@ cd project-name
 
 ### MacOS and Linux
 
-```
-mkdir .devcontainer \
-  && curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz -O -J \
-  && tar -xf rust-on-nails-main.tar.gz \
-  && mv rust-on-nails-main/dev-env-as-code/Dockerfile.devcontainer .devcontainer/Dockerfile \
-  && mv rust-on-nails-main/dev-env-as-code/docker-compose.yml .devcontainer \
-  && mv rust-on-nails-main/dev-env-as-code/devcontainer.json .devcontainer \
-  && mv rust-on-nails-main/dev-env-as-code/ps1.bash .devcontainer \
-  && mv rust-on-nails-main/dev-env-as-code/.bash_aliases .devcontainer \
-  && mv rust-on-nails-main/dev-env-as-code/.gitignore . \
-  && mv rust-on-nails-main/dev-env-as-code/.githooks .devcontainer \
-  && rm -rf rust-on-nails-main*
+```sh
+curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | \
+  tar xvz --strip=2 rust-on-nails-main/nails-devcontainer/ \
+  && rm devcontainer-template.json
 ```
 
-### Windows
+## Windows
 
-```
-mkdir .devcontainer 
-curl -L https://github.com/purton-tech/rust-on-nails/archive/main.zip -O -J \
-tar -xf rust-on-nails-main.zip \
-move rust-on-nails-main\dev-env-as-code\Dockerfile.devcontainer .devcontainer\Dockerfile
-move rust-on-nails-main\dev-env-as-code\docker-compose.yml .devcontainer 
-move rust-on-nails-main\dev-env-as-code\devcontainer.json .devcontainer 
-move rust-on-nails-main\dev-env-as-code\ps1.bash .devcontainer 
-move rust-on-nails-main\dev-env-as-code\.bash_aliases .devcontainer 
-move rust-on-nails-main\dev-env-as-code\.gitignore . 
-move rust-on-nails-main\dev-env-as-code\.githooks .devcontainer 
-del /S rust-on-nails-main.zip
-rmdir /S /Q rust-on-nails-main
+```sh
+curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | \
+  tar xvz --strip=2 rust-on-nails-main/nails-devcontainer/ \
+  && del devcontainer-template.json
 ```
 
 ## VS Code
@@ -86,8 +69,8 @@ How you folder structure will look.
     ├── devcontainer.json
     ├── docker-compose.yml
     └── Dockerfile
-└── target
 └── .gitignore
+└── README.md
 ```
 
 ## Setting up Git
