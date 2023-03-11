@@ -15,7 +15,7 @@ top = false
 
 ## Why Kubernetes
 
-* We can learn one way to deploy applications and re-use those skills on other projects. So rather than learning the Google, Heroke, AWS way to deploy applications we learn the Kubernetes way of deploying applications. We will be **cloud agnostic**.
+* We can learn one way to deploy applications and re-use those skills on other projects. So rather than learning the Google, Heroku, AWS way to deploy applications we learn the Kubernetes way of deploying applications. We will be **cloud agnostic**.
 
 * Kubernetes will handle just about every deployment scenario you can think of.
 
@@ -27,7 +27,7 @@ top = false
 
 ## Setting up a local cluster with Kind
 
-**Kind** Will create a tiny kubernetes cluster in our docker environment. We've pre-installed `kind` in our `devcontainer` so let's create a cluster.
+**Kind** Will create a tiny Kubernetes cluster in our docker environment. We've pre-installed `kind` in our `devcontainer` so let's create a cluster.
 
 ```sh
 $ kind get clusters
