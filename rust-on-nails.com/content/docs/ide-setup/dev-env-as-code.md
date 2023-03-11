@@ -96,7 +96,7 @@ members = [
 Open up the terminal in VSCode again and run the following
 
 ```
-$ cargo new crates/axum-server
+$ cargo new --vcs=none crates/axum-server
      Created binary (application) `crates/axum-server` package
 ```
 
