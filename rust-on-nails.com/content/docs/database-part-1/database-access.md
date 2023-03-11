@@ -231,6 +231,5 @@ running 1 test
     },
 ]
 
-```
 test tests::load_users ... ok
 ```
