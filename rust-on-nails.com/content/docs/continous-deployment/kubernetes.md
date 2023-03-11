@@ -15,7 +15,57 @@ top = false
 
 ## Why Kubernetes
 
-We could learn how to deploy apps with Azure, Google cloud or other providers like fly.io or Heroku. The problem is we go up a learning curve and we can't re-use those skills on other providers.
+* We can learn one way to deploy applications and re-use those skills on other projects. So rather than learning the Google, Heroke, AWS way to deploy applications we learn the Kubernetes way of deploying applications. We will be **cloud agnostic**.
 
-With Kubernetes, once we setup our cluster we are cloud agnostic. We are not tied to a single cloud provider and our skills are re-usable across projects and these skills will be useful for years to come.
+* Kubernetes will handle just about every deployment scenario you can think of.
 
+* We can test our deployments on our local machines using a tool called `kind`.
+
+* The Kubernetes way of application deployment will be a useful skills for the next decade or more.
+
+* For some projects we need to deploy **On Prem** and more and more companies are providing Kubernetes as a way to deploy applications in house.
+
+## Setting up a local cluster with Kind
+
+**Kind** Will create a tiny kubernetes cluster in our docker environment. We've pre-installed `kind` in our `devcontainer` so let's create a cluster.
+
+```sh
+$ kind get clusters
+No kind clusters found.
+```
+
+Ok, let's create a cluster with `kind create cluster --name nails-cluster`.
+
+```sh$ 
+kind create cluster --name nails-cluster
+Creating cluster "nails-cluster" ...
+ ✓ Ensuring node image (kindest/node:v1.25.3) 🖼
+ ✓ Preparing nodes 📦  
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+Set kubectl context to "kind-nails-cluster"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-nails-cluster
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+```
+
+## Interacting with our cluster
+
+Kubernetes is administered with a command called `kubectl` let's configure `kubectl` so that it can access our cluster.
+
+```sh
+$ kind export kubeconfig --name nails-cluster
+Set kubectl context to "kind-nails-cluster"
+```
+
+And now we can use `kubectl` to see what `pods` we have in our cluster.
+
+```sh
+kubectl get pods --insecure-skip-tls-verify
+```
+
+## Installing the Postgres Operator
