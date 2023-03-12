@@ -78,13 +78,29 @@ Change your `index.ts` to look like the following.
 
 ```typescript
 import * as k8s from "@pulumi/kubernetes"
-import * as kx from "@pulumi/kubernetesx"
 
-const nameSpace = new k8s.core.v1.Namespace('rust-on-nails', {
+// Setup a namespace for Cloud Native Pg https://github.com/cloudnative-pg/cloudnative-pg
+const databaseNameSpace = new k8s.core.v1.Namespace('cloud-native-pg', {
+    metadata: {
+        name: 'cloud-native-pg'
+    },
+})
+
+// Setup a namespace for our application
+const applicationNameSpace = new k8s.core.v1.Namespace('rust-on-nails', {
     metadata: {
         name: 'rust-on-nails'
     },
 })
+
+// Install the Postgreds operator from a helm chart
+const cloudnativePgOperator = new k8s.helm.v3.Release("cloudnative-pg", {
+    chart: "cloudnative-pg",
+    namespace: databaseNameSpace.metadata.name,
+    repositoryOpts: {
+        repo: "https://cloudnative-pg.github.io/charts",
+    }
+}); 
 ```
 
 OK. Let's run `opulumi up` and see what we get.
