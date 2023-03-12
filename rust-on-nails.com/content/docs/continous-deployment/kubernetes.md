@@ -4,7 +4,7 @@ description = "Deploying to Kubernetes"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
-weight = 20
+weight = 10
 sort_by = "weight"
 
 
@@ -34,7 +34,26 @@ $ kind get clusters
 No kind clusters found.
 ```
 
-Ok, let's create a cluster with `kind create cluster --name nails-cluster`.
+Create a temporary file called config.yaml.
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+kubeadmConfigPatchesJSON6902:
+- group: kubeadm.k8s.io
+  version: v1beta3
+  kind: ClusterConfiguration
+  patch: |
+    - op: add
+      path: /apiServer/certSANs/-
+      value: host.docker.internal
+```
+
+Normally `kind` is easier to use than this but because we are in a `devcontainer` we have to use some special config.
+
+```sh
+kind create cluster --name nails-cluster --config=config.yaml
+```
 
 ```sh$ 
 kind create cluster --name nails-cluster
@@ -71,21 +90,6 @@ sed -i 's/127.0.0.1/host.docker.internal/g' $HOME/.kube/config
 And now we can use `kubectl` to see what `pods` we have in our cluster.
 
 ```sh
-$ kubectl get pods --insecure-skip-tls-verify
+$ kubectl get pods
 No resources found in default namespace.
 ```
-
-## Installing the Postgres Operator
-
-To extend Kubernetes we can install [Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) so we'll use the [CrunchData Postgres Operator](https://github.com/CrunchyData/postgres-operator) to install Postgres into out cluster using [Helm](https://helm.sh/) which is like a package installer for Kubernetes.
-
-It's a good practice to install operators into their own [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
-
-
-
-Run.
-
-```sh
-helm install pgo oci://registry.developers.crunchydata.com/crunchydata/pgo --kube-insecure-skip-tls-verify --namespace pgo
-```
-

@@ -16,6 +16,8 @@ Casbin
 Oso
 RBAC
 Ok
+Javascript
+typesafe
  - _index.md
 url
 ide-setup
@@ -115,6 +117,8 @@ Cloudflare
 Pulumi
 Heroku
 www.pulumi.com
+Pulumi.yaml
+k9s
  - docs/continuous-integration/_index.md
 40
  - docs/continuous-integration/integration-testing.md
@@ -196,4 +200,5 @@ WebComponent
  - docs/continous-deployment/kubernetes.md
 AWS
 CrunchData
+config.yaml.
 fly.io

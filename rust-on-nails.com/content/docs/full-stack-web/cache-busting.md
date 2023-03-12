@@ -19,7 +19,7 @@ Cache busting is where we invalidate a cached file and force the browser to retr
 
 ## Using Ructe for Cache Busting
 
-Let's turn our `asset-pipeline` folder into a Rust crate. We do this because we can use `Ructe` to generate code that allows to access assets in  atypesafe way. Ructe also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Javascript.
+Let's turn our `asset-pipeline` folder into a Rust crate. We do this because we can use `Ructe` to generate code that allows to access assets in  a typesafe way. Ructe also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Javascript.
 
 Run the following...
 
