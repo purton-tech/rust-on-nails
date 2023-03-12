@@ -62,10 +62,30 @@ $ kind export kubeconfig --name nails-cluster
 Set kubectl context to "kind-nails-cluster"
 ```
 
+We need to do a little trick so that `kubectl` can see the cluster when running inside our `devcontainer`. Run the following.
+
+```sh
+sed -i 's/127.0.0.1/host.docker.internal/g' $HOME/.kube/config
+```
+
 And now we can use `kubectl` to see what `pods` we have in our cluster.
 
 ```sh
-kubectl get pods --insecure-skip-tls-verify
+$ kubectl get pods --insecure-skip-tls-verify
+No resources found in default namespace.
 ```
 
 ## Installing the Postgres Operator
+
+To extend Kuberenetes we can install [Opoerators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) so we'll use the [CrunchData Postgres Operator](https://github.com/CrunchyData/postgres-operator) to install postgres into out cluster using [Helm](https://helm.sh/) which is like a package installer for Kubernetes.
+
+It's a good practive to install operators into their own [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+
+
+
+Run.
+
+```sh
+helm install pgo oci://registry.developers.crunchydata.com/crunchydata/pgo --kube-insecure-skip-tls-verify --namespace pgo
+```
+
