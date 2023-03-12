@@ -22,7 +22,7 @@ Edit your Cargo.toml so it now looks like.
 ```toml
 [workspace]
 members = [
-    "crates/actix-server",
+    "crates/axum-server",
     "crates/db",
     "crates/ui-components",
 ]
