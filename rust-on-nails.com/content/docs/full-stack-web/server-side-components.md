@@ -17,18 +17,6 @@ The [Dioxus](https://dioxuslabs.com/) framework gives us the capability to build
 
 ## Creating a ui-components crate
 
-Edit your Cargo.toml so it now looks like.
-
-```toml
-[workspace]
-members = [
-    "crates/axum-server",
-    "crates/db",
-    "crates/ui-components",
-]
-
-```
-
 ```sh
 cargo init --lib crates/ui-components
 ```
