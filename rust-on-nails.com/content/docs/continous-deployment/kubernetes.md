@@ -77,9 +77,9 @@ No resources found in default namespace.
 
 ## Installing the Postgres Operator
 
-To extend Kuberenetes we can install [Opoerators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) so we'll use the [CrunchData Postgres Operator](https://github.com/CrunchyData/postgres-operator) to install postgres into out cluster using [Helm](https://helm.sh/) which is like a package installer for Kubernetes.
+To extend Kubernetes we can install [Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) so we'll use the [CrunchData Postgres Operator](https://github.com/CrunchyData/postgres-operator) to install Postgres into out cluster using [Helm](https://helm.sh/) which is like a package installer for Kubernetes.
 
-It's a good practive to install operators into their own [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+It's a good practice to install operators into their own [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
 
 
 
