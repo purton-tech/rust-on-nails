@@ -86,7 +86,15 @@ pub fn Layout<'a>(cx: Scope<'a, AppLayoutProps<'a>>) -> Element {
 }
 ```
 
-Let's use this layout to create a very simple users screen that will show a table of users. Create a file `crates/ui-components/src/users.rs`.
+Let's use this layout to create a very simple users screen that will show a table of users.
+
+Make sure you're in the `crates/ui-components` folder and add the `db` crate to your `Cargo.toml` using the following command:
+
+```sh
+cargo add --path ../db
+```
+
+Create a file `crates/ui-components/src/users.rs`.
 
 ```rust
 use crate::layout::Layout;
@@ -151,6 +159,12 @@ pub mod users;
 ```
 
 Then finally we can change our `axum-server` code to generate HTML rather than JSON.
+
+Make sure you're in the `crates/axum-server` folder and add the `ui_components` crate to your `Cargo.toml` using the following command:
+
+```sh
+cargo add --path ../ui_components
+```
 
 Update `crates/axum-server/src/main.rs`
 
