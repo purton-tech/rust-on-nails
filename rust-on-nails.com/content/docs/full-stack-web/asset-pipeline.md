@@ -22,7 +22,7 @@ I've used [Parcel](https://parceljs.org/) on several projects and before that [W
 If you look at your `.devcontainer/docker-compose.yml` you'll see a line that is commented out.
 
 ```yml
-#- node_modules:/vscode/node_modules # Set target as a volume for performance. 
+#- node_modules:/vscode/crates/asset-pipeline/node_modules # Set target as a volume for performance. 
 ```
 
 Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performance during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
@@ -32,17 +32,18 @@ Comment that back in and rebuild your devcontainer. This will setup the node_mod
 To install parcel
 
 ```sh
-$ cd app
+$ mdir crates/asset-pipeline
+$ cd crates/asset-pipeline
 $ npm install --save-dev parcel
 ```
 
-Now create an `app/asset-pipeline/index.ts`
+Now create an `crates/asset-pipeline/index.ts`
 
 ```typescript
 import './scss/index.scss'
 ```
 
-And also `app/asset-pipeline/scss/index.scss`
+And also `crates/asset-pipeline/scss/index.scss`
 
 ```typescript
 h1 {
@@ -72,32 +73,25 @@ node_modules
 
 ## Adding Images
 
-Create an empty images folder in `app/asset-pipeline/images` then your project should now look something like this.
+Create an empty images folder in `crates/asset-pipeline/images` then your project should now look something like this.
 
 ```sh
 .
 ├── .devcontainer/
 │   └── ...
-├── app
-│   ├── .parcel-cache/  <-- Created by parcel for caching
-│   │   └── ...
-│   ├── asset-pipeline/
-│   │   ├── images/
-│   │   │   └── ...
-│   │   ├── scss/
-│   │   │   └── index.scss
-│   │   └── index.ts
-│   ├── dist/           <-- Where parcel builds your assets
-│   │   └── ...
-│   ├── node_modules/
-│   │   └── ...
-│   ├── src/
-│   │   └── ...
-│   ├── Cargo.toml
-│   ├── package-lock.json
-│   ├── package.json
-├── db/
-│   └── ...
+└── crates/
+│         asset-pipeline/
+│         ├── images/
+│         │   └── ...
+│         ├── index.scss
+│         ├── index.ts
+│         └── node_modules/
+│             └── ...
+│         axum-server/
+│         │  └── main.rs
+│         └── Cargo.toml
+│         db/
+│         └── ...
 ├── .gitignore
 ├── Cargo.toml
 └── Cargo.lock
