@@ -155,7 +155,7 @@ It looks something like the image below and gives you the ability to see running
 
 ## Creating a Database and Users
 
-We'll need to incoude some more Pulumi libraries.
+We'll need to include some more Pulumi libraries.
 
 ```
 npm install @pulumi/random @pulumi/postgresql
