@@ -12,6 +12,8 @@ toc = true
 top = false
 +++
 
+[This section is under construction]
+
 ## Introduction
 
 However we decide to deploy our application "Infrastructure as Code" is a best practice. That means we have the ability to reproduce or duplicate our deployment environment from code stored in git. 
@@ -152,3 +154,9 @@ It looks something like the image below and gives you the ability to see running
 ![Adding secrets to cloak](../pods.png)
 
 ## Creating a Database and Users
+
+We'll need to incoude some more Pulumi libraries.
+
+```
+npm install @pulumi/random @pulumi/postgresql
+```
