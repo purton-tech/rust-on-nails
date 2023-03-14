@@ -70,7 +70,7 @@ You should now have a folder structure that looks like the following
 └── Cargo.lock
 ```
 
-## Installing Some Oulumi Dependencies
+## Installing Some Pulumi Dependencies
 
 We'll need to include another Pulumi library.
 
@@ -155,9 +155,9 @@ It looks something like the image below and gives you the ability to see running
 
 ## Creating a Database and Users
 
-Extend our `index.ts` and add the folloowing code under the code we already created above. 
+Extend our `index.ts` and add the following code under the code we already created above. 
 
-This code is reposnsible for creating a namespace called `rust-on-nails` we then install Postgres into that name space and setup a Kubernetes secret caleed `database-urls` so that our application can connect to the database.
+This code is responsible for creating a namespace called `rust-on-nails` we then install Postgres into that name space and setup a Kubernetes secret called `database-urls` so that our application can connect to the database.
 
 ```typescript
 // Setup a namespace for our application
@@ -239,13 +239,13 @@ new kx.Secret("database-urls", {
 
 Run `pulumi up` to apply our latest configuration.
 
-## Connecting to the datbase
+## Connecting to the database
 
 ```sh
 kubectl port-forward service/nails-db-cluster-rw 5455:5432 --namespace=rust-on-nails
 ```
 
-You'll need to get the datapassword from the `database-urls` secret.
+You'll need to get the database password from the `database-urls` secret.
 
 ```sh
 psql -p 5455 -h 127.0.0.1 -U app nails_migrations
