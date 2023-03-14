@@ -12,10 +12,6 @@ toc = true
 top = false
 +++
 
-[This section is under construction]
-
-## Introduction
-
 However we decide to deploy our application "Infrastructure as Code" is a best practice. That means we have the ability to reproduce or duplicate our deployment environment from code stored in git. 
 
 We will use [Pulumi](https://www.pulumi.com/) as this gives us the ability to code how we deploy our infrastructure whether that be with Heroku, Digital Ocean, Google Cloud, Azure and on and on.
@@ -74,12 +70,23 @@ You should now have a folder structure that looks like the following
 └── Cargo.lock
 ```
 
+## Installing Some Oulumi Dependencies
+
+We'll need to include another Pulumi library.
+
+```
+npm install @pulumi/random
+```
+
 ## Configuring namespaces and adding a Postgres Operator
 
 Change your `index.ts` to look like the following.
 
 ```typescript
+import * as pulumi from "@pulumi/pulumi"
 import * as k8s from "@pulumi/kubernetes"
+import * as kx from "@pulumi/kubernetesx"
+import * as random from "@pulumi/random"
 
 // Setup a namespace for Cloud Native Pg https://github.com/cloudnative-pg/cloudnative-pg
 const databaseNameSpace = new k8s.core.v1.Namespace('cloud-native-pg', {
@@ -88,15 +95,8 @@ const databaseNameSpace = new k8s.core.v1.Namespace('cloud-native-pg', {
     },
 })
 
-// Setup a namespace for our application
-const applicationNameSpace = new k8s.core.v1.Namespace('rust-on-nails', {
-    metadata: {
-        name: 'rust-on-nails'
-    },
-})
-
-// Install the Postgreds operator from a helm chart
-const cloudnativePgOperator = new k8s.helm.v3.Release("cloudnative-pg", {
+// Install the Postgres operator from a helm chart
+const cloudnativePg = new k8s.helm.v3.Release("cloudnative-pg", {
     chart: "cloudnative-pg",
     namespace: databaseNameSpace.metadata.name,
     repositoryOpts: {
@@ -155,8 +155,98 @@ It looks something like the image below and gives you the ability to see running
 
 ## Creating a Database and Users
 
-We'll need to include some more Pulumi libraries.
+Extend our `index.ts` and add the folloowing code under the code we already created above. 
 
+This code is reposnsible for creating a namespace called `rust-on-nails` we then install Postgres into that name space and setup a Kubernetes secret caleed `database-urls` so that our application can connect to the database.
+
+```typescript
+// Setup a namespace for our application
+const applicationNameSpace = new k8s.core.v1.Namespace('rust-on-nails', {
+    metadata: {
+        name: 'rust-on-nails'
+    },
+})
+
+// Create 2 Database passwords and store them as secrets
+const migrationPassword = new random.RandomPassword("app_password", {
+    length: 20,
+    special: false,
+});
+
+const DATABASE_NAME="app"
+const MIGRATIONS_ROLE="app"
+
+const appSecret = new kx.Secret("app-secret", {
+    type: "kubernetes.io/basic-auth",
+    metadata: {
+        namespace: applicationNameSpace.metadata.name,
+        name: "app-secret"
+    },
+    stringData: {
+        "username": MIGRATIONS_ROLE,
+        "password": migrationPassword.result,
+    }
+})
+
+const pgCluster = new k8s.apiextensions.CustomResource('nails-db-cluster', {
+    apiVersion: 'postgresql.cnpg.io/v1',
+    kind: 'Cluster',
+    metadata: {
+        name: 'nails-db-cluster',
+        namespace: applicationNameSpace.metadata.name,
+    },
+    spec: {
+        instances: 1,
+        bootstrap: {
+            initdb: {
+                database: DATABASE_NAME,
+                // Bootstrap uses the secrerts we created
+                // above to give us a user
+                owner: appSecret.stringData.username,
+                secret: {
+                    name: appSecret.metadata.name
+                },
+                postInitSQL: [
+                    // Add users here.
+                    // "CREATE ROLE cloak_application LOGIN ENCRYPTED PASSWORD 'testpassword'"
+                ]
+            }
+        },
+        storage: {
+            size: '1Gi'
+        }
+    }
+}, {
+    dependsOn: cloudnativePg
+})
+
+let migrationsUrl = pulumi.all([migrationPassword.result])
+    .apply(([password]) => 
+    `postgres://${MIGRATIONS_ROLE}:${password}@cluster-sample-rw:5432/${DATABASE_NAME}?sslmode=require`)
+
+
+// Create a database url secret so our app will work.
+new kx.Secret("database-urls", {
+    metadata: {
+        namespace: applicationNameSpace.metadata.name,
+        name: "database-urls"
+    },
+    stringData: {
+        "migrations-url": migrationsUrl
+    }
+})
 ```
-npm install @pulumi/random @pulumi/postgresql
+
+Run `pulumi up` to apply our latest configuration.
+
+## Connecting to the datbase
+
+```sh
+kubectl port-forward service/nails-db-cluster-rw 5455:5432 --namespace=rust-on-nails
+```
+
+You'll need to get the datapassword from the `database-urls` secret.
+
+```sh
+psql -p 5455 -h 127.0.0.1 -U app nails_migrations
 ```
