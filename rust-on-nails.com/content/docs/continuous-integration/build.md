@@ -23,11 +23,28 @@ Earthly uses Dockerfile syntax for creating builds. So we can leverage our exist
 Create an Earthfile with the below contents.
 
 ```Dockerfile
-FROM purtontech/rust-on-nails-devcontainer:1.0.5
+# https://earthly.dev/
+# Fast, repeatable CI/CD with an instantly familiar syntax – like Dockerfile and Makefile had a baby.
+
+# Set the version
+VERSION 0.6
+
+# We use our devcontainer as it has all the tools we need
+FROM purtontech/rust-on-nails-devcontainer:1.1.2
 
 ARG APP_NAME=app
 ARG APP_FOLDER=app
 ARG IMAGE_PREFIX=rustonnails
+ARG APP_EXE_NAME=axum-server
+
+# Version of software
+ARG DBMATE_VERSION=1.15.0
+
+# Folders
+ARG AXUM_FOLDER=crates/axum-server
+ARG DB_FOLDER=crates/db
+ARG GRPC_API_FOLDER=crates/grpc-api
+ARG PIPELINE_FOLDER=crates/asset-pipeline
 
 # This file builds the following containers
 ARG APP_IMAGE_NAME=$IMAGE_PREFIX/$APP_NAME:latest
@@ -43,55 +60,79 @@ DO github.com/earthly/lib+INSTALL_DIND
 USER vscode
 
 all:
-    BUILD +build
+    BUILD +migration-container
+    BUILD +app-container
 
 npm-deps:
-    COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
-    COPY $APP_FOLDER/package-lock.json $APP_FOLDER/package-lock.json
-    RUN cd $APP_FOLDER && npm install
-    SAVE ARTIFACT $APP_FOLDER/node_modules
+    COPY $PIPELINE_FOLDER/package.json $PIPELINE_FOLDER/package.json
+    COPY $PIPELINE_FOLDER/package-lock.json $PIPELINE_FOLDER/package-lock.json
+    RUN cd $PIPELINE_FOLDER && npm install
+    SAVE ARTIFACT $PIPELINE_FOLDER/node_modules
 
 npm-build:
     FROM +npm-deps
-    COPY $APP_FOLDER/asset-pipeline $APP_FOLDER/asset-pipeline
-    COPY --if-exists protos protos
-    COPY $APP_FOLDER/templates $APP_FOLDER/templates
-    COPY +npm-deps/node_modules $APP_FOLDER/node_modules
-    RUN cd $APP_FOLDER && npm run release
-    SAVE ARTIFACT $APP_FOLDER/dist
+    COPY $PIPELINE_FOLDER $PIPELINE_FOLDER
+    COPY --if-exists $GRPC_API_FOLDER $GRPC_API_FOLDER
+    COPY +npm-deps/node_modules $PIPELINE_FOLDER/node_modules
+    RUN cd $PIPELINE_FOLDER && npm run release
+    SAVE ARTIFACT $PIPELINE_FOLDER/dist
 
 prepare-cache:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
+    # Copy in all our crates
+    COPY --dir crates crates
     COPY Cargo.lock Cargo.toml .
-    RUN cargo chef prepare --recipe-path recipe.json
+    RUN cargo chef prepare --recipe-path recipe.json --bin $AXUM_FOLDER
     SAVE ARTIFACT recipe.json
 
 build-cache:
     COPY +prepare-cache/recipe.json ./
-    RUN cargo chef cook --release --target x86_64-unknown-linux-musl 
+    RUN cargo chef cook --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
     SAVE IMAGE --cache-hint
 
 build:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/templates $APP_FOLDER/queries $APP_FOLDER/asset-pipeline $APP_FOLDER
-    COPY --dir db Cargo.lock Cargo.toml protos .
+    # Copy in all our crates
+    COPY --dir crates crates
+    COPY --dir Cargo.lock Cargo.toml .
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
-    RUN mkdir asset-pipeline
-    COPY --dir +npm-build/dist $APP_FOLDER/
-    COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
-    # We need to run inside docker as we need postgres running for SQLX
+    COPY --dir +npm-build/dist $PIPELINE_FOLDER/
+    # We need to run inside docker as we need postgres running for cornucopia
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/postgres?sslmode=disable
     USER root
     WITH DOCKER \
         --pull postgres:alpine
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
-                dbmate up \
+                dbmate --migrations-dir $DB_FOLDER/migrations up \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/$APP_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME
+
+# This is our migrations sidecar
+migration-container:
+    FROM alpine
+    RUN apk add --no-cache \
+        curl \
+        postgresql-client \
+        tzdata
+    RUN curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
+        && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
+        && chmod +x /usr/bin/dbmate
+    COPY --dir $DB_FOLDER .
+    CMD dbmate up
+    SAVE IMAGE --push $MIGRATIONS_IMAGE_NAME
+
+# Our axum server
+app-container:
+    FROM scratch
+    COPY +build/$APP_EXE_NAME axum-server
+    # Place assets in a build folder as that's where statics is expecting them.
+    COPY --dir +npm-build/dist /build/$PIPELINE_FOLDER/
+    COPY --dir $PIPELINE_FOLDER/images /build/$PIPELINE_FOLDER/images
+    ENTRYPOINT ["./axum-server"]
+    SAVE IMAGE --push $APP_IMAGE_NAME
 ```
 
 ## Running the Build
@@ -102,32 +143,19 @@ From the command line run
 earthly -P +all
 ```
 
-The build will happened and you should see the executable being created.
+## Validating the build
 
-## Building Containers
+Assuming the build completes succesfully we will have built two docker images
 
-The above build will create our rust executable, to turn that into a docker container add the following to the end of your `Earthfile`.
-
-```Dockerfile
-migration-container:
-    FROM debian:bullseye-slim
-    RUN apt-get update -y \  
-        && apt-get install -y --no-install-recommends ca-certificates curl libpq-dev \
-        && rm -rf /var/lib/apt/lists/*
-    RUN curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
-        && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
-        && chmod +x /usr/bin/dbmate
-    COPY --dir db .
-    CMD dbmate up
-    SAVE IMAGE $INIT_IMAGE_NAME
-
-app-container:
-    FROM scratch
-    COPY +build/$APP_EXE_NAME rust-exe
-    COPY --dir +npm-build/dist dist
-    COPY --dir $APP_FOLDER/asset-pipeline/images asset-pipeline/images
-    ENTRYPOINT ["./rust-exe"]
-    SAVE IMAGE $APP_IMAGE_NAME
+```sh
+docker images | grep rustonnails
 ```
 
-We actually create 2 containers. One for the executable and another that will run migrations.
+Your should see
+
+```
+rustonnails/app                                                  latest           db9b3436b423   6 minutes ago    10.1MB
+rustonnails/app-migrations                                       latest           64064cf0fde4   11 minutes ago   24.1MB
+```
+
+One image is our Axum server, the other is an image that runs our database migrations.

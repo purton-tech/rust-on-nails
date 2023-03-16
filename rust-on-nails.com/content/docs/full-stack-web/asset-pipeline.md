@@ -22,10 +22,25 @@ I've used [Parcel](https://parceljs.org/) on several projects and before that [W
 If you look at your `.devcontainer/docker-compose.yml` you'll see a line that is commented out.
 
 ```yml
-#- node_modules:/vscode/crates/asset-pipeline/node_modules # Set target as a volume for performance. 
+#- node_modules:/workspace/crates/asset-pipeline/node_modules # Set target as a volume for performance. 
 ```
 
 Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performance during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
+
+Also in your `.devcontainer/Dockerfile` uncomment the following line.
+
+```Dockerfile
+#RUN sudo mkdir -p /workspace/crates/asset-pipeline/node_modules && sudo chown $USERNAME:$USERNAME /workspace/crates/asset-pipeline/node_modules
+```
+
+## .gitignore
+
+We need the folloewing `.gitignore` file.
+
+```
+dist
+node_modules
+```
 
 ## Installing Parcel
 
@@ -62,7 +77,7 @@ Add a scripts section to your package.json
 
 ## npm run start
 
-And now when you run `npm run start` parcel will generate your assets into the dist folder. We should also update our `./.gitignore` to exclude the generated files.
+And now when you run `npm install & npm run start` parcel will generate your assets into the dist folder. We should also update our `./.gitignore` to exclude the generated files.
 
 ```
 /target
@@ -81,6 +96,7 @@ Create an empty images folder in `crates/asset-pipeline/images` then your projec
 │   └── ...
 └── crates/
 │         asset-pipeline/
+│         ├── .gitignore
 │         ├── images/
 │         │   └── ...
 │         ├── index.scss
