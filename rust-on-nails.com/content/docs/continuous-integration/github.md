@@ -73,6 +73,6 @@ The images will be renamed to match your Github organisation and project.
 
 ## Packages
 
-The screenshot belows shows how your Github repo should look aftyer the piepline has run.
+The screenshot below shows how your Github repo should look after the pipeline has run.
 
 ![Github Repo](../github-repo.png)

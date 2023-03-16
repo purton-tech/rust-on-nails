@@ -145,7 +145,7 @@ earthly -P +all
 
 ## Validating the build
 
-Assuming the build completes succesfully we will have built two docker images
+Assuming the build completes successfully we will have built two docker images
 
 ```sh
 docker images | grep rustonnails

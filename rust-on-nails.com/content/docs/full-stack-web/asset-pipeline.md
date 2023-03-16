@@ -35,7 +35,7 @@ Also in your `.devcontainer/Dockerfile` uncomment the following line.
 
 ## .gitignore
 
-We need the folloewing `.gitignore` file.
+We need the following `.gitignore` file.
 
 ```
 dist
