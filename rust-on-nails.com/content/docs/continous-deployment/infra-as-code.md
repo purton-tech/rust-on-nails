@@ -105,7 +105,7 @@ const cloudnativePg = new k8s.helm.v3.Release("cloudnative-pg", {
 }); 
 ```
 
-OK. Let's run `opulumi up` and see what we get.
+OK. Let's run `pulumi up` and see what we get.
 
 ```sh
 $ pulumi up
@@ -238,6 +238,27 @@ new kx.Secret("database-urls", {
 ```
 
 Run `pulumi up` to apply our latest configuration.
+
+```
+Updating (dev)
+
+View in Browser (Ctrl+O): https://app.pulumi.com/ianpurton/nails-example/dev/updates/3
+
+     Type                                         Name               S
+     pulumi:pulumi:Stack                          nails-example-dev   
+ +   ├─ kubernetes:core/v1:Namespace              rust-on-nails      c
+ +   ├─ random:index:RandomPassword               app_password       c
+ +   ├─ kubernetes:core/v1:Secret                 database-urls      c
+ +   ├─ kubernetes:core/v1:Secret                 app-secret         c
+ +   └─ kubernetes:postgresql.cnpg.io/v1:Cluster  nails-db-cluster   c
+
+
+Resources:
+    + 5 created
+    3 unchanged
+
+Duration: 10s
+```
 
 ## Connecting to the database
 
