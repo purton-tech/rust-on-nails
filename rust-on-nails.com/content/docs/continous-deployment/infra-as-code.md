@@ -244,13 +244,13 @@ Updating (dev)
 
 View in Browser (Ctrl+O): https://app.pulumi.com/ianpurton/nails-example/dev/updates/3
 
-     Type                                         Name               S
+     Type                                         Name               
      pulumi:pulumi:Stack                          nails-example-dev   
- +   ├─ kubernetes:core/v1:Namespace              rust-on-nails      c
- +   ├─ random:index:RandomPassword               app_password       c
- +   ├─ kubernetes:core/v1:Secret                 database-urls      c
- +   ├─ kubernetes:core/v1:Secret                 app-secret         c
- +   └─ kubernetes:postgresql.cnpg.io/v1:Cluster  nails-db-cluster   c
+ +   ├─ kubernetes:core/v1:Namespace              rust-on-nails      created
+ +   ├─ random:index:RandomPassword               app_password       created
+ +   ├─ kubernetes:core/v1:Secret                 database-urls      created
+ +   ├─ kubernetes:core/v1:Secret                 app-secret         created
+ +   └─ kubernetes:postgresql.cnpg.io/v1:Cluster  nails-db-cluster   created
 
 
 Resources:
@@ -269,5 +269,5 @@ kubectl port-forward service/nails-db-cluster-rw 5455:5432 --namespace=rust-on-n
 You'll need to get the database password from the `database-urls` secret.
 
 ```sh
-psql -p 5455 -h 127.0.0.1 -U app nails_migrations
+psql -p 5455 -h 127.0.0.1 -U app app
 ```
