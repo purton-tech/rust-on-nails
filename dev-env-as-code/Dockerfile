@@ -43,6 +43,8 @@ RUN apt-get -y update \
         git \
         ssh \
         sudo \
+        # jq is used by earthly
+        jq \
         # required by parcel or you can't npm install 
         build-essential \
         # Needed so that prost builds
