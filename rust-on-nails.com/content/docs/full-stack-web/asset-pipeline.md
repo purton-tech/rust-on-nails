@@ -40,6 +40,7 @@ We need the following `.gitignore` file.
 ```
 dist
 node_modules
+.parcel-cache
 ```
 
 ## Installing Parcel
