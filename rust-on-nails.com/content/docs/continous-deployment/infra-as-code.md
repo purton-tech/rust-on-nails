@@ -107,7 +107,7 @@ export function setupCluster() : Release {
 }
 ```
 
-This will be setup that is re-usable across applications, as often in kubernetes we can install more than one application per cluster.
+This will be setup that is re-usable across applications, as often in Kubernetes we can install more than one application per cluster.
 
 Change your `index.ts` to look like the following.
 
@@ -179,7 +179,7 @@ It looks something like the image below and gives you the ability to see running
 
 ## Creating a Database and Users
 
-Crteate a `database.ts` and add the following code under the code we already created above. 
+Create a `database.ts` and add the following code under the code we already created above. 
 
 This code is responsible for creating a namespace called `rust-on-nails` we then install Postgres into that name space and setup a Kubernetes secret called `database-urls` so that our application can connect to the database.
 
@@ -300,7 +300,7 @@ export function setupDatabase(
 }
 ```
 
-Finally extend the `index.ts` and add the folloowing to the end. This will call the database fuction and also create our deployment.
+Finally extend the `index.ts` and add the following to the end. This will call the database function and also create our deployment.
 
 ```typescript
 setupDatabase(applicationNameSpace, cloudnativePg)
@@ -349,7 +349,7 @@ new kx.Deployment("application", {
 })
 ```
 
-Youy also need to uncomment the `//import { setupDatabase } from './database'` from the top of the `index.ts`.
+You also need to uncomment the `//import { setupDatabase } from './database'` from the top of the `index.ts`.
 
 Note. Your images will need to have been created in your Github repo.
 
