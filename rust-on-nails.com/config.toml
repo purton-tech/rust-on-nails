@@ -45,7 +45,7 @@ github_repo = "https://github.com/purton-tech/rust-on-nails"
 # Resources on the footer (LHS)
 resources_1 = [
     {name = "Blog", url = "/blog"},
-    {name = "Documentation", url = "/documentation"},
+    {name = "Documentation", url = "/docs/ide-setup/introduction/"},
 ]
 
 resources_2 = [
