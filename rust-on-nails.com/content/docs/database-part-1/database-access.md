@@ -99,32 +99,26 @@ Add the following code to `crates/db/src/lib.rs` will we use this to convert our
 
 ```rust
 use std::str::FromStr;
+use std::sync::Arc;
+use std::time::SystemTime;
 
-pub use deadpool_postgres::{Pool, Transaction, PoolError};
-pub use tokio_postgres::Error as TokioPostgresError;
 pub use cornucopia_async::Params;
+pub use deadpool_postgres::{Pool, PoolError, Transaction};
+use rustls::client::{ServerCertVerified, ServerCertVerifier};
+use rustls::ServerName;
+pub use tokio_postgres::Error as TokioPostgresError;
 
 pub use queries::users::User;
 
 pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
     let config = tokio_postgres::Config::from_str(database_url).unwrap();
 
-    let manager = if database_url.contains("sslmode=require") {
-        let mut root_store = rustls::RootCertStore::empty();
-        root_store.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(
-            |ta| {
-                rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-                    ta.subject,
-                    ta.spki,
-                    ta.name_constraints,
-                )
-            },
-        ));
-
+    let manager = if config.get_ssl_mode() != tokio_postgres::config::SslMode::Disable {
         let tls_config = rustls::ClientConfig::builder()
             .with_safe_defaults()
-            .with_root_certificates(root_store)
+            .with_custom_certificate_verifier(Arc::new(DummyTlsVerifier))
             .with_no_client_auth();
+
         let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
         deadpool_postgres::Manager::new(config, tls)
     } else {
@@ -132,6 +126,22 @@ pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
     };
 
     deadpool_postgres::Pool::builder(manager).build().unwrap()
+}
+
+struct DummyTlsVerifier;
+
+impl ServerCertVerifier for DummyTlsVerifier {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &rustls::Certificate,
+        _intermediates: &[rustls::Certificate],
+        _server_name: &ServerName,
+        _scts: &mut dyn Iterator<Item = &[u8]>,
+        _ocsp_response: &[u8],
+        _now: SystemTime,
+    ) -> Result<ServerCertVerified, rustls::Error> {
+        Ok(ServerCertVerified::assertion())
+    }
 }
 
 include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
@@ -173,7 +183,7 @@ cargo add deadpool_postgres
 cargo add tokio_postgres_rustls
 cargo add postgres_types
 cargo add tokio --features macros,rt-multi-thread
-cargo add rustls
+cargo add rustls --features dangerous_configuration
 cargo add webpki_roots
 cargo add futures
 cargo add serde --features derive

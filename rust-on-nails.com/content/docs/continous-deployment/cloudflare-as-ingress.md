@@ -60,7 +60,7 @@ Add the following to bottom of `index.ts`
 new k8s.core.v1.Service("application", {
     metadata: {
         name: "application",
-        namespace: applicationNameSpace.metadata.namespace
+        namespace: applicationNameSpace.metadata.name
     },
     spec: {
         ports: [
@@ -68,7 +68,7 @@ new k8s.core.v1.Service("application", {
         ],
         type: "ClusterIP",
         selector: {
-            app: deployment.metadata.namespace
+            app: deployment.metadata.name
         }
     }
 })
