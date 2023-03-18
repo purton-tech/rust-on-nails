@@ -113,6 +113,7 @@ vars
  - docs/continous-deployment/cloudflare-as-ingress.md
 Cloudflare
 30
+cloudfared
  - docs/continous-deployment/infra-as-code.md
 Pulumi
 Heroku
