@@ -39,6 +39,9 @@ Create a temporary file called config.yaml.
 ```yaml
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  # If we don't do this, then we can't connect on linux
+  apiServerAddress: "0.0.0.0"
 kubeadmConfigPatchesJSON6902:
 - group: kubeadm.k8s.io
   version: v1beta3
@@ -72,7 +75,7 @@ kubectl cluster-info --context kind-nails-cluster
 Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
 ```
 
-## Interacting with our cluster
+## Interacting with our cluster (Windows and MacOs)
 
 Kubernetes is administered with a command called `kubectl` let's configure `kubectl` so that it can access our cluster.
 
@@ -84,7 +87,36 @@ Set kubectl context to "kind-nails-cluster"
 We need to do a little trick so that `kubectl` can see the cluster when running inside our `devcontainer`. Run the following.
 
 ```sh
-sed -i 's/127.0.0.1/host.docker.internal/g' $HOME/.kube/config
+sed -i 's/0.0.0.0/host.docker.internal/g' $HOME/.kube/config
+```
+
+And now we can use `kubectl` to see what `pods` we have in our cluster.
+
+```sh
+$ kubectl get pods
+No resources found in default namespace.
+```
+
+## Interacting with our cluster in Linux
+
+Add the following to `.devcontainer/docker-compose.yml`
+
+```yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+```
+
+And rebuild your devcontainer
+
+```sh
+$ kind export kubeconfig --name nails-cluster
+Set kubectl context to "kind-nails-cluster"
+```
+
+We need to do a little trick so that `kubectl` can see the cluster when running inside our `devcontainer`. Run the following.
+
+```sh
+sed -i 's/0.0.0.0/host.docker.internal/g' $HOME/.kube/config
 ```
 
 And now we can use `kubectl` to see what `pods` we have in our cluster.
