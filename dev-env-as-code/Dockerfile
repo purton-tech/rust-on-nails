@@ -40,7 +40,6 @@ RUN apt-get -y update \
     && apt-get install -y --no-install-recommends \
         curl \
         wget \
-        git \
         ssh \
         sudo \
         # jq is used by earthly
@@ -65,6 +64,8 @@ RUN apt-get -y update \
     && apt-get clean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/* \
     # Stuff that updates the package manager
+    # Debian bullseye backports for later Git version
+    && sh -c 'echo "deb http://deb.debian.org/debian bullseye-backports main" > /etc/apt/sources.list.d/bullseye-backports.list' \
     # Postgres
     && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
@@ -77,6 +78,8 @@ RUN apt-get -y update \
     && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get -y update \
     && apt-get -y --no-install-recommends install \
+        # More recent Git version
+        git/bullseye-backports \
         postgresql-client \
         # Docker Engine for Earthly. 
         docker-ce docker-ce-cli containerd.io \
