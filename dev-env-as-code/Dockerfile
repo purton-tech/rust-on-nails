@@ -21,7 +21,7 @@ FROM rust:slim
 ARG CLOAK_VERSION=1.17.15
 ARG DBMATE_VERSION=1.16.0
 ARG MOLD_VERSION=1.7.0
-ARG EARTHLY_VERSION=0.6.29
+ARG EARTHLY_VERSION=0.7.2
 ARG DOCKER_COMPOSE_VERSION=1.29.2
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
