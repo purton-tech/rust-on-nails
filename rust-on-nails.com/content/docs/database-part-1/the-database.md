@@ -15,8 +15,11 @@ top = false
 
 ## Why Postgres?
 
-* Postgres supports RLS (Row Level Security) this allows us to implement authorization over our data at the lowest level.
-* Support for unstructured data. Postgres can store and search JSON and other types of data.
+* PostgreSQL supports most of the major features of SQL:2016. Out of 177 mandatory features required for full Core conformance, PostgreSQL conforms to at least 170. In addition, there is a long list of supported optional features. It might be worth noting that at the time of writing, no current version of any database management system claims full conformance to Core SQL:2016.
+* Scales Vertically and Horizontally with tools such as Citus (https://www.citusdata.com/)
+* Postgres supports RLS (Row Level Security) allowing you to implement authorization at the database level.
+* It can support many 1000's of transaction per second running on commodity hardware.
+* NoSQL support. Postgres can store and search JSON and other types of unstructured data.
 * Postgres has earned a strong reputation for its proven architecture, reliability, data integrity, robust feature set, extensibility, and the dedication of the open source community behind the software to consistently deliver performant and innovative solutions.
 
 ## Test out your Postgres installation
