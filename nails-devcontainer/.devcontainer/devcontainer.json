@@ -7,14 +7,27 @@
 	],
 	"service": "development",
 	"workspaceFolder": "/workspace",
+		
 	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"lldb.executable": "/usr/bin/lldb",
-		// VS Code don't watch files under ./target
-		"files.watcherExclude": {
-			"**/target/**": true
-		},
-		"rust-analyzer.checkOnSave.command": "clippy"
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"lldb.executable": "/usr/bin/lldb",
+				// VS Code don't watch files under ./target
+				"files.watcherExclude": {
+					"**/target/**": true
+				},
+				"rust-analyzer.checkOnSave.command": "clippy"
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"vadimcn.vscode-lldb",
+				"mutantdino.resourcemonitor",
+				"rust-lang.rust-analyzer",
+				"tamasfe.even-better-toml",
+				"serayuzgur.crates"
+			]
+		}
 	},
 
 	"remoteEnv": {
@@ -24,15 +37,6 @@
 		// Pass in the host directory for Docker mount commands from inside the container
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
 	},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"vadimcn.vscode-lldb",
-		"mutantdino.resourcemonitor",
-		"rust-lang.rust-analyzer",
-		"tamasfe.even-better-toml",
-		"serayuzgur.crates"
-	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [5432],
