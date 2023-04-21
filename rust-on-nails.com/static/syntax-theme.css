@@ -108,13 +108,13 @@ font-style: italic;
 .z-meta.z-diff, .z-meta.z-diff.z-range {
  color: #3bc0f0;
 }
-.z-todo.z-environment.z-name {
+.z-todo.z-category.z-name {
  color: #e8bf6a;
 }
 .z-todo.z-task.z-urgent {
  color: #feff00;
 }
-.z-todo.z-environment.z-extras {
+.z-todo.z-category.z-extras {
  color: #bc9458;
 }
 .z-todo.z-task.z-dormant {
