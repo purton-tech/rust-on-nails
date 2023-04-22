@@ -13,7 +13,7 @@ top = false
 +++
 
 
-![Creating a vault](/yay-your-on-nails.png)
+![Yay! You're on Nails! screenshot](/yay-your-on-nails.png)
 
 To build a web application you need to make architecture decisions across a range of topics. The beauty of Ruby on Rails or Django is that they make those decisions for you so you can start building your web application straight away. They also back those decisions up with great documentation.
 
