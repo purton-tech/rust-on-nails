@@ -1,5 +1,5 @@
 # Do all the cargo install stuff
-FROM rust:slim as builder
+FROM rust:slim-bookworm as builder
 
 # Configure apt and install packages
 RUN apt-get update \
@@ -16,7 +16,7 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.8.2 cornucopia 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
 
-FROM rust:slim
+FROM rust:slim-bookworm
 
 ARG CLOAK_VERSION=1.19.4
 ARG DBMATE_VERSION=2.2.0
