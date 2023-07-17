@@ -109,13 +109,12 @@ You should now have a folder structure like the following.
 │         axum-server/
 │         │  └── main.rs
 │         └── Cargo.toml
-├── Cargo.toml
-└── Cargo.lock
+└── Cargo.toml
 ```
 
 ## Testing
 
-Test out you development environment with
+Test out your development environment with
 
 ```
 $ cargo run
