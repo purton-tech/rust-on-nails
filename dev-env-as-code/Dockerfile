@@ -38,6 +38,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Configure apt and install packages
 RUN apt-get -y update \
     && apt-get install -y --no-install-recommends \
+        git \
         curl \
         wget \
         ssh \
