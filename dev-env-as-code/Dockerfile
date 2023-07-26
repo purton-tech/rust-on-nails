@@ -58,34 +58,29 @@ RUN apt-get -y update \
         gnupg-agent \
         gnupg \
         software-properties-common \
+        postgresql-client \
+        # Install node.
+        npm \
+        nodejs \
     #
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/* \
-    # Stuff that updates the package manager
-    # Debian bullseye backports for later Git version
-    && sh -c 'echo "deb http://deb.debian.org/debian bullseye-backports main" > /etc/apt/sources.list.d/bullseye-backports.list' \
-    # Postgres
-    && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+
+    # Docker Engine for Earthly. https://docs.docker.com/engine/install/debian/
+    && install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && chmod a+r /etc/apt/keyrings/docker.gpg \
     && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
-    && add-apt-repository \
-        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) \
-        stable" \
-    # Node
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && echo \
+        "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+        "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null \
     && apt-get -y update \
-    && apt-get -y --no-install-recommends install \
-        # More recent Git version
-        git/bullseye-backports \
-        postgresql-client \
-        # Docker Engine for Earthly. 
-        docker-ce docker-ce-cli containerd.io \
-        # Install node.
-        nodejs \
+    && apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io \
     && apt-get autoremove -y && apt-get clean -y \
+
     # Create a non-root user
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \

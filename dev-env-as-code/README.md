@@ -1,0 +1,3 @@
+## Build
+
+docker build .
