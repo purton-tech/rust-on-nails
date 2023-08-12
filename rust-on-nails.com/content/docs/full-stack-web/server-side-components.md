@@ -148,10 +148,10 @@ pub mod users;
 
 Then finally we can change our `axum-server` code to generate HTML rather than JSON.
 
-Make sure you're in the `crates/axum-server` folder and add the `ui_components` crate to your `Cargo.toml` using the following command:
+Make sure you're in the `crates/axum-server` folder and add the `ui-components` crate to your `Cargo.toml` using the following command:
 
 ```sh
-cargo add --path ../ui_components
+cargo add --path ../ui-components
 ```
 
 Update `crates/axum-server/src/main.rs`
