@@ -23,7 +23,7 @@ However all modern browser come with web components built in and as they are pre
 
 ## Example WebComponent
 
-An example of a very simple component create the following in `crates/asset-pipelinse/components/hello_world.ts`.
+An example of a very simple component create the following in `crates/asset-pipelines/components/hello_world.ts`.
 
 ```typescript
 //define a class extending HTMLElement
