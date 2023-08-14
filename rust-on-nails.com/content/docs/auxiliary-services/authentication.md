@@ -20,13 +20,15 @@ Probably the quickest way to add authentication to an application is with [Barri
 We've already created the tables that Barricade needs in the migrations section. so we just need to add configuration `.devcontainer/docker-compose.yml`.
 
 ```yml
-  auth:
-    image: purtontech/barricade:1.2.0
+  barricade:
+    image: purtontech/barricade:1.2.5
     env_file:
         - .env
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:9090:9090"
 ```
 
 We also need to add a health check to our db section so that we know when the database is ready.
@@ -45,24 +47,15 @@ Add the following to you `.devcontainer/.env`
 
 ```sh
 # Barricade config
+DATABASE_URL=postgresql://postgres:testpassword@db:5432/postgres?sslmode=disable
 SECRET_KEY=190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
-ENABLE_EMAIL_OTP='true'
 
-FORWARD_URL=app
+FORWARD_URL=development
 FORWARD_PORT=3000
 # Any requests that meet the following regular expressions
 # with pass through. i.e. They don't require auth.
 SKIP_AUTH_FOR=/static*
 REDIRECT_URL='/'
-
-# Send all email to mailhog
-SMTP_HOST=smtp
-SMTP_PORT=1025
-SMTP_USERNAME=thisisnotused
-SMTP_PASSWORD=thisisnotused
-SMTP_TLS_OFF='true'
-RESET_DOMAIN=http://localhost:7100
-RESET_FROM_EMAIL_ADDRESS=support@wedontknowyet.com
 ```
 
 ## Testing Barricade
@@ -70,8 +63,8 @@ RESET_FROM_EMAIL_ADDRESS=support@wedontknowyet.com
 After rebuilding your *devcontainer* you will need to register as a user. Make sure you server is running again i.e. 
 
 ```sh
-$ cd app
-$ cargo run
+cd /workspace
+cargo run
 ```
 
 Expose port 9090 from your devcontainer then go to `http://localhost:9090` and sign up.
@@ -80,17 +73,16 @@ Expose port 9090 from your devcontainer then go to `http://localhost:9090` and s
 
 ## Accessing the user from Axum
 
-We need to create a file called `crates/axum-server/src/authentification.rs` and add the following code.
+We need to create a file called `crates/axum-server/src/authentication.rs` and add the following code.
 
 ```rust
 // Extract the barricade 
 use axum::{
     async_trait,
     extract::FromRequestParts,
-    http::StatusCode,
+    http::{StatusCode, request::Parts},
     response::{IntoResponse, Response},
 };
-use http::request::Parts;
 
 #[derive(Debug)]
 pub struct Authentication {
@@ -132,7 +124,7 @@ Form within a handler you can access the user id like so...
 
 pub async fn index(
     Extension(pool): Extension<Pool>,
-    current_user: Authentication,
+    current_user: authentication::Authentication,
 ) -> Result<Html<String>, CustomError> {
   ...
   dbg!(current_user.user_id);
