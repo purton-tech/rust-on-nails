@@ -26,6 +26,7 @@ PostgreSQL
 Citus
 1000's
 NoSQL
+Dioxus
  - _index.md
 url
 ide-setup
@@ -161,6 +162,8 @@ Ructe
 80
 struct
 FruitPreferences
+2023-08-12
+serde
  - docs/full-stack-web/front-end.md
 120
  - docs/full-stack-web/html-templating.md

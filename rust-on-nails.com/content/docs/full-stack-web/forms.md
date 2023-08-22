@@ -2,7 +2,7 @@
 title = "Forms"
 description = "Forms"
 date = 2021-05-01T08:00:00+00:00
-updated = 2023-08-12:00:00+00:00
+updated = 2023-08-12T08:00:00+00:00
 draft = false
 weight = 80
 sort_by = "weight"
