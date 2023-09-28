@@ -15,9 +15,26 @@ top = false
 
 ![Yay! You're on Nails! screenshot](/yay-your-on-nails.png)
 
-To build a web application you need to make architecture decisions across a range of topics. The beauty of Ruby on Rails or Django is that they make those decisions for you so you can start building your web application straight away. They also back those decisions up with great documentation.
+When creating software it's often a good practice to document the architecture using  a technique called [Architecture Decision Records](https://adr.github.io/).
 
-Rust on Nails is a framework leveraging existing solutions that fulfil the needs of a full stack development. We look at each decision that needs to be made then pull in solutions and package everything up so that it works together. It's an opinionated framework and it's how Cloak was built see the Cloak Github Repo.
+An ADR is nothing more than a markdown document that records the title, status, context, decision, and consequences of a particular design choice.
+
+When a decision is made it's often helpful to create a small Proof of Concept that illustrates how the decision will play out in the real world. 
+
+## This Guide
+
+After running through a few projects creating ADR's I realised a lot of the are re-usable. When you add in the Proofs of Concept which are required to prove an architecture decision you end up with something almost like a turorial.
+
+This guide shows how to get Rust web applications into production.
+
+The following applications were built using decisions that are documented here.
+
+## Showcase
+
+The following projects were built using these guidelines
+
+- [Bionic GPT](https://github.com/purton-tech/bionicgpt)
+- [SkyTrace](https://github.com/purton-tech/skytrace)
 
 ## Architecture
 
