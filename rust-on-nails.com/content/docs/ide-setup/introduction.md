@@ -23,7 +23,7 @@ When a decision is made it's often helpful to create a small Proof of Concept th
 
 ## This Guide
 
-After running through a few projects creating ADR's I realised a lot of the are re-usable. When you add in the Proofs of Concept which are required to prove an architecture decision you end up with something almost like a tutorial.
+After running through a few projects creating ADR's I realised a lot of them are re-usable. With the Proofs of Concept which are required to prove an architecture decision you end up with something almost like a tutorial.
 
 This guide shows how to get Rust web applications into production.
 
