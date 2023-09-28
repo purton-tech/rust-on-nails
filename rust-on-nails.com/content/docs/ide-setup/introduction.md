@@ -33,8 +33,8 @@ The following applications were built using decisions that are documented here.
 
 The following projects were built using these guidelines
 
-- [Bionic GPT](https://github.com/purton-tech/bionicgpt)
-- [SkyTrace](https://github.com/purton-tech/skytrace)
+- [Bionic GPT](https://github.com/purton-tech/bionicgpt?campaign=rustonnails)
+- [SkyTrace](https://github.com/purton-tech/skytrace?campaign=rustonnails)
 
 ## Architecture
 
