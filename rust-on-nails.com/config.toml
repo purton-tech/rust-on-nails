@@ -54,6 +54,7 @@ resources_2 = [
 ]
 
 menu_items = [
+    {name = "Github", url = "https://github.com/purton-tech/rust-on-nails"}
 ]
 
 # Documentation sections
