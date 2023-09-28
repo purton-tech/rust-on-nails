@@ -27,6 +27,11 @@ Citus
 1000's
 NoSQL
 Dioxus
+ADR
+GPT
+LLM
+OpenAI
+PPTX
  - _index.md
 url
 ide-setup
@@ -180,6 +185,7 @@ Actix
 Tokio
  - docs/ide-setup/introduction.md
 Django
+SkyTrace
  - docs/spa/webassembly.md
 Webassembly
  - privacy-policy/_index.md
@@ -216,3 +222,20 @@ AWS
 CrunchData
 config.yaml.
 fly.io
+ - docs/llm/_index.md
+LLM's
+ - docs/llm/cli-client.md
+openai-api-rs
+RustTLS
+TODO
+ - docs/llm/embeddings.md
+text-embedding-ada-002
+512
+pgvector
+0.2
+postgres
+384
+ - docs/llm/model.md
+llama.cpp
+ - docs/llm/unstructured.md
+3GB
