@@ -164,6 +164,7 @@ struct
 FruitPreferences
 2023-08-12
 serde
+2023-08-12T08
  - docs/full-stack-web/front-end.md
 120
  - docs/full-stack-web/html-templating.md
