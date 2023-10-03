@@ -179,7 +179,7 @@ First add the client side dependencies to our project
 
 ```sh
 cargo add tokio_postgres
-cargo add deadpool_postgres
+cargo add deadpool_postgres@0.10.5
 cargo add tokio_postgres_rustls
 cargo add postgres_types
 cargo add tokio --features macros,rt-multi-thread
