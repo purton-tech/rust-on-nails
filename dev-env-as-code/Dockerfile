@@ -19,10 +19,10 @@ RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
 FROM rust:slim-bookworm
 
 ARG CLOAK_VERSION=1.19.4
-ARG DBMATE_VERSION=2.6.0
-ARG MOLD_VERSION=1.11.0
-ARG EARTHLY_VERSION=0.7.2
-ARG DOCKER_COMPOSE_VERSION=1.29.2
+ARG DBMATE_VERSION=2.7.0
+ARG MOLD_VERSION=2.3.2
+ARG EARTHLY_VERSION=0.7.21
+ARG DOCKER_COMPOSE_VERSION=2.23.0
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
