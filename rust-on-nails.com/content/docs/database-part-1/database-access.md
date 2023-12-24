@@ -183,7 +183,7 @@ cargo add deadpool-postgres@0.10.5
 cargo add tokio_postgres_rustls
 cargo add postgres_types
 cargo add tokio --features macros,rt-multi-thread
-cargo add rustls --features dangerous_configuration
+cargo add rustls@0.21.10 --features dangerous_configuration
 cargo add webpki_roots
 cargo add futures
 cargo add serde --features derive
