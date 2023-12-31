@@ -13,7 +13,7 @@ toc = true
 top = false
 +++
 
-[cloudfared](https://github.com/cloudflare/cloudflared) is a tool we can use to connect our cluster securely to the outside world.
+[cloudflared](https://github.com/cloudflare/cloudflared) is a tool we can use to connect our cluster securely to the outside world.
 
 Cloudflare also gives us the option to use [Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/do-more-with-tunnels/trycloudflare/) so we don't even have to setup a Cloudflare account at this stage.
 
