@@ -123,7 +123,7 @@ Everything should compile at this point.
 
 ## Implementing our API End Point
 
-Create a file called `crago/axum-server/api_service.rs` and add the following implementation for our gRPC service.
+Create a file called `crates/axum-server/api_service.rs` and add the following implementation for our gRPC service.
 
 ```rust
 use grpc_api::api::*;
