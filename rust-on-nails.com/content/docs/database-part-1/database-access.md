@@ -100,22 +100,21 @@ Add the following code to `crates/db/src/lib.rs` will we use this to convert our
 ```rust
 use std::str::FromStr;
 use std::sync::Arc;
-use std::time::SystemTime;
 
 pub use cornucopia_async::Params;
 pub use deadpool_postgres::{Pool, PoolError, Transaction};
-use rustls::client::{ServerCertVerified, ServerCertVerifier};
-use rustls::ServerName;
+use rustls::client::danger::{ServerCertVerified, ServerCertVerifier, HandshakeSignatureValid};
+use rustls_pki_types::{ServerName, CertificateDer, UnixTime};
 pub use tokio_postgres::Error as TokioPostgresError;
 
 pub use queries::users::User;
 
-pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
+pub fn create_pool(database_url: &str) -> Pool {
     let config = tokio_postgres::Config::from_str(database_url).unwrap();
 
     let manager = if config.get_ssl_mode() != tokio_postgres::config::SslMode::Disable {
         let tls_config = rustls::ClientConfig::builder()
-            .with_safe_defaults()
+            .dangerous()
             .with_custom_certificate_verifier(Arc::new(DummyTlsVerifier))
             .with_no_client_auth();
 
@@ -125,22 +124,44 @@ pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
         deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
     };
 
-    deadpool_postgres::Pool::builder(manager).build().unwrap()
+    Pool::builder(manager).build().unwrap()
 }
 
+#[derive(Debug)]
 struct DummyTlsVerifier;
 
 impl ServerCertVerifier for DummyTlsVerifier {
     fn verify_server_cert(
         &self,
-        _end_entity: &rustls::Certificate,
-        _intermediates: &[rustls::Certificate],
+        _end_entity: &CertificateDer,
+        _intermediates: &[CertificateDer],
         _server_name: &ServerName,
-        _scts: &mut dyn Iterator<Item = &[u8]>,
         _ocsp_response: &[u8],
-        _now: SystemTime,
+        _now: UnixTime,
     ) -> Result<ServerCertVerified, rustls::Error> {
         Ok(ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, rustls::Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, rustls::Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
+        Vec::new()
     }
 }
 
@@ -179,11 +200,12 @@ First add the client side dependencies to our project
 
 ```sh
 cargo add tokio_postgres
-cargo add deadpool-postgres@0.10.5
+cargo add deadpool-postgres
 cargo add tokio_postgres_rustls
 cargo add postgres_types
 cargo add tokio --features macros,rt-multi-thread
-cargo add rustls@0.21.10 --features dangerous_configuration
+cargo add rustls
+cargo add rustls-pki-types
 cargo add webpki_roots
 cargo add futures
 cargo add serde --features derive
