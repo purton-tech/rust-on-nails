@@ -84,7 +84,7 @@ pub fn users(users: Vec<User>) -> String {
     // Construct our component and render it to a string.
     let mut app = VirtualDom::new_with_props(app, Props { users });
     let _ = app.rebuild();
-    dioxus::ssr::render_vdom(&app)
+    format!("<!DOCTYPE html><html lang='en'>{}</html>", dioxus_ssr::render(&app))
 }
 ```
 
@@ -138,10 +138,8 @@ async fn main() {
     // run it
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
 async fn users(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
@@ -254,10 +252,8 @@ async fn main() {
     // run it
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
 async fn users(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
