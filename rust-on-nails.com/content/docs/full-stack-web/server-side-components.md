@@ -25,7 +25,8 @@ cargo init --lib crates/ui-components
 
 ```sh
 cd crates/ui-components
-cargo add dioxus@0.2 --features ssr
+cargo add dioxus
+cargo add dioxus-ssr
 ```
 
 ## Creating a Layout Component
@@ -48,9 +49,6 @@ pub struct AppLayoutProps<'a> {
 
 pub fn Layout<'a>(cx: Scope<'a, AppLayoutProps<'a>>) -> Element {
     cx.render(rsx!(
-        {
-            LazyNodes::new(|f| f.text(format_args!("<!DOCTYPE html><html lang='en'>")))
-        }
         head {
             title {
                 "{cx.props.title}"
@@ -135,7 +133,7 @@ pub fn users(users: Vec<User>) -> String {
         },
     );
     let _ = app.rebuild();
-    dioxus::ssr::render_vdom(&app)
+    format!("<!DOCTYPE html><html lang='en'>{}</html>", dioxus_ssr::render(&app))
 }
 ```
 
@@ -179,9 +177,8 @@ async fn main() {
     // run it
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
 async fn users(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
