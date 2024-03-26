@@ -3,6 +3,9 @@ FROM purtontech/rust-on-nails-devcontainer:1.1.6 AS development
 COPY ps1.bash .
 RUN cat ps1.bash >> ~/.bashrc && sudo rm ps1.bash
 
+COPY install_cmake.sh .
+RUN  sudo sh install_cmake.sh
+
 COPY .bash_aliases /home/vscode/.bash_aliases
 
 # Enable our git hooks and set the permisisons on docker sock.
