@@ -7,6 +7,7 @@ RUN apt-get update \
         libpq-dev \
         curl \
         xz-utils \
+        build-essential \
         unzip
 
 RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo-watch-v7.8.0-x86_64-unknown-linux-musl.tar.xz -L -o cargo-watch.tar.xz \
@@ -14,11 +15,13 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
     && mv cargo-watch-v7.8.0-x86_64-unknown-linux-musl/cargo-watch /home
 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.9.0 cornucopia 
+RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.5.0 dioxus-cli 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
 
 FROM rust:slim-bookworm
 
 ARG CLOAK_VERSION=1.19.4
+ARG ZOLA_VERSION=0.17.2
 ARG DBMATE_VERSION=2.7.0
 ARG MOLD_VERSION=2.30.0
 ARG EARTHLY_VERSION=0.7.21
@@ -121,7 +124,12 @@ RUN apt-get -y update \
     && mv ./kind /usr/local/bin/kind \
     # Kubectl
     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
-    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
+    # Zola
+    && curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+    && tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+    && rm zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+    && install -o root -g root -m 0755 zola /usr/local/bin/zola
     
 USER $USERNAME
 
@@ -129,6 +137,7 @@ USER $USERNAME
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/dx $CARGO_HOME/bin
 
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
