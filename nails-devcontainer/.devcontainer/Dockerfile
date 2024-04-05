@@ -1,4 +1,4 @@
-FROM purtontech/rust-on-nails-devcontainer:1.1.18 AS development
+FROM purtontech/rust-on-nails-devcontainer:1.2.0 AS development
 
 COPY ps1.bash .
 RUN cat ps1.bash >> ~/.bashrc && sudo rm ps1.bash
