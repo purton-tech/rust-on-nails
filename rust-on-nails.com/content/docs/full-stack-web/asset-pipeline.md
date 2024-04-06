@@ -22,7 +22,7 @@ I've used [Parcel](https://parceljs.org/) on several projects and before that [W
 If you look at your `.devcontainer/docker-compose.yml` you'll see a line that is commented out.
 
 ```yml
-#- node_modules:/workspace/crates/asset-pipeline/node_modules # Set target as a volume for performance. 
+#- node_modules:/workspace/crates/asset-pipeline/node_modules # Set target as a volume for performance.
 ```
 
 Comment that back in and rebuild your devcontainer. This will setup the node_modules folder as a volume and you will get way better performance during builds. This is due to the fact the node_modules folder has many files and docker tries to sync them with your main file system.
@@ -48,7 +48,7 @@ node_modules
 To install parcel
 
 ```sh
-$ mdir crates/asset-pipeline
+$ mkdir crates/asset-pipeline
 $ cd crates/asset-pipeline
 $ npm install --save-dev parcel
 ```
