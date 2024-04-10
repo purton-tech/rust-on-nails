@@ -15,8 +15,16 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
     && mv cargo-watch-v7.8.0-x86_64-unknown-linux-musl/cargo-watch /home
 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.9.0 cornucopia 
-RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.5.0 dioxus-cli 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
+
+# Install cargo-binstall, which makes it easier to install other
+# cargo extensions like cargo-leptos
+RUN wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
+RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
+RUN cp cargo-binstall /usr/local/cargo/bin
+
+# Install cargo-leptos
+RUN cargo binstall cargo-leptos -y
 
 FROM rust:slim-bookworm
 
@@ -94,6 +102,7 @@ RUN apt-get -y update \
     && rustup component add rustfmt clippy \
     # Add the musl toolchain
     && rustup target add x86_64-unknown-linux-musl \
+    && rustup target add wasm32-unknown-unknown \
     # Install secrets management
     && /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak" \
     # Database migrations   
@@ -136,8 +145,8 @@ USER $USERNAME
 # Copy the binaries we built in builder container
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-leptos $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/dx $CARGO_HOME/bin
 
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
