@@ -6,6 +6,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libpq-dev \
         curl \
+        wget \
         xz-utils \
         build-essential \
         unzip
