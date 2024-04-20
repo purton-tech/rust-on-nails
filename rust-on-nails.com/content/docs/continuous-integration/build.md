@@ -35,13 +35,13 @@ FROM purtontech/rust-on-nails-devcontainer:1.1.2
 ARG APP_NAME=app
 ARG APP_FOLDER=app
 ARG IMAGE_PREFIX=rustonnails
-ARG APP_EXE_NAME=axum-server
+ARG APP_EXE_NAME=web-ui
 
 # Version of software
 ARG DBMATE_VERSION=1.15.0
 
 # Folders
-ARG AXUM_FOLDER=crates/axum-server
+ARG AXUM_FOLDER=crates/web-ui
 ARG DB_FOLDER=crates/db
 ARG GRPC_API_FOLDER=crates/grpc-api
 ARG PIPELINE_FOLDER=crates/asset-pipeline
@@ -127,11 +127,11 @@ migration-container:
 # Our axum server
 app-container:
     FROM scratch
-    COPY +build/$APP_EXE_NAME axum-server
+    COPY +build/$APP_EXE_NAME web-ui
     # Place assets in a build folder as that's where statics is expecting them.
     COPY --dir +npm-build/dist /build/$PIPELINE_FOLDER/
     COPY --dir $PIPELINE_FOLDER/images /build/$PIPELINE_FOLDER/images
-    ENTRYPOINT ["./axum-server"]
+    ENTRYPOINT ["./web-ui"]
     SAVE IMAGE --push $APP_IMAGE_NAME
 ```
 

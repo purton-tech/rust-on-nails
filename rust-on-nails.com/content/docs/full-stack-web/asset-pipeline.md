@@ -104,7 +104,7 @@ Create an empty images folder in `crates/asset-pipeline/images` then your projec
 │         ├── index.ts
 │         └── node_modules/
 │             └── ...
-│         axum-server/
+│         web-ui/
 │         │  └── main.rs
 │         └── Cargo.toml
 │         db/

@@ -83,7 +83,7 @@ Your project folders should now look like this.
 ├── .devcontainer/
 │   └── ...
 └── crates/
-│         axum-server/
+│         web-ui/
 │         │  └── main.rs
 │         └── Cargo.toml
 │         db/
