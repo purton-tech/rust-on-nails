@@ -70,7 +70,7 @@ psql $DATABASE_URL -c 'SELECT count(*) FROM users;'
 
 And you should see
 
-```
+```sh
  count 
 -------
       0
