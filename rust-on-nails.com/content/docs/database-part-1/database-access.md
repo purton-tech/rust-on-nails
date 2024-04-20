@@ -20,8 +20,7 @@ We'll turn our `crates/db` folder into a crate so we can keep all our database l
 Run the following
 
 ```sh
-$ cargo init --lib crates/db
-Created library package
+cargo init --lib crates/db
 ```
 
 ## Installation
@@ -30,7 +29,7 @@ Install `cornucopia` into your project `cd` into your `crates/db` folder.
 
 ```sh
 cd crates/db
-cargo add cornucopia_async
+cargo add cornucopia_async@0.6
 ```
 
 ## Creating a SQL definition
@@ -95,74 +94,30 @@ fn cornucopia() {
 
 ## Add a function to do connection pooling
 
+First add some more crates, make sure you are in the `crates/db` folder.
+
+
+```sh
+cargo add tokio_postgres@0.7
+cargo add deadpool-postgres@0.12
+cargo add postgres_types@0.2
+cargo add tokio@1 --features macros,rt-multi-thread
+cargo add futures@0.3
+cargo add serde@1 --features derive
+```
+
 Add the following code to `crates/db/src/lib.rs` will we use this to convert our `DATABASE_URL` env var into something cornucopia can use for connection pooling.
 
 ```rust
 use std::str::FromStr;
-use std::sync::Arc;
 
 pub use cornucopia_async::Params;
 pub use deadpool_postgres::{Pool, PoolError, Transaction};
-use rustls::client::danger::{ServerCertVerified, ServerCertVerifier, HandshakeSignatureValid};
-use rustls_pki_types::{ServerName, CertificateDer, UnixTime};
-pub use tokio_postgres::Error as TokioPostgresError;
 
-pub use queries::users::User;
-
-pub fn create_pool(database_url: &str) -> Pool {
+pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
     let config = tokio_postgres::Config::from_str(database_url).unwrap();
-
-    let manager = if config.get_ssl_mode() != tokio_postgres::config::SslMode::Disable {
-        let tls_config = rustls::ClientConfig::builder()
-            .dangerous()
-            .with_custom_certificate_verifier(Arc::new(DummyTlsVerifier))
-            .with_no_client_auth();
-
-        let tls = tokio_postgres_rustls::MakeRustlsConnect::new(tls_config);
-        deadpool_postgres::Manager::new(config, tls)
-    } else {
-        deadpool_postgres::Manager::new(config, tokio_postgres::NoTls)
-    };
-
-    Pool::builder(manager).build().unwrap()
-}
-
-#[derive(Debug)]
-struct DummyTlsVerifier;
-
-impl ServerCertVerifier for DummyTlsVerifier {
-    fn verify_server_cert(
-        &self,
-        _end_entity: &CertificateDer,
-        _intermediates: &[CertificateDer],
-        _server_name: &ServerName,
-        _ocsp_response: &[u8],
-        _now: UnixTime,
-    ) -> Result<ServerCertVerified, rustls::Error> {
-        Ok(ServerCertVerified::assertion())
-    }
-
-    fn verify_tls12_signature(
-        &self,
-        _message: &[u8],
-        _cert: &CertificateDer,
-        _dss: &rustls::DigitallySignedStruct,
-    ) -> Result<HandshakeSignatureValid, rustls::Error> {
-        Ok(HandshakeSignatureValid::assertion())
-    }
-
-    fn verify_tls13_signature(
-        &self,
-        _message: &[u8],
-        _cert: &CertificateDer,
-        _dss: &rustls::DigitallySignedStruct,
-    ) -> Result<HandshakeSignatureValid, rustls::Error> {
-        Ok(HandshakeSignatureValid::assertion())
-    }
-
-    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
-        Vec::new()
-    }
+    let manager = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
+    deadpool_postgres::Pool::builder(manager).build().unwrap()
 }
 
 include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
@@ -194,23 +149,6 @@ You should now have a folder structure something like this.
 
 ## Testing our database crate
 
-Make sure you're in the `crates/db` folder.
-
-First add the client side dependencies to our project
-
-```sh
-cargo add tokio_postgres
-cargo add deadpool-postgres
-cargo add tokio_postgres_rustls
-cargo add postgres_types
-cargo add tokio --features macros,rt-multi-thread
-cargo add rustls
-cargo add rustls-pki-types
-cargo add webpki_roots
-cargo add futures
-cargo add serde --features derive
-```
-
 Make sure everything builds.
 
 ```sh
@@ -225,18 +163,18 @@ mod tests {
     use super::*;
     #[tokio::test]
     async fn load_users() {
-
         let db_url = std::env::var("DATABASE_URL").unwrap();
         let pool = create_pool(&db_url);
 
         let client = pool.get().await.unwrap();
-    
+        //let transaction = client.transaction().await.unwrap();
+
         let users = crate::queries::users::get_users()
             .bind(&client)
             .all()
             .await
             .unwrap();
-    
+
         dbg!(users);
     }
 }
