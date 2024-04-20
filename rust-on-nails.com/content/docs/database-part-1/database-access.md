@@ -180,7 +180,15 @@ mod tests {
 }
 ```
 
-Run `cargo test -- --nocapture` and you should see
+## Run the test
+
+Run the below to trigger the unit test
+
+```sh
+cargo test -- --nocapture
+```
+
+### The Results
 
 ```sh
 Running unittests src/lib.rs (/workspace/target/debug/deps/db-1a59f4c51c8578ce)
@@ -203,3 +211,5 @@ running 1 test
 
 test tests::load_users ... ok
 ```
+
+Great, from now on adding code to access the database is as simple as creating new `sql` files. The code generator will take care of the details.
