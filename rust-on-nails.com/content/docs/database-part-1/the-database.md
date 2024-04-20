@@ -27,8 +27,12 @@ top = false
 Postgres is pre-installed in your `devcontainer`. To try it out run the below.
 
 ```sh
-> psql $DATABASE_URL
+psql $DATABASE_URL
+```
 
+You should see something like the below. (\q to Quit)
+
+```sh
 psql (14.2 (Debian 14.2-1.pgdg110+1), server 14.1 (Debian 14.1-1.pgdg110+1))
 Type "help" for help.
 
