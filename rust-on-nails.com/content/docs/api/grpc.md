@@ -46,7 +46,7 @@ Create a folder called `crates/grpc-api/protos` and a file called `api.proto`
 └── crates/
 │         asset-pipeline/
 │         └── ...
-│         axum-server/
+│         web-ui/
 │         └── ...
 │         db/
 │         └── ...
@@ -123,7 +123,7 @@ Everything should compile at this point.
 
 ## Implementing our API End Point
 
-Create a file called `crates/axum-server/api_service.rs` and add the following implementation for our gRPC service.
+Create a file called `crates/web-ui/api_service.rs` and add the following implementation for our gRPC service.
 
 ```rust
 use grpc_api::api::*;
@@ -178,7 +178,7 @@ impl grpc_api::users_server::Fortunes for UsersService {
 
 We can modify our Axum server so that it can respond to HTTP and gRPC requests.
 
-Our `crates/axum-server/src/main.rs` now needs to look like this.
+Our `crates/web-ui/src/main.rs` now needs to look like this.
 
 ```rust
 mod config;

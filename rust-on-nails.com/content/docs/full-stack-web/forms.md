@@ -95,13 +95,13 @@ _Note:_ `for` and `type` are Rust keywords. We must prefix them with `r#` so Rus
 We need to install [serde](https://serde.rs/) to transform the HTTP body into a Rust struct.
 
 ```bash
-cd crates/axum-server
+cd crates/web-ui
 cargo add serde@1.0 --features derive
 ```
 
 [Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. We are going to create a `create_form` handler to save new users to our database.
 
-Update `crates/axum-server/src/main.rs`
+Update `crates/web-ui/src/main.rs`
 
 ```rust
 mod config;
@@ -207,11 +207,11 @@ Our web form validates that the user input is an email. We should also check tha
 Install the `Validator` crate.
 
 ```bash
-cd crates/axum-server
+cd crates/web-ui
 cargo add validator@0.15 --features derive
 ```
 
-Update `crates/axum-server/src/main.rs`
+Update `crates/web-ui/src/main.rs`
 
 ```rust
 mod config;

@@ -73,7 +73,7 @@ Expose port 9090 from your devcontainer then go to `http://localhost:9090` and s
 
 ## Accessing the user from Axum
 
-We need to create a file called `crates/axum-server/src/authentication.rs` and add the following code.
+We need to create a file called `crates/web-ui/src/authentication.rs` and add the following code.
 
 ```rust
 // Extract the barricade 
@@ -114,7 +114,7 @@ where
 }
 ```
 
-Connect this into our `crates/axum-server/src/main.rs` by adding a line `mod authentication` at the top of the `main.rs`.
+Connect this into our `crates/web-ui/src/main.rs` by adding a line `mod authentication` at the top of the `main.rs`.
 
 ## Using the Authentication Extractor
 

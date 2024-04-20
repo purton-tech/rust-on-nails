@@ -65,7 +65,7 @@ dbg!(index_css.name) -> index.234532455.css
 
 ## Configuring a route for our assets
 
-In `crates/axum-server/main.rs` create the following function.
+In `crates/web-ui/main.rs` create the following function.
 
 ```rust
 async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
@@ -89,7 +89,7 @@ async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
 }
 ```
 
-And add the following route also in `crates/axum-server/main.rs`
+And add the following route also in `crates/web-ui/main.rs`
 
 ```rust
 .route("/static/*path", get(static_path))
