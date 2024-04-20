@@ -31,7 +31,7 @@ We have pre-configured a development environment with all the tools needed to cr
 
 To get started create a folder for your project. Change directory into that folder then run.
 
-```
+```sh
 mkdir project-name
 cd project-name
 ```
@@ -78,7 +78,7 @@ How you folder structure will look.
 Open up a terminal in VSCode (CTRL + `) and execute
 
 ```sh
-$ git init
+$ git init --initial-branch=main
 Initialized empty Git repository in /workspace/.git/
 ```
 
@@ -88,6 +88,8 @@ We are going to create a workspace for our web application. Create a new `Cargo.
 
 ```toml
 [workspace]
+resolver = "2"
+
 members = [
     "crates/*",
 ]
@@ -95,9 +97,9 @@ members = [
 
 Open up the terminal in VSCode again and run the following
 
-```
-$ cargo new --vcs=none crates/axum-server
-     Created binary (application) `crates/axum-server` package
+```sh
+cargo new --vcs=none crates/hello-world
+# Created binary (application) `crates/hello-world` package
 ```
 
 You should now have a folder structure like the following.
@@ -106,7 +108,7 @@ You should now have a folder structure like the following.
 ├── .devcontainer/
 │   └── ...
 └── crates/
-│         axum-server/
+│         hello-world/
 │         │  └── main.rs
 │         └── Cargo.toml
 └── Cargo.toml
@@ -116,19 +118,19 @@ You should now have a folder structure like the following.
 
 Test out your development environment with
 
-```
-$ cargo run
-   Compiling app v0.1.0 (/workspace/app)
-    Finished dev [unoptimized + debuginfo] target(s) in 1.16s
-     Running `target/debug/app`
-Hello, world!
+```sh
+cargo run
+#   Compiling app v0.1.0 (/workspace/app)
+#    Finished dev [unoptimized + debuginfo] target(s) in 1.16s
+#     Running `target/debug/app`
+# Hello, world!
 ```
 
 ## Commit your code
 
 From the `/workspace` folder
 
-```
-$ git add .
-$ git commit -m"Initial Commit"
+```sh
+git add .
+git commit -m"Initial Commit"
 ```
