@@ -73,7 +73,7 @@ And you should see
 ```sh
  count 
 -------
-      0
+      3
 (1 row)
 ```
 
