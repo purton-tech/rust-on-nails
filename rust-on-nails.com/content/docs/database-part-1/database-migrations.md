@@ -35,9 +35,9 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO users(email, hashed_password) VALUES('test1@test1.com');
-INSERT INTO users(email, hashed_password) VALUES('test2@test1.com');
-INSERT INTO users(email, hashed_password) VALUES('test3@test1.com');
+INSERT INTO users(email) VALUES('test1@test1.com');
+INSERT INTO users(email) VALUES('test2@test1.com');
+INSERT INTO users(email) VALUES('test3@test1.com');
 
 -- migrate:down
 DROP TABLE users;
