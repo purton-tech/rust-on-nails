@@ -32,6 +32,7 @@ GPT
 LLM
 OpenAI
 PPTX
+javascript
  - _index.md
 url
 ide-setup
@@ -128,6 +129,7 @@ vars
 Cloudflare
 30
 cloudfared
+cloudflared
  - docs/continous-deployment/infra-as-code.md
 Pulumi
 Heroku
@@ -163,6 +165,8 @@ gitignore
  - docs/full-stack-web/cache-busting.md
 100
 Ructe
+80
+css
  - docs/full-stack-web/forms.md
 80
 struct
@@ -217,6 +221,7 @@ ui-components
  - docs/full-stack-web/islands-architecture.md
 120
 WebComponent
+110
  - docs/continous-deployment/kubernetes.md
 AWS
 CrunchData
@@ -239,3 +244,6 @@ postgres
 llama.cpp
  - docs/llm/unstructured.md
 3GB
+ - docs/full-stack-web/isalands-architecture-ts.md
+120
+WebComponent
