@@ -96,80 +96,58 @@ cargo add serde@1.0 --features derive
 
 [Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. We are going to create a `create_form` handler to save new users to our database.
 
-Update `crates/web-ui/src/main.rs`
+Create a new file `crates/web-ui/src/new_user.rs`
 
 ```rust
-mod config;
-mod errors;
+use serde::Deserialize;
 
 use crate::errors::CustomError;
-// 👇 update axum imports
 use axum::{
     extract::Extension,
-    response::Html,
     response::Redirect,
-    routing::get,
-    routing::post,
     Form,
-    Router,
 };
-// 👇 new import
-use serde::Deserialize;
-use std::net::SocketAddr;
-
-#[tokio::main]
-async fn main() {
-    let config = config::Config::new();
-
-    let pool = db::create_pool(&config.database_url);
-
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(users))
-        .route("/sign_up", post(accept_form)) // 👈 add new route
-        .layer(Extension(config))
-        .layer(Extension(pool.clone()));
-
-    // run it
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    println!("listening on {}", addr);
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app.into_make_service()).await.unwrap();
-}
-
-async fn users(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
-    let client = pool.get().await?;
-
-    let users = db::queries::users::get_users().bind(&client).all().await?;
-
-    // We now return HTML
-    Ok(Html(ui_components::users::users(users)))
-}
 
 // 👇 create new SignUp struct
 #[derive(Deserialize )]
-struct SignUp {
+pub struct SignUp {
     email: String,
 }
 
 // 👇 handle form submission
-async fn accept_form(
+pub async fn process_form(
     Extension(pool): Extension<db::Pool>,
     Form(form): Form<SignUp>,
 ) -> Result<Redirect, CustomError> {
     let client = pool.get().await?;
 
     let email = form.email;
-    // TODO - accept a password and hash it
-    let hashed_password = String::from("aaaa");
     let _ = db::queries::users::create_user()
-        .bind(&client, &email.as_str(), &hashed_password.as_str())
+        .bind(&client, &email.as_str())
         .await?;
 
     // 303 redirect to users list
     Ok(Redirect::to("/"))
 }
 ```
+
+## Add the form handling to our routes
+
+In `crates/web-ui/main.rs` add a `mod new_user;` and add another route like the following.
+
+```rust
+.route("/sign_up", post(new_user::process_form))
+```
+
+You'll also need to add `post` to our `use` section.
+
+```rust
+use axum::{extract::Extension, routing::{get, post}, Router};
+```
+
+The compiler will complain becuase we haven't added the database code to handle form submission.
+
+## Create the database code
 
 We are using `db::queries::users::create_user()` in our `accept_form` handler. We must also update `crates/db/queries/users.sql` to include our actual SQL query
 
@@ -184,8 +162,10 @@ FROM users;
 
 -- 👇 add `create_user` query
 --! create_user
-INSERT INTO users (email, hashed_password)
-VALUES(:email, :hashed_password);
+INSERT INTO 
+    users (email)
+VALUES
+    (:email);
 ```
 
 You should get results like the screenshot below.
