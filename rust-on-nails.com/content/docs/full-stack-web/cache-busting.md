@@ -1,10 +1,10 @@
 +++
-title = "Cache Busting and Images"
-description = "Cache Busting and Images"
+title = "Assets and Cache Busting"
+description = "Assets and Cache Busting"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
-weight = 100
+weight = 80
 sort_by = "weight"
 
 
@@ -13,44 +13,46 @@ toc = true
 top = false
 +++
 
-[NOTE - This section needs to be tested since we migrated to using crates]
+We'll want to add assets to our project such as images, css and perhaps javascript (but hopefully not javascript).
 
 Cache busting is where we invalidate a cached file and force the browser to retrieve the file from the server. We can instruct the browser to bypass the cache by simply changing the filename. To the browser, this is a completely new resource so it will fetch the resource from the server. The most common way to do this is to add the hash of the file to the URL.
 
-## Using Ructe for Cache Busting
+We can also generate some code so the assets are available in our Rust pages and then we get the added benefit that if the files are deleted or names are chnaged we get compiler errors.
 
-Let's turn our `asset-pipeline` folder into a Rust crate. We do this because we can use `Ructe` to generate code that allows to access assets in  a typesafe way. Ructe also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Javascript.
-
-Run the following...
-
+## Create an Asset Pipeline
 
 ```sh
-$ cargo init --lib crates/asset-pipeline
-Created library package
+cargo init --lib crates/web-assets
 ```
 
-Create a  `crates/asset-pipeline/build.rs` so that the `main` method looks like the following.
+## Using Ructe for Cache Busting
+
+We'll use `Ructe` to generate code that allows to access assets in a typesafe way. Ructe also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Images.
+
+
+Create a  `crates/web-assets/src/build.rs` so that the `main` method looks like the following.
 
 ```rust
-fn main() -> Result<()>  {
+use ructe::{Result, Ructe};
 
-    cornucopia()?;
+fn main() -> Result<()>  {
 
     let mut ructe = Ructe::from_env().unwrap();
     let mut statics = ructe.statics().unwrap();
-    statics.add_files("dist").unwrap();
     statics.add_files("images").unwrap();
     ructe.compile_templates("templates").unwrap();
 
     Ok(())
 }
+
 ```
 
-And add the following to `crates/asset-pipeline/Cargo.toml` in the dependencies section.
+Setup our dependencies
 
-```toml
-# Used by ructe for image mime type detection
-mime = "0.3.0"
+```sh
+cd crates/web-assets
+cargo add mime@0.3
+cargo add --dev ructe@0.17 --no-default-features -F mime
 ```
 
 Ructe will now take our assets and turn them into rust functions. It handles creating a hash for the assets so we get good browser cache busting.
