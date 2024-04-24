@@ -90,13 +90,13 @@ _Note:_ `for` and `type` are Rust keywords. We must prefix them with `r#` so Rus
 We need to install [serde](https://serde.rs/) to transform the HTTP body into a Rust struct.
 
 ```bash
-cd crates/web-ui
+cd crates/web-server
 cargo add serde@1.0 --features derive
 ```
 
 [Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. We are going to create a `create_form` handler to save new users to our database.
 
-Create a new file `crates/web-ui/src/new_user.rs`
+Create a new file `crates/web-server/src/new_user.rs`
 
 ```rust
 use serde::Deserialize;
@@ -133,7 +133,7 @@ pub async fn process_form(
 
 ## Add the form handling to our routes
 
-In `crates/web-ui/main.rs` add a `mod new_user;` and add another route like the following.
+In `crates/web-server/main.rs` add a `mod new_user;` and add another route like the following.
 
 ```rust
 .route("/sign_up", post(new_user::process_form))
@@ -182,11 +182,11 @@ Our web form validates that the user input is an email. We should also check tha
 Install the `Validator` crate.
 
 ```bash
-cd crates/web-ui
+cd crates/web-server
 cargo add validator@0.15 --features derive
 ```
 
-Update `crates/web-ui/src/new_user.rs` and add validation.
+Update `crates/web-server/src/new_user.rs` and add validation.
 
 ```rust
 use serde::Deserialize;

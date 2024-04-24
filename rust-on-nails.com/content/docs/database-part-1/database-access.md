@@ -134,7 +134,7 @@ You should now have a folder structure something like this.
 ├── .devcontainer/
 │   └── ...
 └── crates/
-│         web-ui/
+│         web-server/
 │         │  └── main.rs
 │         └── Cargo.toml
 │         db/

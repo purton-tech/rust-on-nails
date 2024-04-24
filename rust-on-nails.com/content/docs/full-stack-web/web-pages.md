@@ -135,15 +135,15 @@ pub fn render(mut virtual_dom: VirtualDom) -> String {
 
 ```
 
-Then finally we can change our `web-ui` code to generate HTML rather than JSON.
+Then finally we can change our `web-server` code to generate HTML rather than JSON.
 
-Make sure you're in the `crates/web-ui` folder and add the `web-pages` crate to your `Cargo.toml` using the following command:
+Make sure you're in the `crates/web-server` folder and add the `web-pages` crate to your `Cargo.toml` using the following command:
 
 ```sh
 cargo add --path ../web-pages
 ```
 
-Update `crates/web-ui/src/main.rs`
+Update `crates/web-server/src/main.rs`
 
 ```rust
 mod config;

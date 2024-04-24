@@ -21,7 +21,7 @@ The functions that respond to routes can have parameters. These parameters which
 
 ## Handling Configuration
 
-We'll separate our configuration into it's own file. create `crates/web-ui/src/config.rs`
+We'll separate our configuration into it's own file. create `crates/web-server/src/config.rs`
 
 ```rust
 #[derive(Clone, Debug)]
@@ -44,7 +44,7 @@ impl Config {
 
 Now is a good time to think about how we will handle errors so we don't have to `unwrap` all the time.
 
-Create a file called `crates/web-ui/src/errors.rs` and add the following code.
+Create a file called `crates/web-server/src/errors.rs` and add the following code.
 
 ```rust
 use axum::{
@@ -106,7 +106,7 @@ impl From<PoolError> for CustomError {
 
 ## Install Axum
 
-Make sure you're in the `crates/web-ui` folder and add Axum to your `Cargo.toml` using the following command.
+Make sure you're in the `crates/web-server` folder and add Axum to your `Cargo.toml` using the following command.
 
 ```sh
 cargo add axum@0.7 --no-default-features -F json
@@ -114,7 +114,7 @@ cargo add tokio@1 --no-default-features -F macros,fs,rt-multi-thread
 cargo add --path ../db
 ```
 
-And replace your `crates/web-ui/src/main.rs` with the following
+And replace your `crates/web-server/src/main.rs` with the following
 
 ```rust
 mod config;

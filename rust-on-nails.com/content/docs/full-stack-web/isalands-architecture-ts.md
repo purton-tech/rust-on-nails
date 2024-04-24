@@ -103,7 +103,7 @@ Create an empty images folder in `crates/asset-pipeline/images` then your projec
 │         ├── index.ts
 │         └── node_modules/
 │             └── ...
-│         web-ui/
+│         web-server/
 │         │  └── main.rs
 │         └── Cargo.toml
 │         db/

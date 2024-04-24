@@ -85,9 +85,9 @@ pub use templates::statics as files;
 
 ## Configuring a route for our assets
 
-Back to our `web-ui` crate.
+Back to our `web-server` crate.
 
-create a new file `crates/web-ui/src/static_files.rs` and add the following function.
+create a new file `crates/web-server/src/static_files.rs` and add the following function.
 
 ```rust
 use axum::extract::Path;
@@ -117,7 +117,7 @@ pub async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
 }
 ```
 
-And add the following route in `crates/web-ui/src/main.rs` in the section where we defined our routes.
+And add the following route in `crates/web-server/src/main.rs` in the section where we defined our routes.
 
 ```rust
 .route("/static/*path", get(static_files::static_path))

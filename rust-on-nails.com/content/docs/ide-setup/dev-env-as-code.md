@@ -98,8 +98,8 @@ members = [
 Open up the terminal in VSCode again and run the following
 
 ```sh
-cargo new --vcs=none crates/web-ui
-# Created binary (application) `crates/web-ui` package
+cargo new --vcs=none crates/web-server
+# Created binary (application) `crates/web-server` package
 ```
 
 You should now have a folder structure like the following.
@@ -108,7 +108,7 @@ You should now have a folder structure like the following.
 ├── .devcontainer/
 │   └── ...
 └── crates/
-│         web-ui/
+│         web-server/
 │         │  └── main.rs
 │         └── Cargo.toml
 └── Cargo.toml
