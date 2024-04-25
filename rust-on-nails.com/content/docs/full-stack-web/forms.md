@@ -145,7 +145,7 @@ You'll also need to add `post` to our `use` section.
 use axum::{extract::Extension, routing::{get, post}, Router};
 ```
 
-The compiler will complain becuase we haven't added the database code to handle form submission.
+The compiler will complain because we haven't added the database code to handle form submission.
 
 ## Create the database code
 

@@ -98,9 +98,9 @@ First add some more crates, make sure you are in the `crates/db` folder.
 
 
 ```sh
-cargo add tokio_postgres@0.7
+cargo add tokio-postgres@0.7
 cargo add deadpool-postgres@0.12
-cargo add postgres_types@0.2
+cargo add postgres-types@0.2
 cargo add tokio@1 --features macros,rt-multi-thread
 cargo add futures@0.3
 cargo add serde@1 --features derive
