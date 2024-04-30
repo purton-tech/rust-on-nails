@@ -146,7 +146,9 @@ RUN apt-get -y update \
     && curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
     && tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
     && rm zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-    && install -o root -g root -m 0755 zola /usr/local/bin/zola
+    && install -o root -g root -m 0755 zola /usr/local/bin/zola \
+    # Mirrord
+    && curl -fsSL https://raw.githubusercontent.com/metalbear-co/mirrord/main/scripts/install.sh | bash
     
 USER $USERNAME
 
