@@ -83,7 +83,7 @@ message GetUsersResponse {
     repeated User users = 1;
 }
 
-message Fortune {
+message User {
     uint32 id = 1;
     string email = 2;
 }
