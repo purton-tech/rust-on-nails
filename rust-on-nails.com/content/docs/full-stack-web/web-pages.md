@@ -83,6 +83,7 @@ cargo add --path ../db
 Create a file `crates/web-pages/src/users.rs`.
 
 ```rust
+use crate::layout::Layout;
 use db::User;
 use dioxus::prelude::*;
 

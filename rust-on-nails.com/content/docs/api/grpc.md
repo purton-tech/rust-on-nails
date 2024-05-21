@@ -83,7 +83,7 @@ message GetUsersResponse {
     repeated User users = 1;
 }
 
-message Fortune {
+message User {
     uint32 id = 1;
     string email = 2;
 }
@@ -94,15 +94,14 @@ message Fortune {
 Add the following to your `crates/grpc-api/build.rs` in the `main` function.
 
 ```rust
+use std::io::Result;
+
 fn main() -> Result<()> {
-
     tonic_build::configure()
-    .compile(
-        &["api.proto"], // Files in the path
-        &["../protos"], // The path to search
-    )
-    .unwrap();
-
+        .compile(
+            &["protos/api.proto"], // Update the path to the .proto file
+            &["protos"],           // Update the search path for proto files
+        )?;
     Ok(())
 }
 ```
