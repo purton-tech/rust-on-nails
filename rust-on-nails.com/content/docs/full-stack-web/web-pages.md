@@ -74,7 +74,7 @@ pub fn Layout(title: String, children: Element) -> Element {
 
 Let's use this layout to create a very simple users screen that will show a table of users.
 
-Make sure you're in the `crates/ui-components` folder and add the `db` crate to your `Cargo.toml` using the following command:
+Make sure you're in the `crates/web-pages` folder and add the `db` crate to your `Cargo.toml` using the following command:
 
 ```sh
 cargo add --path ../db
@@ -86,6 +86,17 @@ Create a file `crates/web-pages/src/users.rs`.
 use crate::layout::Layout;
 use db::User;
 use dioxus::prelude::*;
+
+// Create an IndexPage (maps to main.rs)
+#[component]
+pub fn IndexPage(props: IndexPageProps) -> Element {
+    // Use the users function to create the table
+    users(props.users)
+}
+
+pub struct IndexPageProps {
+    pub users: Vec<User>,
+}
 
 // Take a Vec<User> and create an HTML table.
 #[component]
