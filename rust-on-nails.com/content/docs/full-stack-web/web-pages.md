@@ -74,7 +74,7 @@ pub fn Layout(title: String, children: Element) -> Element {
 
 Let's use this layout to create a very simple users screen that will show a table of users.
 
-Make sure you're in the `crates/ui-components` folder and add the `db` crate to your `Cargo.toml` using the following command:
+Make sure you're in the `crates/web-pages` folder and add the `db` crate to your `Cargo.toml` using the following command:
 
 ```sh
 cargo add --path ../db
@@ -85,11 +85,18 @@ Create a file `crates/web-pages/src/users.rs`.
 ```rust
 use crate::layout::Layout;
 use db::User;
-use dioxus::prelude::*;
+use dioxus::prelue::*;
+use dioxus::prelude::component;
 
-// Take a Vec<User> and create an HTML table.
+// Define the properties for IndexPage
+#[derive(Props, Clone, PartialEq)]  // Add Clone and PartialEq here
+pub struct IndexPageProps {
+    pub users: Vec<User>,
+}
+
+// Define the IndexPage component
 #[component]
-pub fn users(users: Vec<User>) -> Element {
+pub fn IndexPage(props: IndexPageProps) -> Element {
     rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
