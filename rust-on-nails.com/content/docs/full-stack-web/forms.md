@@ -34,9 +34,8 @@ We can write this same form using Dioxus. Update `crates/ui-components/src/users
 use crate::layout::Layout;
 use db::User;
 use dioxus::prelude::*;
-use web_assets::files::avatar_svg;
-
 use dioxus::prelude::component;
+use web_assets::files::avatar_svg;
 
 // Define the properties for IndexPage
 #[derive(Props, Clone, PartialEq)]  // Add Clone and PartialEq here
