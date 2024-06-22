@@ -36,9 +36,17 @@ use db::User;
 use dioxus::prelude::*;
 use web_assets::files::avatar_svg;
 
-// Take a Vec<User> and create an HTML table.
+use dioxus::prelude::component;
+
+// Define the properties for IndexPage
+#[derive(Props, Clone, PartialEq)]  // Add Clone and PartialEq here
+pub struct IndexPageProps {
+    pub users: Vec<User>,
+}
+
+// Define the IndexPage component
 #[component]
-pub fn IndexPage(users: Vec<User>) -> Element {
+pub fn IndexPage(props: IndexPageProps) -> Element {
     rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
@@ -133,16 +141,34 @@ pub async fn process_form(
 
 ## Add the form handling to our routes
 
-In `crates/web-server/main.rs` add a `mod new_user;` and add another route like the following.
+In `crates/web-server/main.rs` add a the new module to the top of the file:
 
 ```rust
-.route("/sign_up", post(new_user::process_form))
+mod new_user;
 ```
 
-You'll also need to add `post` to our `use` section.
+Add `post` to our `use` section.
 
 ```rust
 use axum::{extract::Extension, routing::{get, post}, Router};
+```
+
+And add another route like the following to the list of routes to catch the post of the form so that the Router now looks like:
+
+```rust
+    // build our application with a route
+    let app = Router::new()
+        .route("/", get(users))
+        .route("/static/*path", get(static_files::static_path))
+        .route("/sign_up", post(new_user::process_form))
+        .layer(Extension(config))
+        .layer(Extension(pool.clone()));
+```
+
+In `crates/web-server/Cargo.toml` we also need to update the Axum dependency to add the form feature:
+
+```rust
+axum = { version = "0.7", default-features = false, features = ["json","http1","tokio","form"] }
 ```
 
 The compiler will complain because we haven't added the database code to handle form submission.
