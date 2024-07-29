@@ -24,9 +24,6 @@ RUN wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/c
 RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
 RUN cp cargo-binstall /usr/local/cargo/bin
 
-# Install cargo-leptos
-RUN cargo binstall cargo-leptos -y
-
 FROM rust:slim-bookworm
 
 ARG CLOAK_VERSION=1.19.4
@@ -155,8 +152,8 @@ USER $USERNAME
 # Copy the binaries we built in builder container
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-leptos $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-binstall $CARGO_HOME/bin
 
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
