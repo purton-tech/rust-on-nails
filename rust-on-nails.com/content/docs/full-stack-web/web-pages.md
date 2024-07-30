@@ -85,7 +85,7 @@ Create a file `crates/web-pages/src/users.rs`.
 ```rust
 use crate::layout::Layout;
 use db::User;
-use dioxus::prelue::*;
+use dioxus::prelude::*;
 use dioxus::prelude::component;
 
 // Define the properties for IndexPage
@@ -108,7 +108,7 @@ pub fn IndexPage(props: IndexPageProps) -> Element {
                     }
                 }
                 tbody {
-                    for user in users {
+                    for user in props.users {
                         tr {
                             td {
                                 strong {
