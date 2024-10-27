@@ -17,6 +17,7 @@ RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo
 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.9.0 cornucopia 
 RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
+RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install dioxus-cli
 
 # Install cargo-binstall, which makes it easier to install other
 # cargo extensions like cargo-leptos
@@ -154,6 +155,7 @@ COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-binstall $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/dx $CARGO_HOME/bin
 
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
