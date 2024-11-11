@@ -5,7 +5,11 @@
       "@semantic-release/release-notes-generator",
       "@semantic-release/github",
       ["@semantic-release-plus/docker", {
-          "name": "purtontech/rust-on-nails-devcontainer:latest",
+          "name": "purtontech/rust-on-nails-devcontainer-amd64:latest",
+          "skipLogin": true
+      }],
+      ["@semantic-release-plus/docker", {
+          "name": "purtontech/rust-on-nails-devcontainer-arm64:latest",
           "skipLogin": true
       }],
       ["@semantic-release/exec", {

@@ -37,13 +37,13 @@ jobs:
     
     - name: Build Docker file (AMD64)
       run: |
-        docker build --platform amd64 -t purtontech/rust-on-nails-devcontainer dev-env-as-code
-        docker push purtontech/rust-on-nails-devcontainer
+        docker build --platform amd64 -t purtontech/rust-on-nails-devcontainer-amd64 dev-env-as-code
+        docker push purtontech/rust-on-nails-devcontainer-amd64
     
     - name: Build Docker file (ARM64)
       run: |
-        docker build --platform arm64 -t purtontech/rust-on-nails-devcontainer dev-env-as-code
-        docker push purtontech/rust-on-nails-devcontainer
+        docker build --platform arm64 -t purtontech/rust-on-nails-devcontainer-arm64 dev-env-as-code
+        docker push purtontech/rust-on-nails-devcontainer-arm64
 
     # If this is a release
     #   create release notes
