@@ -8,6 +8,10 @@
           "name": "purtontech/rust-on-nails-devcontainer:latest",
           "skipLogin": true
       }],
+      ["@semantic-release-plus/docker", {
+          "name": "purtontech/supakube-devcontainer:latest",
+          "skipLogin": true
+      }],
       ["@semantic-release/exec", {
         "publishCmd": "./release.sh ${nextRelease.version}",
         "execCwd": "./"
