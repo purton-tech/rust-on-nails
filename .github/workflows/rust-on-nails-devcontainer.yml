@@ -44,15 +44,6 @@ jobs:
         context: ./dev-env-as-code
         push: true
         tags: purtontech/rust-on-nails-devcontainer:latest
-        platforms: linux/amd64
-
-    - name: Build and Push supakube-devcontainer
-      uses: docker/build-push-action@v3
-      with:
-        context: ./dev-env-as-code
-        file: Dockerfile.supakube
-        push: true
-        tags: purtontech/supakube-devcontainer:latest
         platforms: linux/amd64,linux/arm64
 
     # If this is a release

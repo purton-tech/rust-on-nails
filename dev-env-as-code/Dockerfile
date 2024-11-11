@@ -1,6 +1,10 @@
 # Do all the cargo install stuff
 FROM rust:slim-bookworm as builder
 
+ARG CARGO_BINSTALL_VERSION=0.8.0
+ARG CARGO_WATCH_VERSION=7.8.0
+ARG TARGETARCH=amd64
+
 # Configure apt and install packages
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -11,27 +15,40 @@ RUN apt-get update \
         build-essential \
         unzip
 
-RUN curl https://github.com/watchexec/cargo-watch/releases/download/v7.8.0/cargo-watch-v7.8.0-x86_64-unknown-linux-musl.tar.xz -L -o cargo-watch.tar.xz \
+# Install cargo-watch
+RUN case "${TARGETARCH}" in \
+        amd64) ARCH_WATCH="x86_64-unknown-linux-musl" ;; \
+        arm64) ARCH_WATCH="aarch64-unknown-linux-musl" ;; \
+        *) echo "Unsupported architecture for cargo-watch: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -L https://github.com/watchexec/cargo-watch/releases/download/v${CARGO_WATCH_VERSION}/cargo-watch-v${CARGO_WATCH_VERSION}-${ARCH_WATCH}.tar.xz -o cargo-watch.tar.xz \
     && tar -xf cargo-watch.tar.xz \
-    && mv cargo-watch-v7.8.0-x86_64-unknown-linux-musl/cargo-watch /home
-
-RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install --version 0.9.0 cornucopia 
-RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install cargo-chef --locked
-RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo install dioxus-cli
+    && mv cargo-watch-v${CARGO_WATCH_VERSION}-${ARCH_WATCH}/cargo-watch /home/ \
+    && chmod +x /home/cargo-watch \
+    && rm -rf cargo-watch.tar.xz cargo-watch-v${CARGO_WATCH_VERSION}-${ARCH_WATCH}
 
 # Install cargo-binstall, which makes it easier to install other
 # cargo extensions like cargo-leptos
-RUN wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
-RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
-RUN cp cargo-binstall /usr/local/cargo/bin
+# Determine architecture and install cargo-binstall
+RUN case "${TARGETARCH}" in \
+        amd64) ARCH="x86_64-unknown-linux-musl" ;; \
+        arm64) ARCH="aarch64-unknown-linux-musl" ;; \
+        *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && wget https://github.com/cargo-bins/cargo-binstall/releases/download/v${CARGO_BINSTALL_VERSION}/cargo-binstall-${ARCH}.tgz \
+    && tar -xvf cargo-binstall-${ARCH}.tgz \
+    && cp cargo-binstall /usr/local/cargo/bin/ \
+    && rm cargo-binstall-${ARCH}.tgz
 
 FROM rust:slim-bookworm
+
+ARG TARGETARCH=amd64
 
 ARG CLOAK_VERSION=1.19.4
 ARG ZOLA_VERSION=0.17.2
 ARG DBMATE_VERSION=2.21.0
 ARG MOLD_VERSION=2.34.1
-ARG EARTHLY_VERSION=0.8.9
+ARG EARTHLY_VERSION=0.8.15
 ARG DOCKER_COMPOSE_VERSION=2.23.0
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
@@ -102,11 +119,9 @@ RUN apt-get -y update \
     # Add the musl toolchain
     && rustup target add x86_64-unknown-linux-musl \
     && rustup target add wasm32-unknown-unknown \
-    # Install secrets management
-    && /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak" \
-    # Database migrations   
-    && curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
-    && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
+     # Database migrations   
+    && curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-${TARGETARCH} \
+    && mv ./dbmate-linux-${TARGETARCH} /usr/bin/dbmate \
     && chmod +x /usr/bin/dbmate \
     # Mold - Fast Rust Linker
     && curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz \
@@ -115,47 +130,28 @@ RUN apt-get -y update \
     && mv ./mold-$MOLD_VERSION-x86_64-linux/lib/mold/mold-wrapper.so /usr/bin/ \
     && rm mold-$MOLD_VERSION-x86_64-linux.tar.gz \
     && rm -rf ./mold-$MOLD_VERSION-x86_64-linux \
-    && chmod +x /usr/bin/mold \
-    # Docker compose for Earthly
-    && curl -L https://github.com/docker/compose/releases/download/v$DOCKER_COMPOSE_VERSION/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose \
-    && chmod +x /usr/local/bin/docker-compose \
-    # Earthly
-    && wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-amd64 -O /usr/local/bin/earthly \
+    && chmod +x /usr/bin/mold
+
+RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-${TARGETARCH} -O /usr/local/bin/earthly \
     && chmod +x /usr/local/bin/earthly \
     # K9s
-    && curl -L -s https://github.com/derailed/k9s/releases/download/v0.32.4/k9s_Linux_amd64.tar.gz | tar xvz -C /tmp \
+    && curl -L -s https://github.com/derailed/k9s/releases/download/v0.32.4/k9s_Linux_${TARGETARCH}.tar.gz | tar xvz -C /tmp \
     && mv /tmp/k9s /usr/bin \
-    && rm -rf k9s_Linux_x86_64.tar.gz \
-    # Kind
-    && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64 \
-    && chmod +x ./kind \
-    && mv ./kind /usr/local/bin/kind \
+    && rm -rf k9s_Linux_*.tar.gz \
     # Kubectl
-    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" \
     && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
     # Just
     && curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin \
-    && mv ~/bin/just /usr/local/bin \
-    # Tailwind binary + extra
-    && curl -OL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 \
-    && chmod +x tailwindcss-extra-linux-x64 \
-    && mv tailwindcss-extra-linux-x64 /usr/local/bin/tailwind-extra \
-    # Zola
-    && curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-    && tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-    && rm zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-    && install -o root -g root -m 0755 zola /usr/local/bin/zola \
-    # Mirrord
-    && curl -fsSL https://raw.githubusercontent.com/metalbear-co/mirrord/main/scripts/install.sh | bash
+    && mv ~/bin/just /usr/local/bin
     
 USER $USERNAME
 
 # Copy the binaries we built in builder container
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
+#COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
+#COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-binstall $CARGO_HOME/bin
-COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/dx $CARGO_HOME/bin
 
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
