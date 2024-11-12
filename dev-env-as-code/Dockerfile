@@ -35,7 +35,7 @@ RUN case "${TARGETARCH}" in \
 # Determine architecture and install cargo-binstall
 RUN case "${TARGETARCH}" in \
         amd64) ARCH="x86_64-unknown-linux-musl" ;; \
-        arm64) ARCH="aarch64-unknown-linux-gnu" ;; \
+        arm64) ARCH="aarch64-unknown-linux-musl" ;; \
         *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
     esac \
     && wget https://github.com/cargo-bins/cargo-binstall/releases/download/v${CARGO_BINSTALL_VERSION}/cargo-binstall-${ARCH}.tgz \
