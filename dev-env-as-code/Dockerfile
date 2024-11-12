@@ -153,7 +153,6 @@ COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 #COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-binstall $CARGO_HOME/bin
 
-
 # Pulumi
 RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
     && sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
