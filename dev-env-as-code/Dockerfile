@@ -1,5 +1,5 @@
 # Do all the cargo install stuff
-FROM rust:slim-bookworm as builder
+FROM --platform=$BUILDPLATFORM rust:slim-bookworm as builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -43,7 +43,7 @@ RUN case "${TARGETARCH}" in \
     && cp cargo-binstall /usr/local/cargo/bin/ \
     && rm cargo-binstall-${ARCH}.tgz
 
-FROM rust:slim-bookworm
+FROM --platform=$BUILDPLATFORM rust:slim-bookworm
 
 ARG TARGETOS
 ARG TARGETARCH
