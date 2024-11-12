@@ -21,7 +21,7 @@ RUN apt-get update \
 # Install cargo-watch
 RUN case "${TARGETARCH}" in \
         amd64) ARCH_WATCH="x86_64-unknown-linux-musl" ;; \
-        arm64) ARCH_WATCH="aarch64-unknown-linux-musl" ;; \
+        arm64) ARCH_WATCH="aarch64-unknown-linux-gnu" ;; \
         *) echo "Unsupported architecture for cargo-watch: ${TARGETARCH}" && exit 1 ;; \
     esac \
     && curl -L https://github.com/watchexec/cargo-watch/releases/download/v${CARGO_WATCH_VERSION}/cargo-watch-v${CARGO_WATCH_VERSION}-${ARCH_WATCH}.tar.xz -o cargo-watch.tar.xz \
@@ -35,7 +35,7 @@ RUN case "${TARGETARCH}" in \
 # Determine architecture and install cargo-binstall
 RUN case "${TARGETARCH}" in \
         amd64) ARCH="x86_64-unknown-linux-musl" ;; \
-        arm64) ARCH="aarch64-unknown-linux-musl" ;; \
+        arm64) ARCH="aarch64-unknown-linux-gnu" ;; \
         *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
     esac \
     && wget https://github.com/cargo-bins/cargo-binstall/releases/download/v${CARGO_BINSTALL_VERSION}/cargo-binstall-${ARCH}.tgz \
