@@ -52,18 +52,24 @@ jobs:
       #   set the docker version
       #   
       - name: Semantic Release
+        id: semantic_release
         run: | 
           npm i -D @semantic-release/exec
           npm i -D @semantic-release-plus/docker
           npm i -D @semantic-release/git
           npx semantic-release
 
+      - name: Check Semantic Release Outputs
+        run: |
+          echo "New release published: ${{ steps.semantic_release.outputs.new-release-published }}"
+          echo "Version: ${{ steps.semantic_release.outputs.version }}"
+ 
       - name: Tag and Push Docker Image
-        if: steps.semantic-release.outputs.new-release-published == 'true'
+        if: ${{ steps.semantic_release.outputs.new-release-published == 'true' }}
         run: |
           docker pull $CONTAINER_NAME:latest
-          docker tag $CONTAINER_NAME:latest $CONTAINER_NAME:${{ steps.semantic-release.outputs.version }}
-          docker push $CONTAINER_NAME:${{ steps.semantic-release.outputs.version }}
+          docker tag $CONTAINER_NAME:latest $CONTAINER_NAME:${{ steps.semantic_release.outputs.version }}
+          docker push $CONTAINER_NAME:${{ steps.semantic_release.outputs.version }}
 
       - name: "Publish Templates"
         uses: devcontainers/action@v1
