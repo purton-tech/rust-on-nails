@@ -4,14 +4,13 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/github",
-      ["@semantic-release-plus/docker", {
-          "name": "purtontech/rust-on-nails-devcontainer-amd64:latest",
-          "skipLogin": true
-      }],
-      ["@semantic-release-plus/docker", {
-          "name": "purtontech/rust-on-nails-devcontainer-arm64:latest",
-          "skipLogin": true
-      }],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "docker buildx create --use || true && docker buildx inspect --bootstrap",
+          "publishCmd": "docker buildx build --platform linux/amd64,linux/arm64 -t purtontech/rust-on-nails-devcontainer:${nextRelease.version} -t purtontech/rust-on-nails-devcontainer:latest --push ."
+        }
+      ],
       ["@semantic-release/exec", {
         "publishCmd": "./release.sh ${nextRelease.version}",
         "execCwd": "./"
