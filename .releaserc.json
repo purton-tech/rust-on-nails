@@ -7,8 +7,8 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "docker buildx create --use || true && docker buildx inspect --bootstrap",
-          "publishCmd": "docker buildx build --platform linux/amd64,linux/arm64 -t purtontech/rust-on-nails-devcontainer:${nextRelease.version} -t purtontech/rust-on-nails-devcontainer:latest --push ."
+          "prepareCmd": "",
+          "publishCmd": "docker tag ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag ghcr.io/purtontech/rust-on-nails-devcontainer:${nextRelease.version} && docker tag ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag ghcr.io/purtontech/rust-on-nails-devcontainer:latest && docker push ghcr.io/purtontech/rust-on-nails-devcontainer:${nextRelease.version} && docker push ghcr.io/purtontech/rust-on-nails-devcontainer:latest"
         }
       ],
       ["@semantic-release/exec", {

@@ -34,16 +34,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
-    - name: Build Docker file (AMD64)
+
+    - name: Build and cache multi-arch image
       run: |
-        docker build --platform amd64 -t purtontech/rust-on-nails-devcontainer-amd64 dev-env-as-code
-        docker push purtontech/rust-on-nails-devcontainer-amd64
-    
-    - name: Build Docker file (ARM64)
-      run: |
-        docker build --platform arm64 -t purtontech/rust-on-nails-devcontainer-arm64 dev-env-as-code
-        docker push purtontech/rust-on-nails-devcontainer-arm64
+        docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag --load dev-env-as-code
 
     # If this is a release
     #   create release notes
