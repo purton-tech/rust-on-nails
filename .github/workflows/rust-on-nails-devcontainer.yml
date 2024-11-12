@@ -34,10 +34,16 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name: Build and cache multi-arch image
+    
+    - name: Build Docker file (AMD64)
       run: |
-        docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag --load dev-env-as-code
+        docker build --platform amd64 -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+        docker push purtontech/rust-on-nails-devcontainer
+    
+    - name: Build Docker file (ARM64)
+      run: |
+        docker build --platform arm64 -t purtontech/rust-on-nails-devcontainer dev-env-as-code
+        docker push purtontech/rust-on-nails-devcontainer
 
     # If this is a release
     #   create release notes
@@ -49,6 +55,13 @@ jobs:
         npm i -D @semantic-release-plus/docker
         npm i -D @semantic-release/git
         npx semantic-release
+
+    - name: Tag and Push Docker Image
+      if: steps.semantic-release.outputs.new-release-published == 'true'
+      run: |
+        docker pull ghcr.io/purtontech/rust-on-nails-devcontainer:latest
+        docker tag ghcr.io/purtontech/rust-on-nails-devcontainer:latest ghcr.io/purtontech/rust-on-nails-devcontainer:${{ steps.semantic-release.outputs.version }}
+        docker push ghcr.io/purtontech/rust-on-nails-devcontainer:${{ steps.semantic-release.outputs.version }}
 
     - name: "Publish Templates"
       uses: devcontainers/action@v1

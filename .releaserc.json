@@ -4,13 +4,6 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/github",
-      [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "",
-          "publishCmd": "docker tag ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag ghcr.io/purtontech/rust-on-nails-devcontainer:${nextRelease.version} && docker tag ghcr.io/purtontech/rust-on-nails-devcontainer:temp-tag ghcr.io/purtontech/rust-on-nails-devcontainer:latest && docker push ghcr.io/purtontech/rust-on-nails-devcontainer:${nextRelease.version} && docker push ghcr.io/purtontech/rust-on-nails-devcontainer:latest"
-        }
-      ],
       ["@semantic-release/exec", {
         "publishCmd": "./release.sh ${nextRelease.version}",
         "execCwd": "./"
