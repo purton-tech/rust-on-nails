@@ -1,9 +1,12 @@
 # Do all the cargo install stuff
 FROM rust:slim-bookworm as builder
 
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETPLATFORM
+
 ARG CARGO_BINSTALL_VERSION=0.8.0
 ARG CARGO_WATCH_VERSION=7.8.0
-ARG TARGETARCH=amd64
 
 # Configure apt and install packages
 RUN apt-get update \
@@ -42,7 +45,9 @@ RUN case "${TARGETARCH}" in \
 
 FROM rust:slim-bookworm
 
-ARG TARGETARCH=amd64
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETPLATFORM
 
 ARG CLOAK_VERSION=1.19.4
 ARG ZOLA_VERSION=0.17.2
