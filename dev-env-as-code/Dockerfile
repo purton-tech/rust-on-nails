@@ -123,6 +123,7 @@ RUN apt-get -y update \
     && rustup component add rustfmt clippy \
     # Add the musl toolchain
     && rustup target add x86_64-unknown-linux-musl \
+    && rustup target add aarch64-unknown-linux-musl \
     && rustup target add wasm32-unknown-unknown \
      # Database migrations   
     && curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-${TARGETARCH} \
