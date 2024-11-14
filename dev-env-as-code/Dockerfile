@@ -43,6 +43,8 @@ RUN case "${TARGETARCH}" in \
     && cp cargo-binstall /usr/local/cargo/bin/ \
     && rm cargo-binstall-${ARCH}.tgz
 
+RUN cargo binstall --no-confirm cornucopia
+
 FROM rust:slim-bookworm
 
 ARG TARGETOS
@@ -155,7 +157,7 @@ USER $USERNAME
 # Copy the binaries we built in builder container
 COPY --chown=$USERNAME --from=builder /home/cargo-watch $CARGO_HOME/bin
 #COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-chef $CARGO_HOME/bin
-#COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
+COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cornucopia $CARGO_HOME/bin
 COPY --chown=$USERNAME --from=builder /usr/local/cargo/bin/cargo-binstall $CARGO_HOME/bin
 
 
