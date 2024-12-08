@@ -114,6 +114,11 @@ RUN apt-get -y update \
     && apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io \
     && apt-get autoremove -y && apt-get clean -y \
 
+    # Tailwind binary + extra
+    && curl -OL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 \
+    && chmod +x tailwindcss-extra-linux-x64 \
+    && mv tailwindcss-extra-linux-x64 /usr/local/bin/tailwind-extra \
+
     # Create a non-root user
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
