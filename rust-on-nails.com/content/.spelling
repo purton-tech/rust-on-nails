@@ -187,6 +187,7 @@ markup.rs
  - docs/full-stack-web/web-server.md
 Actix
 Tokio
+justfile
  - docs/ide-setup/introduction.md
 Django
 SkyTrace
