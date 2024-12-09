@@ -1,6 +1,6 @@
 +++
-title = "Forms"
-description = "Forms"
+title = "Forms and Actions"
+description = "Forms and Actions"
 date = 2021-05-01T08:00:00+00:00
 updated = 2023-08-12T08:00:00+00:00
 draft = false
@@ -28,27 +28,23 @@ In the following form we use an email type and a required attribute. The browser
 </form>
 ```
 
-We can write this same form using Dioxus. Update `crates/ui-components/src/users.rs` with a form to add users.
+We can write this same form using Dioxus. Update `crates/ui-components/src/root.rs` with a form to add users.
 
 ```rust
-use crate::layout::Layout;
+use crate::{layout::Layout, render};
 use db::User;
 use dioxus::prelude::*;
-use dioxus::prelude::component;
-use web_assets::files::avatar_svg;
+use web_assets::files::favicon_svg;
 
-// Define the properties for IndexPage
-#[derive(Props, Clone, PartialEq)]  // Add Clone and PartialEq here
-pub struct IndexPageProps {
-    pub users: Vec<User>,
-}
-
-// Define the IndexPage component
-#[component]
-pub fn IndexPage(props: IndexPageProps) -> Element {
-    rsx! {
+pub fn index(users: Vec<User>) -> String {
+    let page = rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
+            stylesheets: vec![],
+            header: rsx!(),
+            sidebar: rsx!(),
+            sidebar_header: rsx!(),
+            sidebar_footer: rsx!(),
             table {
                 thead {
                     tr {
@@ -61,7 +57,7 @@ pub fn IndexPage(props: IndexPageProps) -> Element {
                         tr {
                             td {
                                 img {
-                                    src: format!("/static/{}", avatar_svg.name),
+                                    src: favicon_svg.name,
                                     width: "16",
                                     height: "16"
                                 }
@@ -86,7 +82,9 @@ pub fn IndexPage(props: IndexPageProps) -> Element {
                 button { "Submit" }
             }
         }
-    }
+    };
+
+    render(page)
 }
 ```
 

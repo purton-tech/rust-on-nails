@@ -1,6 +1,6 @@
 +++
-title = "Islands Architecture (Rust)"
-description = "Front End"
+title = "HTMX and Interactivity"
+description = "HTMX and Interactivity"
 date = 2021-05-01T08:00:00+00:00
 updated = 2021-05-01T08:00:00+00:00
 draft = false
