@@ -123,12 +123,11 @@ And replace your `crates/web-server/src/main.rs` with the following
 ```rust
 mod config;
 mod errors;
+mod root;
 
 use std::net::SocketAddr;
 
-use crate::errors::CustomError;
-use axum::{routing::get, Extension, Json, Router};
-use db::User;
+use axum::{routing::get, Extension, Router};
 use tower_livereload::LiveReloadLayer;
 
 #[tokio::main]
@@ -139,7 +138,7 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/", get(users))
+        .route("/", get(root::loader))
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
@@ -152,8 +151,20 @@ async fn main() {
         .await
         .unwrap();
 }
+```
 
-async fn users(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<User>>, CustomError> {
+## Loaders
+
+create a file called `root.rs`. This is where we will have the logic that will load data from the database and pass it to the pages so they can render.
+
+In this example we will just return JSON for now.
+
+```rust
+use crate::errors::CustomError;
+use axum::{Extension, Json};
+use db::User;
+
+pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<User>>, CustomError> {
     let client = pool.get().await?;
 
     let users = db::queries::users::get_users().bind(&client).all().await?;
