@@ -258,3 +258,17 @@ SCSS
 WebComponent
  - docs/full-stack-web/styling.md
 90
+ - docs/full-stack-web/htmx.md
+HTMX
+110
+ - docs/full-stack-web/islands-architecture-ts.md
+120
+Sass
+Webpack
+node_modules
+gitignore
+package.json
+npm
+dist
+SCSS
+WebComponent
