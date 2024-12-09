@@ -244,39 +244,12 @@ Make sure you're in the `crates/web-server` folder and add the `web-pages` crate
 cargo add --path ../web-pages
 ```
 
-Update `crates/web-server/src/main.rs`
+Update `crates/web-server/src/root.rs`
 
 ```rust
-mod config;
-mod errors;
 use crate::errors::CustomError;
-use axum::response::Html;
-use axum::{extract::Extension, routing::get, Router};
-use std::net::SocketAddr;
+use axum::{response::Html, Extension};
 use web_pages::root;
-use tower_livereload::LiveReloadLayer;
-
-#[tokio::main]
-async fn main() {
-    let config = config::Config::new();
-
-    let pool = db::create_pool(&config.database_url);
-
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(loader))
-        .layer(Extension(config))
-        .layer(LiveReloadLayer::new())
-        .layer(Extension(pool.clone()));
-
-    // run it
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    println!("listening on... {}", addr);
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
-}
 
 pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
