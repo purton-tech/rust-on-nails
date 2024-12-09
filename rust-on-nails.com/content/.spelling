@@ -258,6 +258,8 @@ SCSS
 WebComponent
  - docs/full-stack-web/styling.md
 90
+Justfile
+stylesheet
  - docs/full-stack-web/htmx.md
 HTMX
 110
@@ -272,3 +274,6 @@ npm
 dist
 SCSS
 WebComponent
+ - docs/full-stack-web/component-library.md
+DaisyUI
+RSX

@@ -13,7 +13,8 @@ toc = true
 top = false
 +++
 
+One of the main benefits of React is that you can construct user interfaces from components. We can do exactly the same with Dioxus. We'll use a pre-designed set of components called [DaisyUI](https://daisyui.com/) which gives most things we will need i.e. Buttons, Tabs etc.
 
-[Coming Soon]
+And we can use [Daisy RSX](https://github.com/bionic-gpt/daisy-rsx/) which is a crate that gives us a wrapper around the Daisy components in RSX.
 
 
