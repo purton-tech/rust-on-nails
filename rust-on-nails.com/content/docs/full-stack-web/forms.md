@@ -28,7 +28,7 @@ In the following form we use an email type and a required attribute. The browser
 </form>
 ```
 
-We can write this same form using Dioxus. Update `crates/ui-components/src/root.rs` with a form to add users.
+We can write this same form using Dioxus. Update `crates/web-pages/src/root.rs` with a form to add users.
 
 ```rust
 use crate::{layout::Layout, render};
@@ -40,11 +40,6 @@ pub fn index(users: Vec<User>) -> String {
     let page = rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
-            stylesheets: vec![],
-            header: rsx!(),
-            sidebar: rsx!(),
-            sidebar_header: rsx!(),
-            sidebar_footer: rsx!(),
             table {
                 thead {
                     tr {
@@ -90,14 +85,8 @@ pub fn index(users: Vec<User>) -> String {
 
 _Note:_ `for` and `type` are Rust keywords. We must prefix them with `r#` so Rust knows that we want the raw string literal of "for" and "type".
 
-## Handling form submission
+## Handling form submission with Actions
 
-We need to install [serde](https://serde.rs/) to transform the HTTP body into a Rust struct.
-
-```bash
-cd crates/web-server
-cargo add serde@1.0 --features derive
-```
 
 [Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. We are going to create a `create_form` handler to save new users to our database.
 

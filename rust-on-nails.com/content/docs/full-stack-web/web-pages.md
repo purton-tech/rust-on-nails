@@ -47,10 +47,26 @@ It's a big one as I've added some styling which we won't use until later.
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
+#[component]
+pub fn Layout(title: String, children: Element) -> Element {
+    rsx! {
+        BaseLayout { 
+            title,
+            stylesheets: vec![],
+            header: rsx!(),
+            sidebar: rsx!(),
+            sidebar_header: rsx!(),
+            sidebar_footer: rsx!(),
+            children,
+        }
+    }
+}
+
+
 #[derive(Props, Clone, PartialEq)]
-pub struct LayoutProps {
+pub struct BaseLayoutProps {
     title: String,
-    fav_icon_src: String,
+    fav_icon_src: Option<String>,
     stylesheets: Vec<String>,
     js_href: Option<String>,
     header: Element,
@@ -60,7 +76,7 @@ pub struct LayoutProps {
     sidebar_header: Element,
 }
 
-pub fn Layout(props: LayoutProps) -> Element {
+pub fn BaseLayout(props: BaseLayoutProps) -> Element {
     rsx!(
         head {
             title {
@@ -90,10 +106,12 @@ pub fn Layout(props: LayoutProps) -> Element {
                     src: "{js_href}"
                 }
             }
-            link {
-                rel: "icon",
-                "type": "image/svg+xml",
-                href: "{props.fav_icon_src}"
+            if let Some(fav_icon_src) = props.fav_icon_src {
+                link {
+                    rel: "icon",
+                    "type": "image/svg+xml",
+                    href: "{fav_icon_src}"
+                }
             }
         }
         body {
@@ -184,16 +202,12 @@ Create a file `crates/web-pages/src/root.rs`. we call it `root.rs` because it's 
 use crate::{layout::Layout, render};
 use db::User;
 use dioxus::prelude::*;
+use web_assets::files::favicon_svg;
 
 pub fn index(users: Vec<User>) -> String {
     let page = rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
-            stylesheets: vec![],
-            header: rsx!(),
-            sidebar: rsx!(),
-            sidebar_header: rsx!(),
-            sidebar_footer: rsx!(),
             table {
                 thead {
                     tr {

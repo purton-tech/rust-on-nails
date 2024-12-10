@@ -170,11 +170,6 @@ pub fn index(users: Vec<User>) -> String {
     let page = rsx! {
         Layout {    // <-- Use our layout
             title: "Users Table",
-            stylesheets: vec![],
-            header: rsx!(),
-            sidebar: rsx!(),
-            sidebar_header: rsx!(),
-            sidebar_footer: rsx!(),
             table {
                 thead {
                     tr {
@@ -186,8 +181,9 @@ pub fn index(users: Vec<User>) -> String {
                     for user in users {
                         tr {
                             td {
+                                // 👇 We added the image
                                 img {
-                                    src: format!("/static/{}", favicon_svg.name),
+                                    src: favicon_svg.name,
                                     width: "16",
                                     height: "16"
                                 }
