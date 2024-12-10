@@ -43,6 +43,12 @@ tailwind:
     cd /workspace/crates/web-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
 ```
 
+Also create a `.gitignore` so that we don't include the dist folder in our repo.
+
+```sh
+dist
+```
+
 Now we can run 
 
 ```sh
@@ -50,3 +56,24 @@ just tailwind
 ```
 
 The stylesheet will be compiled.
+
+## Add the stylesheet to the layout
+
+Update `crates/web-assets/build.rs` and add the `dist` folder to our static files.
+
+
+```rust
+let asset_dirs = vec![PathBuf::from("./images"), PathBuf::from("./dist")];
+```
+
+Update `crates/web-pages/src/layout.rs` and change the stylesheets entry.
+
+```rust
+stylesheets: vec![web_assets::files::tailwind_css.name.to_string()],
+```
+
+## With Tailwind
+
+We're nearly there. Our app is not using tailwind.
+
+![Screenshot](../screenshot-with-tailwind.png)
