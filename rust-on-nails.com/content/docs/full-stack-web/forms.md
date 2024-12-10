@@ -70,7 +70,7 @@ pub fn index(users: Vec<User>) -> String {
 
             // 👇 this is our new form
             form {
-                action: "/sign_up",
+                action: "/new_user",
                 method: "POST",
                 label { r#for: "user_email", "Email:" }
                 input { id: "user_email", name: "email", r#type: "email", required: "true" }
@@ -90,17 +90,24 @@ _Note:_ `for` and `type` are Rust keywords. We must prefix them with `r#` so Rus
 
 [Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. We are going to create a `create_form` handler to save new users to our database.
 
-Create a new file `crates/web-server/src/new_user.rs`
+Let's update `crates/web-server/src/root.rs` to add a new action (handler).
 
 ```rust
-use serde::Deserialize;
-
 use crate::errors::CustomError;
-use axum::{
-    extract::Extension,
-    response::Redirect,
-    Form,
-};
+use axum::{response::{Html, Redirect}, Extension};
+use axum_extra::extract::Form;
+use serde::Deserialize;
+use web_pages::root;
+
+pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
+    let client = pool.get().await?;
+
+    let users = db::queries::users::get_users().bind(&client).all().await?;
+
+    let html = root::index(users);
+
+    Ok(Html(html))
+}
 
 // 👇 create new SignUp struct
 #[derive(Deserialize )]
@@ -109,7 +116,7 @@ pub struct SignUp {
 }
 
 // 👇 handle form submission
-pub async fn process_form(
+pub async fn new_user_action(
     Extension(pool): Extension<db::Pool>,
     Form(form): Form<SignUp>,
 ) -> Result<Redirect, CustomError> {
@@ -136,7 +143,7 @@ mod new_user;
 Add `post` to our `use` section.
 
 ```rust
-use axum::{extract::Extension, routing::{get, post}, Router};
+use axum::{routing::{get, post}, Extension, Router};
 ```
 
 And add another route like the following to the list of routes to catch the post of the form so that the Router now looks like:
@@ -145,23 +152,17 @@ And add another route like the following to the list of routes to catch the post
     // build our application with a route
     let app = Router::new()
         .route("/", get(users))
+        .route("/new_user", post(root::new_user_action))
         .route("/static/*path", get(static_files::static_path))
-        .route("/sign_up", post(new_user::process_form))
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
-```
-
-In `crates/web-server/Cargo.toml` we also need to update the Axum dependency to add the form feature:
-
-```rust
-axum = { version = "0.7", default-features = false, features = ["json","http1","tokio","form"] }
 ```
 
 The compiler will complain because we haven't added the database code to handle form submission.
 
 ## Create the database code
 
-We are using `db::queries::users::create_user()` in our `accept_form` handler. We must also update `crates/db/queries/users.sql` to include our actual SQL query
+We are using `db::queries::users::create_user()` in our `new_user_action` handler. We must also update `crates/db/queries/users.sql` to include our actual SQL query
 
 ```sql
 --: User()
@@ -198,7 +199,7 @@ cd crates/web-server
 cargo add validator@0.15 --features derive
 ```
 
-Update `crates/web-server/src/new_user.rs` and add validation.
+Update `crates/web-server/src/root.rs` and add validation.
 
 ```rust
 use serde::Deserialize;
