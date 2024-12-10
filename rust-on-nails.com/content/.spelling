@@ -260,6 +260,7 @@ WebComponent
 90
 Justfile
 stylesheet
+stylesheets
  - docs/full-stack-web/htmx.md
 HTMX
 110
@@ -276,4 +277,5 @@ SCSS
 WebComponent
  - docs/full-stack-web/component-library.md
 DaisyUI
+daisyUI
 RSX
