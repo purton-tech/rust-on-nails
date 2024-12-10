@@ -134,13 +134,7 @@ pub async fn new_user_action(
 
 ## Add the form handling to our routes
 
-In `crates/web-server/main.rs` add a the new module to the top of the file:
-
-```rust
-mod new_user;
-```
-
-Add `post` to our `use` section.
+In `crates/web-server/main.rs` add `post` to our `use` section.
 
 ```rust
 use axum::{routing::{get, post}, Extension, Router};
@@ -202,17 +196,24 @@ cargo add validator@0.15 --features derive
 Update `crates/web-server/src/root.rs` and add validation.
 
 ```rust
+use crate::errors::CustomError;
+use axum::{http::StatusCode, response::{Html, IntoResponse, Redirect, Response}, Extension};
+use axum_extra::extract::Form;
 use serde::Deserialize;
 use validator::Validate;
+use web_pages::root;
 
-use crate::errors::CustomError;
-use axum::{
-    extract::Extension,
-    http::StatusCode,
-    response::{IntoResponse, Redirect, Response},
-    Form,
-};
+pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
+    let client = pool.get().await?;
 
+    let users = db::queries::users::get_users().bind(&client).all().await?;
+
+    let html = root::index(users);
+
+    Ok(Html(html))
+}
+
+// 👇 create new SignUp struct
 #[derive(Deserialize, Validate)]
 pub struct SignUp {
     #[validate(email)] // 👈 add validate annotation
@@ -220,11 +221,11 @@ pub struct SignUp {
 }
 
 // 👇 handle form submission
-pub async fn process_form(
+pub async fn new_user_action(
     Extension(pool): Extension<db::Pool>,
     Form(form): Form<SignUp>,
 ) -> Result<Response, CustomError> {
-    
+
     // 👇 add our error handling
     if form.validate().is_err() {
         return Ok((StatusCode::BAD_REQUEST, "Bad request").into_response());
@@ -245,5 +246,5 @@ pub async fn process_form(
 And we can test that our validation works by sending a request directly to the server (bypassing the browser form):
 
 ```bash
-curl http://localhost:3000/sign_up --data-raw 'email=bad-data'
+curl -v http://localhost:3000/new_user --data-raw 'email=bad-data'
 ```
