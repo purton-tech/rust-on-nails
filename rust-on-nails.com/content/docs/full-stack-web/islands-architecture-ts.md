@@ -36,7 +36,7 @@ Also in your `.devcontainer/Dockerfile` uncomment the following line.
 
 We need the following `.gitignore` file.
 
-```
+```.gitignore
 dist
 node_modules
 .parcel-cache
@@ -79,7 +79,7 @@ Add a scripts section to your package.json
 
 And now when you run `npm install & npm run start` parcel will generate your assets into the dist folder. We should also update our `./.gitignore` to exclude the generated files.
 
-```
+```sh
 /target
 .parcel-cache
 /app/dist
