@@ -15,11 +15,13 @@ top = false
 
 Things are already starting to look more professional. Let's tidy up the  main part of the screen.
 
-We can use cards to lay the table out neater.
+## The Finished Result
+
+![Screenshot](../screenshot-more-components.png)
 
 ## Cards, Buttons and Forms.
 
-![Screenshot](../screenshot-more-components.png)
+Add the code below to `crates/web-pages/src/root.rs`.
 
 ```rust
 use crate::{layout::{Layout, SideBar}, render};
@@ -109,5 +111,5 @@ pub fn index(users: Vec<User>) -> String {
 }
 ```
 
-
+We can now compose applications from the components in the `daisy_rsx` library. You can also look at the code for the components to see how to create your own.
 
