@@ -54,3 +54,15 @@ BaseLayout {
 ```
 
 ## Form Submission Without Page Refresh
+
+In the `crates/web-pages/src/root.rs` update the form and give it a [hx-boost](https://htmx.org/attributes/hx-boost/) attribute.
+
+The form will now use Ajax to communicate with the back end and we get a smoother experience on the front end.
+
+```rust
+...
+form {
+    // 👇 Boost the form
+    "hx-boost": "true", 
+...
+```

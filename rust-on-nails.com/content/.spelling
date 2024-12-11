@@ -264,6 +264,7 @@ stylesheets
  - docs/full-stack-web/htmx.md
 HTMX
 110
+hx-boost
  - docs/full-stack-web/islands-architecture-ts.md
 120
 Sass
