@@ -83,7 +83,7 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
                     ol {
                         class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
                         li {
-                            class: "items-center gap-1.5 hidden md:block",
+                            class: "ml-3 items-center gap-1.5 hidden md:block",
                             "Your Application"
                         }
                         li {

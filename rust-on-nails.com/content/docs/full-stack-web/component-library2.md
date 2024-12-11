@@ -19,6 +19,8 @@ We can use cards to lay the table out neater.
 
 ## Cards, Buttons and Forms.
 
+![Screenshot](../screenshot-more-components.png)
+
 ```rust
 use crate::{layout::{Layout, SideBar}, render};
 use daisy_rsx::*;
@@ -32,9 +34,9 @@ pub fn index(users: Vec<User>) -> String {
             title: "Users Table",
             selected_item: SideBar::Users,
             BlankSlate {
-                heading: "Looks like you don't have any API keys",
+                heading: "Welcome To Your Application",
                 visual: favicon_svg.name,
-                description: "API Keys allow you to access our programming interface",
+                description: "This is just the beginning",
             }
             Card {
                 class: "card-bordered mt-12 has-data-table",
@@ -77,6 +79,7 @@ pub fn index(users: Vec<User>) -> String {
                     title: "Add User"
                 }
                 CardBody {
+                    class: "p-3",
                     form {
                         class: "flex flex-col",
                         action: "/new_user",
@@ -84,7 +87,7 @@ pub fn index(users: Vec<User>) -> String {
 
                         Input {
                             input_type: InputType::Email,
-                            placeholder: "Production API Key",
+                            placeholder: "e.g. ian@test.com",
                             help_text: "Please enter an email address",
                             required: true,
                             label: "Email",
