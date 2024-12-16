@@ -15,6 +15,19 @@ top = false
 
 If you are not able to get all the interactivity your application needs with Htmx then we can deploy some rust in the browser.
 
+To do this we'll follow the guidelines in [Reasonable System for JavaScript Structure](https://ricostacruz.com/rsjs/) and apply those to Rust.
+
+## Using a counter component as an example.
+
+To follow the RSJS guidelines, we will use data attributes, that is, HTML attributes that begin with data-, a standard feature of HTML, to indicate that our HTML is a counter component. We will then write Rust to use an attribute selector that looks for the data-counter attribute as the root element in our counter component and wires in the appropriate event handlers and logic. Additionally, let’s rework the code to use query_selector() and add the counter functionality to all counter components found on the page. (You never know how many counters you might want!)
+
+```html
+<section class="counter" data-counter> <1>
+  <output id="my-output" data-counter-output>0</output> <2>
+  <button class="increment-btn" data-counter-increment>Increment</button>
+</section>
+```
+
 ## A new web-csr (client side rendering) crate
 
 ```sh
@@ -56,7 +69,7 @@ opt-level = "s"
 
 ## Our first component
 
-This component attaches to any element with the attribute `data-alert` and shows an alert if the lement is clicked.
+This component attaches to any element with the attribute `data-alert` and shows an alert if the element is clicked.
 
 ```rust
 use wasm_bindgen::prelude::*;
