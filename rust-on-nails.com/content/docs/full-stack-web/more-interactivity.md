@@ -111,3 +111,4 @@ Now run `just wasm` and a wasm file will be created in the `dist` folder.
 ## Todo
 
 - [ ] Update the layout
+- [ ] Serve the assets
