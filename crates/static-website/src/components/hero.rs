@@ -23,7 +23,7 @@ pub fn Hero() -> Element {
             div {
                 class: "max-w-3xl mx-auto text-center",
                 img {
-                    src: "/landing-page/example-app.png",
+                    src: "/landing-page/screenshot-full-app.png",
                     loading: "lazy",
                     width: "800"
                 }
