@@ -1,0 +1,10 @@
+[package]
+name = "web-assets"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mime = "0.3"
+
+[build-dependencies]
+cache-busters = "0.1.0"

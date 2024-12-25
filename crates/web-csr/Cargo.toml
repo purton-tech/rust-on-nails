@@ -1,0 +1,26 @@
+[package]
+name = "web-csr"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# Our default feature set (WASM):
+default = ["wasm-bindgen", "web-sys", "console_error_panic_hook"]
+
+# A "native" feature that doesn't include any of the WASM stuff.
+native = ["dioxus"]
+
+[dependencies]
+wasm-bindgen = { version = "0.2.84", optional = true }
+web-sys = { version = "0.3.76", optional = true, features = ["Document","Element","Event","HtmlElement","Node","Window","console"] }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+dioxus = { version = "0.6", default-features = false, optional = true, features = ["macro", "html", "signals"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.34"
+
+[profile.release]
+opt-level = "s"
