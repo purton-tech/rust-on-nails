@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 pub fn home_page() -> String {
     let page = rsx! {
         Layout {
-            title: "Enterprise Generative AI",
+            title: "Rust on Nails",
             description: "The Industry Standard For Enterprise Generative AI",
             mobile_menu: None,
             section: Section::Home,
