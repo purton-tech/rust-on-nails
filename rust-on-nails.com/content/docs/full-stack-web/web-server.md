@@ -110,7 +110,7 @@ Make sure you're in the `crates/web-server` folder and add Axum to your `Cargo.t
 
 ```sh
 cargo add axum@0.7 --no-default-features -F json,http1,tokio
-cargo add axum-extra@0.9 --F form
+cargo add axum-extra@0.9 -F form
 cargo add tokio@1 --no-default-features -F macros,rt-multi-thread
 cargo add tokio-util@0.7 --no-default-features
 cargo add tower-livereload@0.9
