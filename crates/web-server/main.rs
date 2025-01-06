@@ -1,6 +1,7 @@
 mod config;
 mod errors;
 mod root;
+mod settings;
 mod static_files;
 
 use std::net::SocketAddr;
@@ -21,6 +22,7 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(root::loader))
+        .route("/settings", get(settings::loader))
         .route("/new_user", post(root::new_user_action))
         .route("/static/*path", get(static_files::static_path))
         .nest_service("/wasm", ServeDir::new("/workspace/crates/web-csr/dist"))

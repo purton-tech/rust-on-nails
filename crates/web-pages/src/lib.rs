@@ -1,5 +1,6 @@
 mod layout;
 pub mod root;
+pub mod settings;
 use dioxus::prelude::*;
 
 pub fn render(page: Element) -> String {

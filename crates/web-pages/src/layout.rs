@@ -7,6 +7,7 @@ use web_csr::HelloWorld;
 #[derive(PartialEq, Clone, Eq, Debug)]
 pub enum SideBar {
     Users,
+    Settings,
 }
 
 impl std::fmt::Display for SideBar {
@@ -59,6 +60,13 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
                             href: "/",
                             icon: favicon_svg.name,
                             title: "Users"
+                        }
+                        NavItem {
+                            id: SideBar::Settings.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: "/settings",
+                            icon: favicon_svg.name,
+                            title: "Settings"
                         }
                     )
                 }

@@ -18,6 +18,8 @@ alias nrs='npm run start'
 
 # Database
 alias db='psql $DATABASE_URL'
+alias dbmate='dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations'
+alias dbdown='while dbmate down; do :; done'
 
 # Spellcheck
 alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/rust-on-nails.com/content:/workdir tmaier/markdown-spellcheck:latest "**/*.md"'
