@@ -164,13 +164,24 @@ Here’s a comprehensive guide to the critical factors to consider:
 
 ---
 
-### **15. Geographic Distribution**
-- **SQL**: Requires manual setup for multi-region deployments, such as replication.
-- **NoSQL**: Distributed databases like Cassandra or Spanner natively support multi-region scaling.
+### **5. Multi-Tenancy vs. Single-Tenancy**
 
-**Architect’s Consideration:**
-- Does your application require low-latency access across multiple regions?
 
+![Tenancy](./tenancy.png)
+
+- **Single-Tenancy**: Each customer or tenant gets a separate database or schema, ensuring isolation and easier customization at the cost of higher resource usage.
+- **Multi-Tenancy**: All tenants share the same database, with data partitioned by tenant ID, allowing for more efficient use of resources but requiring robust data isolation mechanisms.
+
+#### Real-World Example:
+
+- SaaS Platforms: Platforms like Salesforce use multi-tenancy to serve multiple customers efficiently while maintaining data isolation and security.
+- Dedicated Systems: Enterprise applications requiring strict data isolation, such as financial systems, may opt for single-tenancy.
+
+#### Architect’s Consideration:
+
+Does the application need strict isolation per tenant, or can tenants share a database with logical separation?
+
+Does your application require low-latency access across multiple regions?
 ---
 
 ### **How PostgreSQL Meets Most Requirements (and Where It Doesn't)**
@@ -190,6 +201,9 @@ PostgreSQL has evolved into a versatile database capable of addressing a wide ra
 - Eventual consistency and ultra-low-latency global access may favor NoSQL or specialized distributed databases.
 
 ### Conclusion
+
+
+![Postgres](./postgres.png)
 
 Ultimately, there’s no one-size-fits-all solution. PostgreSQL is a strong default choice for many applications, offering flexibility and scalability that meet most requirements. 
 
