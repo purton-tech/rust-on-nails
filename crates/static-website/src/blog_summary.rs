@@ -26,6 +26,16 @@ pub fn summary() -> Summary {
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
                     author: Some("Ian Purton")
                 },
+                Page {
+                    date: "2025-01-10",
+                    title: "MPA vs SPA in 2025: A Senior Architect’s Perspective",
+                    description: "PA vs. SPA: A Senior Architect’s Perspective",
+                    folder: "blog/mpa-vs-spa/",
+                    markdown: include_str!("../content/blog/mpa-vs-spa/index.md"),
+                    image: Some("/blog/mpa-vs-spa/mpa-vs-spa.png"),
+                    author_image: Some("/blog-authors/ian-purton.jpeg"),
+                    author: Some("Ian Purton")
+                },
             ]
         }]
     }
