@@ -182,6 +182,7 @@ Here’s a comprehensive guide to the critical factors to consider:
 Does the application need strict isolation per tenant, or can tenants share a database with logical separation?
 
 Does your application require low-latency access across multiple regions?
+
 ---
 
 ### **How PostgreSQL Meets Most Requirements (and Where It Doesn't)**
