@@ -16,6 +16,16 @@ pub fn summary() -> Summary {
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
                     author: Some("Ian Purton")
                 },
+                Page {
+                    date: "2024-01-24",
+                    title: "SQL vs. NoSQL: A Senior Architect’s Perspective",
+                    description: "SQL vs. NoSQL: A Senior Architect’s Perspective",
+                    folder: "blog/version-0.1/",
+                    markdown: include_str!("../content/blog/sql-vs-nosql/index.md"),
+                    image: Some("/blog/sql-vs-nosql/sql-vs-nosql.png"),
+                    author_image: Some("/blog-authors/ian-purton.jpeg"),
+                    author: Some("Ian Purton")
+                },
             ]
         }]
     }
