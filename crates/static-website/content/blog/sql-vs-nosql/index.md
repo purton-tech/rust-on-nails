@@ -14,7 +14,7 @@ As an architect, the decision between SQL and NoSQL databases boils down to addr
 
 ### PostgreSQL: The Hybrid Solution  
 
-Modern relational databases like **PostgreSQL** offer a **hybrid approach** that allows you to tackle both decisions independently:  
+Relational databases like **PostgreSQL** offer a **hybrid approach** that allows you to tackle both decisions independently:  
 
 - **Data Storage Flexibility**:  
    PostgreSQL can store **JSON/JSONB**, enabling you to mix relational (structured) and document-style (flexible) data within the same system. This makes it possible to:  
