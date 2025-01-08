@@ -20,6 +20,10 @@ Here’s a comprehensive guide to the critical factors to consider:
 ---
 
 ### **2. Do You Need Horizontal Scaling?**
+
+
+![Horizontal Scaling](./horizontal-scaling.png)
+
 - **SQL**: Can scale horizontally with techniques like sharding or tools like Vitess (for MySQL) and Citus (for PostgreSQL), though it’s often more complex.
 - **NoSQL**: Designed with horizontal scaling in mind, often offering built-in mechanisms for sharding and distributing data.
 
@@ -45,6 +49,9 @@ Here’s a comprehensive guide to the critical factors to consider:
 ---
 
 ### **4. Query Complexity**
+
+![Complex SQL](./complex-sql.png)
+
 - **SQL**: Supports complex queries involving joins, aggregations, and multi-table relationships.
 - **NoSQL**: Best suited for simpler, high-performance queries but may require additional workarounds for complex queries.
 
@@ -89,6 +96,9 @@ Here’s a comprehensive guide to the critical factors to consider:
 ---
 
 ### **8. Ecosystem and Tools**
+
+![Complex SQL](./db-developers.png)
+
 - **SQL**: Mature ecosystem with robust tools for analytics, migrations, and optimization.
 - **NoSQL**: Offers tools optimized for specific use cases, like MongoDB Atlas for clustering.
 
@@ -98,6 +108,7 @@ Here’s a comprehensive guide to the critical factors to consider:
 ---
 
 ### **9. Developer and Operational Expertise**
+
 - **SQL**: Familiar to most developers, with a well-established knowledge base.
 - **NoSQL**: May require specialized skills for schema design, query optimization, and operations like re-sharding.
 
@@ -134,6 +145,9 @@ Here’s a comprehensive guide to the critical factors to consider:
 ---
 
 ### **13. Integration with Analytics and BI**
+
+![Complex SQL](./grafana.png)
+
 - **SQL**: Integrates easily with reporting and analytics tools.
 - **NoSQL**: Often requires additional pipelines or custom solutions for analytics.
 
