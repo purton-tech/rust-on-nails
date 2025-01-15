@@ -35,7 +35,7 @@ pub struct Page {
 
 impl Page {
     pub fn permalink(&self) -> String {
-        format!("https://bionic-gpt.com/{}", self.folder)
+        format!("https://rust-on-nails/{}", self.folder)
     }
 }
 
