@@ -42,7 +42,7 @@ pub fn summary() -> Summary {
                     description: "Stop saying Rust is Complicated",
                     folder: "blog/rust-complicated/",
                     markdown: include_str!("../content/blog/rust-complicated/index.md"),
-                    image: Some("/blog/mpa-vs-spa/mpa-vs-spa.png"),
+                    image: Some("/blog/rust-complicated/rust.jpg"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
                     author: Some("Ian Purton")
                 },
