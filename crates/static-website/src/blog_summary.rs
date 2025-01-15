@@ -36,6 +36,16 @@ pub fn summary() -> Summary {
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
                     author: Some("Ian Purton")
                 },
+                Page {
+                    date: "2025-01-15",
+                    title: "Stop saying Rust is Complicated: A Senior Architect’s Perspective",
+                    description: "Stop saying Rust is Complicated: A Senior Architect’s Perspective",
+                    folder: "blog/rust-complicated/",
+                    markdown: include_str!("../content/blog/rust-complicated/index.md"),
+                    image: Some("/blog/mpa-vs-spa/mpa-vs-spa.png"),
+                    author_image: Some("/blog-authors/ian-purton.jpeg"),
+                    author: Some("Ian Purton")
+                },
             ]
         }]
     }
