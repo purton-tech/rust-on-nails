@@ -4,6 +4,8 @@ Rust often gets labeled as “too hard” or “too complicated” because it fo
 
 ## 1. It’s Not Rust; It’s Software Engineering
 
+![Rust Learning Curve](./learning-curve.jpg)
+
 Rust includes many features—like `Option<T>`, `Result<T, E>`, *traits*, algebraic data types (ADTs), and RAII—that people sometimes describe as “complicated.” But these concepts aren’t unique to Rust; they’re borrowed or refined from decades of programming language research and practice. In other words, **Rust is simply packaging essential software engineering concepts into the language, making them hard to ignore**.
 
 Here’s a quick rundown of some key “Rust features” and where they came from:
@@ -93,6 +95,8 @@ Rust’s `Option<T>` type forces you to *explicitly* handle the “no value” c
 
 ## 2. It’s a Learning Curve or Bugs in Production
 
+![Bugs in Production](./root-causes.jpg)
+
 Yes, Rust makes you jump through hoops for error handling (`Result<T, E>`), memory safety (ownership and borrowing), and concurrency. But if you’re *not* doing these checks in other languages, the bugs don’t magically disappear; they just lurk in your code, waiting to manifest at the worst possible time (like in production).
 
 - **Memory leaks and data races**: In C or C++, you can inadvertently leak memory or cause data races, relying on code reviews and testing to (hopefully) catch them. Rust’s ownership system *automates* this checking at compile time.  
@@ -103,6 +107,8 @@ Yes, Rust makes you jump through hoops for error handling (`Result<T, E>`), memo
 ---
 
 ## 3. You Get This For Free
+
+![Rust uses](./rust-uses.jpg)
 
 Once you wrap your head around Rust’s approach, you get a ton of benefits “for free”:
 
@@ -129,6 +135,8 @@ In short, **lifetimes** ensure references never outlive the data they point to. 
 ---
 
 ## 5. It’s More Important Than Ever
+
+![AI Code Gen](./ai-code-gen.jpg)
 
 With the rise of AI-assisted coding (Copilot, ChatGPT, etc.), we’re generating more code automatically. That’s convenient, but it also means we risk injecting subtle bugs into production without a second thought. A strong type system—one that enforces ownership, borrowing, and explicit error handling—is your safety net.
 
