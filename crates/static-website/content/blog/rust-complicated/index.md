@@ -95,7 +95,7 @@ Rust’s `Option<T>` type forces you to *explicitly* handle the “no value” c
 
 ## 2. It’s a Learning Curve or Bugs in Production
 
-![Bugs in Production](./root-causes.jpg)
+![Bugs in Production](./root-causes.png)
 
 Yes, Rust makes you jump through hoops for error handling (`Result<T, E>`), memory safety (ownership and borrowing), and concurrency. But if you’re *not* doing these checks in other languages, the bugs don’t magically disappear; they just lurk in your code, waiting to manifest at the worst possible time (like in production).
 
@@ -108,7 +108,7 @@ Yes, Rust makes you jump through hoops for error handling (`Result<T, E>`), memo
 
 ## 3. You Get This For Free
 
-![Rust uses](./rust-uses.jpg)
+![Rust uses](./rust-uses.png)
 
 Once you wrap your head around Rust’s approach, you get a ton of benefits “for free”:
 
@@ -136,7 +136,7 @@ In short, **lifetimes** ensure references never outlive the data they point to. 
 
 ## 5. It’s More Important Than Ever
 
-![AI Code Gen](./ai-code-gen.jpg)
+![AI Code Gen](./ai-code-gen.png)
 
 With the rise of AI-assisted coding (Copilot, ChatGPT, etc.), we’re generating more code automatically. That’s convenient, but it also means we risk injecting subtle bugs into production without a second thought. A strong type system—one that enforces ownership, borrowing, and explicit error handling—is your safety net.
 
