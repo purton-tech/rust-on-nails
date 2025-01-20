@@ -115,6 +115,8 @@ While React’s dynamism and interactivity bring significant benefits, it’s im
 - **Complexity**: Managing state across larger applications can require additional libraries (like Redux or Zustand) or advanced patterns, adding to the learning curve.
 - **Initial Setup**: Adding React to a project often requires a bundler or build toolchain, making it less straightforward than server-rendered approaches.
 
+![Codebase](./codebase.png)
+
 ### The New Era of Server-Side React
 
 
