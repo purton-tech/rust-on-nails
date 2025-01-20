@@ -107,6 +107,9 @@ In this post, we will explore the evolution of React-based architectures (both c
    This kind of real-time interactivity would require more manual effort with traditional templating or server-rendered approaches, involving AJAX calls or page reloads.
 
 ### Downsides of React  
+
+![Server Side React](./react-rest-api.png)
+
 While React’s dynamism and interactivity bring significant benefits, it’s important to consider the trade-offs:
 - **Performance Overhead**: Even for small components, React requires shipping a runtime and the supporting JavaScript to the client.
 - **Complexity**: Managing state across larger applications can require additional libraries (like Redux or Zustand) or advanced patterns, adding to the learning curve.
