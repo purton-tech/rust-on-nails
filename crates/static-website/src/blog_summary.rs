@@ -8,8 +8,8 @@ pub fn summary() -> Summary {
             pages: vec![
                 Page {
                     date: "2025-01-28",
-                    title: "Stop building React backends in Java/Python/*",
-                    description: "Stop building React backends in Java/Python/*",
+                    title: "Stop building React backends in Java, Python or Go",
+                    description: "Stop building React backends in Java, Python or Go",
                     folder: "blog/react-backends/",
                     markdown: include_str!("../content/blog/react-backends/index.md"),
                     image: Some("/blog/react-backends/backend-army.png"),
