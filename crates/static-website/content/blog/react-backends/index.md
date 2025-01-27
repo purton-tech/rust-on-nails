@@ -56,6 +56,10 @@ The **UI layer** is not as small or simple as the whiteboard diagram might sugge
 
 In practice, it’s not uncommon for **front-end work** to demand as much time or more than the backend. This can lead to an **imbalanced resource allocation** if you’ve assumed the front end would be a trivial portion of the project. Overlooking the complexities of the UI may result in rushed features, poor user engagement, and high technical debt in the long run.
 
+[Example on github (Sentry)](https://github.com/getsentry/sentry)
+
+![React Roadmap](./python-typescript.png)
+
 ---
 
 ## Problem #3 – Impedance Mismatch
