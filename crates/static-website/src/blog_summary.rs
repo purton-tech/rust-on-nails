@@ -7,6 +7,16 @@ pub fn summary() -> Summary {
             name: "TOFU".to_string(),
             pages: vec![
                 Page {
+                    date: "2025-01-28",
+                    title: "Stop building React backends in Java/Python/*",
+                    description: "Stop building React backends in Java/Python/*",
+                    folder: "blog/react-backends/",
+                    markdown: include_str!("../content/blog/react-backends/index.md"),
+                    image: Some("/blog/react-backends/backend-army.png"),
+                    author_image: Some("/blog-authors/ian-purton.jpeg"),
+                    author: Some("Ian Purton")
+                },
+                Page {
                     date: "2024-12-24",
                     title: "Rust on Nails : Version 0.1",
                     description: "Rust on Nails : Version 0.1",
