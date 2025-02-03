@@ -7,6 +7,16 @@ pub fn summary() -> Summary {
             name: "TOFU".to_string(),
             pages: vec![
                 Page {
+                    date: "2025-02-04",
+                    title: "Stop saying Kubernetes is Complicated",
+                    description: "Stop saying Kubernetes is Complicated",
+                    folder: "blog/kubernetes-complicated/",
+                    markdown: include_str!("../content/blog/kubernetes-complicated/index.md"),
+                    image: Some("/blog/kubernetes-complicated/kubernetes.webp"),
+                    author_image: Some("/blog-authors/ian-purton.jpeg"),
+                    author: Some("Ian Purton")
+                },
+                Page {
                     date: "2025-01-28",
                     title: "Stop building React backends in Java, Python or Go",
                     description: "Stop building React backends in Java, Python or Go",
