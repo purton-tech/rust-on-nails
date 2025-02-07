@@ -84,25 +84,7 @@ K3d bridges the gap between local development and production, helping you avoid 
 
 ---
 
-## 5. CI/CD: Putting It All Together
-
-### Reusing Those Docker Skills
-
-Regardless of the tools you use, building your application inside a Docker container for CI/CD is a **huge** win. The final artifact (the Docker image) is consistent, testable, and deployable across various environments.
-
-### Earthly: One Way to Standardize Builds
-
-[Earthly](https://earthly.dev/) is a build tool that uses Docker containers for everything—local builds, CI builds, and more. This has benefits for developers who are already comfortable with Docker:
-
-1. **Unified CI and Local Builds**: If your CI pipeline fails, you can replicate the same containerized build locally to debug.  
-2. **Version Control**: Your Earthly configuration is just another file in your repo—version it, test it, share it.  
-3. **Simple, Docker-Focused**: You don’t need to learn a separate DSL (beyond Earthfile syntax), making it simpler for Docker-savvy teams.
-
-In short, Earthly helps ensure your CI/CD is as reproducible as your local setup—both rely on Docker containers under the hood.
-
----
-
-## 6. Orchestration: Deciding How to Deploy
+## 5. One skill multiple ways to deploy
 
 Once you’ve containerized your applications and standardized your builds, the next question is how to *deploy* them. You have options:
 
@@ -116,41 +98,12 @@ Since you’re following best practices in your dev environment, you’ll likely
 
 ---
 
-## 7. Infrastructure as Code (IaC)
-
-We’ve talked about environment-as-code, but the same principle applies to your underlying infrastructure—servers, networks, IAM policies, and more. While YAML is fine for describing Kubernetes resources, you’ll often need something more flexible and robust for cloud infrastructure. Two popular tools are:
-
-1. **Terraform**: Uses a domain-specific language (HCL). A huge ecosystem of providers, widely adopted in the DevOps world.  
-2. **Pulumi**: Lets you write IaC in general-purpose languages like TypeScript, Python, Go, or C#. This can be more powerful if you need advanced logic or if your team already loves a particular programming language.
-
-**Key Benefits of IaC**:  
-- **Version Control**: Your entire infrastructure can be pinned to a commit in Git.  
-- **Reusability**: Build reusable modules and share them across projects.  
-- **Reduced Human Error**: Automated scripts are less error-prone than manual provisioning.
-
----
-
-## 8. Kubernetes Operators
-
-![Server Side React](./operators.png)
-
-As you become more advanced in your Kubernetes journey, you might encounter **Operators**. An Operator packages operational knowledge (like how to manage, scale, or heal an application) into a custom Kubernetes controller. Think of it as:
-
-- **IaC on Steroids**: You’re defining not only resources but also *behavior*—self-healing, backups, or upgrades, all automatically handled by the cluster.  
-- **Same Language**: With Operator frameworks (like the Operator SDK or KubeBuilder), you can write this logic in Go (or other languages), which you may already be using.  
-- **Ease for Complex Services**: If your app has specialized operational tasks, an Operator can handle them for you, in code, so you don’t have to manually run scripts each time.
-
----
-
-## 9. Summary: A Best Practices Roadmap
+## 6. Summary: A Best Practices Roadmap
 
 1. **Quick Win with K3s**: Start with a lightweight Kubernetes distribution on a VM for your initial cluster—no need for a large multi-node environment right away.  
 2. **Dev Environments as Code**: Containerize your development setup to avoid “works on my machine” issues.  
 3. **Match Dev and Prod with K3d**: Bring Kubernetes into your local workflow. Reuse the same YAML or Helm charts for local dev and production.  
-4. **Containerized CI/CD**: Standardize builds using Docker images; explore tools like Earthly for reproducible pipelines.  
 5. **Choose Your Deployment**: With your app containerized and build process automated, pick a PaaS or your own Kubernetes cluster—whichever suits your scale and needs.  
-6. **Embrace Infrastructure as Code**: Use Terraform or Pulumi to manage infrastructure changes in a version-controlled, consistent way.  
-7. **Consider Kubernetes Operators**: For complex apps with specialized operational tasks, Operators can automate workflows in a language you already know.
 
 **Final Thoughts:**  
 - K3s proves Kubernetes doesn’t have to be heavyweight or multi-node to be useful.  
