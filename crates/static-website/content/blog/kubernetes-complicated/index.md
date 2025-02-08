@@ -84,7 +84,9 @@ K3d bridges the gap between local development and production, helping you avoid 
 
 ---
 
-## 5. One skill multiple ways to deploy
+## 5. One skill hundreds of deployment scenarios
+
+![Server Side React](./f16.png)
 
 Once you’ve containerized your applications and standardized your builds, the next question is how to *deploy* them. You have options:
 
@@ -95,6 +97,9 @@ Once you’ve containerized your applications and standardized your builds, the 
    - **Consistency**: If your dev environment is on K3d, your production environment can be a near-identical cluster (just bigger or in the cloud).
 
 Since you’re following best practices in your dev environment, you’ll likely find it straightforward to deploy into *any* Kubernetes cluster.
+
+
+![Server Side React](./cloud-agnostic.png)
 
 ---
 
