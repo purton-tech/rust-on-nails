@@ -52,7 +52,7 @@ jobs:
         id: semantic_release
         run: | 
           npm i -D @semantic-release/exec
-          npm i -D @codedependant/docker
+          npm i -D @codedependant/semantic-release-docker
           npm i -D @semantic-release/git
           npx semantic-release
 
