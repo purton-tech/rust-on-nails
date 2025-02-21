@@ -2,7 +2,7 @@
 
 A full stack architecture for web development with Rust.
 
-![Rust on Nails](./rust-on-nails.com/static/yay-your-on-nails.png)
+![Rust on Nails](crates\static-website\content\docs\yay-your-on-nails.png)
 
 ## Building the static site
 
