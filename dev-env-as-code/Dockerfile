@@ -169,5 +169,6 @@ RUN curl -fsSL https://get.pulumi.com | sudo -E bash - \
     && sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
 
 # Compile here as it requires musl.
-RUN cargo binstall --no-confirm cornucopia clorinde
+RUN cargo binstall --no-confirm cornucopia \
+    && cargo binstall --no-confirm clorinde
 
