@@ -31,7 +31,7 @@ curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | \
   && rm devcontainer-template.json
 ```
 
-## Windows
+### Windows
 
 ```bat
 :: Use Command Prompt, not PowerShell
