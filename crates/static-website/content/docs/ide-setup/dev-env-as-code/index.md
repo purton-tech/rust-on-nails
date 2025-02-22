@@ -75,7 +75,7 @@ We are going to create a workspace for our web application. Create a new `Cargo.
 
 ```toml
 [workspace]
-resolver = "2"
+edition = "2021"
 
 members = [
     "crates/*",
