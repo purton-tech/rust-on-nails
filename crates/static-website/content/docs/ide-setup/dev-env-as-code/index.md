@@ -31,12 +31,11 @@ curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | \
   && rm devcontainer-template.json
 ```
 
-## Windows
+### Windows
 
-```sh
-curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | \
-  tar xvz --strip=2 rust-on-nails-main/nails-devcontainer/ \
-  && del devcontainer-template.json
+```bat
+:: Use Command Prompt, not PowerShell
+curl -L https://github.com/purton-tech/rust-on-nails/archive/main.tar.gz | tar xvz --strip=2 rust-on-nails-main/nails-devcontainer/ && del devcontainer-template.json
 ```
 
 ## VS Code
