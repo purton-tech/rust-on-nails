@@ -70,17 +70,19 @@ ARG USER_GID=$USER_UID
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Configure apt and install packages
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-    apt-get update && \
+RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        apt-transport-https \
-        build-essential \
         ca-certificates \
-        curl \
-        git \
         gnupg \
         gnupg-agent \
+        curl && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        apt-transport-https \
+        build-essential \
+        git \
         jq \
         musl \
         musl-dev \
