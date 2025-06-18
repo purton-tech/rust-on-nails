@@ -55,6 +55,8 @@ ARG DBMATE_VERSION=2.26.0
 ARG MOLD_VERSION=2.34.1
 ARG EARTHLY_VERSION=0.8.15
 ARG DOCKER_COMPOSE_VERSION=2.23.0
+ARG POSTGRES_CLIENT_VERSION=16
+
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
@@ -68,38 +70,32 @@ ARG USER_GID=$USER_UID
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Configure apt and install packages
-RUN apt-get -y update \
-    && apt-get install -y --no-install-recommends \
-        git \
-        curl \
-        wget \
-        ssh \
-        sudo \
-        # jq is used by earthly
-        jq \
-        # required by parcel or you can't npm install 
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        apt-transport-https \
         build-essential \
-        # Needed so that prost builds
-        protobuf-compiler \
-        # For musl builds
+        ca-certificates \
+        curl \
+        git \
+        gnupg \
+        gnupg-agent \
+        jq \
+        musl \
         musl-dev \
         musl-tools \
-        musl \
-        # Docker in Docker for Earthly
-        apt-transport-https \
-        ca-certificates \
-        gnupg-agent \
-        gnupg \
-        software-properties-common \
-        postgresql-client \
-        # Install node.
-        npm \
         nodejs \
-    #
-    # Clean up
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -r /var/cache/* /var/lib/apt/lists/* \
+        npm \
+        protobuf-compiler \
+        software-properties-common \
+        ssh \
+        sudo \
+        wget \
+        postgresql-client-${POSTGRES_CLIENT_VERSION} && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* /var/cache/* \
 
     # Docker Engine for Earthly. https://docs.docker.com/engine/install/debian/
     && install -m 0755 -d /etc/apt/keyrings \
