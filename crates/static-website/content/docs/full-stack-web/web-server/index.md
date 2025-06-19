@@ -8,7 +8,7 @@ The functions that respond to routes can have parameters. These parameters which
 
 ## Handling Configuration
 
-We'll separate our configuration into it's own file. create `crates/web-server/src/config.rs`
+We'll separate our configuration into its own file. create `crates/web-server/src/config.rs`
 
 ```rust
 #[derive(Clone, Debug)]
