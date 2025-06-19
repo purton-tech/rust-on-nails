@@ -164,7 +164,7 @@ pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<Use
 
 We could use `cargo run` to start our server but ideally we'd like our server to re-start when we make changes and for the browser to reload itself.
 
-We've installed [Just](https://github.com/casey/just) which is a command runner.
+Our development environment (container) comes preinstalled with [Just](https://github.com/casey/just) which is a command runner.
 
 Issue the following command to create a justfile with an entry to run our server.
 
