@@ -8,7 +8,7 @@ The functions that respond to routes can have parameters. These parameters which
 
 ## Handling Configuration
 
-We'll separate our configuration into it's own file. create `crates/web-server/src/config.rs`
+We'll separate our configuration into its own file. create `crates/web-server/src/config.rs`
 
 ```rust
 #[derive(Clone, Debug)]
@@ -97,9 +97,9 @@ Make sure you're in the `crates/web-server` folder and add Axum to your `Cargo.t
 
 ```sh
 cargo add axum@0.7 --no-default-features -F json,http1,tokio
-cargo add axum-extra@0.9 --F form
+cargo add axum-extra@0.9 -F form,typed-routing
 cargo add tokio@1 --no-default-features -F macros,rt-multi-thread
-cargo add tokio-util@0.7 --no-default-features
+cargo add tokio-util@0.7 --no-default-features -F io
 cargo add tower-livereload@0.9
 cargo add serde@1 -F "derive"
 cargo add --path ../db
@@ -164,7 +164,7 @@ pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<Use
 
 We could use `cargo run` to start our server but ideally we'd like our server to re-start when we make changes and for the browser to reload itself.
 
-We've installed [Just](https://github.com/casey/just) which is a command runner.
+Our development environment (container) comes preinstalled with [Just](https://github.com/casey/just) which is a command runner.
 
 Issue the following command to create a justfile with an entry to run our server.
 
