@@ -147,6 +147,11 @@ In our `crates/web-pages` directory run...
 cargo add --path ../web-assets
 ```
 
+And do the same from `crates/web-server`:
+```sh
+cargo add --path ../web-assets
+```
+
 And update the `crates/web-pages/src/root.rs` so it includes our image.
 
 ```rust
@@ -194,9 +199,10 @@ pub fn index(users: Vec<User>) -> String {
 }
 ```
 
-Update your just file so any changes to the `web-pages` crate are reflected in the browser.
 
-Add this `-w crates/web-pages`.
+Update your `Justfile` file so any changes to the `web-pages` crate are reflected in the browser.
+
+Add this to the end of line 2: `-w crates/web-pages`.
 
 ## The Finished Result
 
