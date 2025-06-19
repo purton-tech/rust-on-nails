@@ -44,7 +44,7 @@ fn main() {
         PathBuf::from("./images"),
     ];
 
-    generate_static_files_code(&static_out_dir, &asset_dirs).unwrap();
+    generate_static_files_code(&static_out_dir, &asset_dirs, &[]).unwrap();
 }
 ```
 
