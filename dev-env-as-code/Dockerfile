@@ -98,7 +98,6 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/* \
-
     # Docker Engine for Earthly. https://docs.docker.com/engine/install/debian/
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
@@ -111,12 +110,10 @@ RUN apt-get update && \
     && apt-get -y update \
     && apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io \
     && apt-get autoremove -y && apt-get clean -y \
-
     # Tailwind binary + extra
     && curl -OL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 \
     && chmod +x tailwindcss-extra-linux-x64 \
     && mv tailwindcss-extra-linux-x64 /usr/local/bin/tailwind-extra \
-
     # Create a non-root user
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
@@ -131,14 +128,20 @@ RUN apt-get update && \
      # Database migrations   
     && curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-${TARGETARCH} \
     && mv ./dbmate-linux-${TARGETARCH} /usr/bin/dbmate \
-    && chmod +x /usr/bin/dbmate \
-    # Mold - Fast Rust Linker
-    && curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz \
-    && tar -xf mold-$MOLD_VERSION-x86_64-linux.tar.gz \
-    && mv ./mold-$MOLD_VERSION-x86_64-linux/bin/mold /usr/bin/ \
-    && mv ./mold-$MOLD_VERSION-x86_64-linux/lib/mold/mold-wrapper.so /usr/bin/ \
-    && rm mold-$MOLD_VERSION-x86_64-linux.tar.gz \
-    && rm -rf ./mold-$MOLD_VERSION-x86_64-linux \
+    && chmod +x /usr/bin/dbmate
+
+# Mold - Fast Rust Linker
+RUN case "${TARGETARCH}" in \
+        amd64) ARCH="x86_64" ;; \
+        arm64) ARCH="aarch64" ;; \
+        *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && curl -OL https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-${ARCH}-linux.tar.gz \
+    && tar -xf mold-$MOLD_VERSION-${ARCH}-linux.tar.gz \
+    && mv ./mold-$MOLD_VERSION-${ARCH}-linux/bin/mold /usr/bin/ \
+    && mv ./mold-$MOLD_VERSION-${ARCH}-linux/lib/mold/mold-wrapper.so /usr/bin/ \
+    && rm mold-$MOLD_VERSION-${ARCH}-linux.tar.gz \
+    && rm -rf ./mold-$MOLD_VERSION-${ARCH}-linux \
     && chmod +x /usr/bin/mold
 
 RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-${TARGETARCH} -O /usr/local/bin/earthly \
