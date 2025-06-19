@@ -60,12 +60,14 @@ cargo add --build cache-busters@0.1
 
 ## Export the Assets
 
-We needs to export our assets from our crate overwrite the `crates/web-assets/src/lib.rs`
+We need to export our assets from our crate. Overwrite the `crates/web-assets/src/lib.rs`
 
 ```rust
 include!(concat!(env!("OUT_DIR"), "/static_files.rs"));
 pub use statics as files;
 ```
+
+The code above will likely show errors from rust-analyzer; we will create the required file next.
 
 ## Configuring a route for our assets
 
