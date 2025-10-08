@@ -1,0 +1,48 @@
+name: Build Nails CLI Release
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Earthly
+        uses: earthly/actions/setup@v1
+        with:
+          version: v0.7.11
+
+      - name: Earthly bootstrap
+        run: earthly bootstrap
+
+      - name: Run Earthly build
+        run: earthly --ci --platform=linux/amd64 +nails-cli
+
+      - name: List build output
+        run: ls -lh ./nails
+
+      - name: Get latest release
+        id: get_latest_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          if [ -z "$latest_release" ]; then
+            echo "No releases found; cannot upload artifact" >&2
+            exit 1
+          fi
+          echo "latest_release=$latest_release" >> "$GITHUB_OUTPUT"
+
+      - name: Upload binary to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ steps.get_latest_release.outputs.latest_release }}" ./nails --clobber
