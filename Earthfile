@@ -1,7 +1,7 @@
 VERSION 0.7
 
 target +nails-cli:
-    FROM docker.io/library/rust:1.76-bullseye
+    FROM purtontech/rust-on-nails-devcontainer:1.3.18
     WORKDIR /workspace
 
     RUN apt-get update && \
@@ -23,9 +23,9 @@ target +nails-cli:
     SAVE ARTIFACT /out/nails AS LOCAL nails
 
 target +nails-operator-image:
-    ARG IMAGE=ghcr.io/nails/manager:dev
+    ARG IMAGE=purtontech/nails-operator:dev
 
-    FROM docker.io/library/rust:1.76-bullseye AS build
+    FROM purtontech/rust-on-nails-devcontainer:1.3.18 AS build
     WORKDIR /workspace
 
     RUN apt-get update && \
