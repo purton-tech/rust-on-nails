@@ -28,14 +28,14 @@ data:
   datasources.yaml: |
     apiVersion: 1
     datasources:
-      - name: Bionic Database
+      - name: Application Database
         type: postgres
         access: proxy
-        url: bionic-db-cluster-rw:5432
-        user: bionic_readonly
-        database: bionic-gpt
+        url: nails-db-cluster-rw:5432
+        user: application_readonly
+        database: nails_app
         secureJsonData:
-          password: $BIONIC_PASSWORD
+          password: $APPLICATION_PASSWORD
         jsonData:
           sslmode: disable  
   dashboards.yaml: |
@@ -96,8 +96,8 @@ spec:
           mountPath: /etc/grafana/provisioning/dashboards/dashboards.yaml
           subPath: dashboards.yaml
         - name: grafana-dashboards
-          mountPath: /etc/grafana/provisioning/dashboards/bionic-dashboard.json
-          subPath: bionic-dashboard.json
+          mountPath: /etc/grafana/provisioning/dashboards/application-dashboard.json
+          subPath: application-dashboard.json
         env:
         - name: GF_SECURITY_ADMIN_USER
           valueFrom:

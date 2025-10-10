@@ -27,7 +27,7 @@ metadata:
 spec:
   runtimeClassName: nvidia
   containers:
-  - name: bionic-gpt-operator
+  - name: nails-model-server
     image: ghcr.io/huggingface/text-generation-inference:0.4
     args: 
       - --model-id 

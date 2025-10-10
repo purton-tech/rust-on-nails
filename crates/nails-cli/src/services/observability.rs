@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::{cli::apply, operator::crd::BionicSpec};
+use crate::{cli::apply, operator::crd::NailsAppSpec};
 use k8s_openapi::api::{apps::v1::Deployment, core::v1::ConfigMap};
 use kube::{
     api::{DeleteParams, Patch, PatchParams},
@@ -7,14 +7,15 @@ use kube::{
 };
 
 const GRAFANA_YAML: &str = include_str!("../../config/grafana.yaml");
-const BIONIC_DASHBOARD_JSON: &str = include_str!("../../config/dashboards/bionic-dashboard.json");
+const APPLICATION_DASHBOARD_JSON: &str =
+    include_str!("../../config/dashboards/application-dashboard.json");
 const CONFIG_NAME: &str = "grafana-dashboards";
 
 // Large Language Model
 pub async fn deploy(
     client: Client,
     password: Option<String>,
-    spec: BionicSpec,
+    spec: NailsAppSpec,
     namespace: &str,
 ) -> Result<(), Error> {
     let config_map = serde_json::json!({
@@ -25,7 +26,7 @@ pub async fn deploy(
             "namespace": namespace
         },
         "data": {
-            "bionic-dashboard.json": BIONIC_DASHBOARD_JSON
+            "application-dashboard.json": APPLICATION_DASHBOARD_JSON
         }
     });
 
@@ -44,7 +45,7 @@ pub async fn deploy(
         "".to_string()
     };
 
-    let yaml = GRAFANA_YAML.replace("$BIONIC_PASSWORD", &password);
+    let yaml = GRAFANA_YAML.replace("$APPLICATION_PASSWORD", &password);
     let yaml = yaml.replace("$HOSTNAME_URL", &spec.hostname_url);
     let mut yaml = yaml.replace("$ADMIN_PASSWORD", &super::database::rand_hex());
 

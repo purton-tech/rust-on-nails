@@ -1,6 +1,6 @@
 use crate::error::Error;
-use crate::operator::crd::Bionic;
-use crate::operator::crd::BionicSpec;
+use crate::operator::crd::NailsApp;
+use crate::operator::crd::NailsAppSpec;
 use anyhow::Result;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Namespace;
@@ -23,30 +23,40 @@ use kube_runtime::wait::Condition;
 use local_ip_address::local_ip;
 use serde_json::json;
 
-const BIONIC_OPERATOR_IMAGE: &str = "ghcr.io/bionic-gpt/bionicgpt-k8s-operator";
+const OPERATOR_IMAGE: &str = "ghcr.io/nails/manager";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const CNPG_YAML: &str = include_str!("../../config/cnpg-1.22.1.yaml");
 const NGINX_YAML: &str = include_str!("../../config/nginx-ingress.yaml");
 const POSTGRES_SERVICE: &str = include_str!("../../config/postgres-service-dev.yaml");
-const APPLICATION_SERVICE: &str = include_str!("../../config/bionic-service-dev.yaml");
+const APPLICATION_SERVICE: &str = include_str!("../../config/application-service-dev.yaml");
+
+pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
+    println!("Connecting to the cluster...");
+    let client = Client::try_default().await?;
+    println!("Connected");
+
+    install_postgres_operator(&client).await?;
+    if !initializer.disable_ingress {
+        install_nginx_operator(&client).await?;
+    }
+    create_namespace(&client, &initializer.namespace).await?;
+    create_namespace(&client, &initializer.operator_namespace).await?;
+    create_crd(&client).await?;
+    create_roles(&client, &initializer.operator_namespace).await?;
+    if !initializer.no_operator {
+        create_operator(&client, &initializer.operator_namespace).await?;
+    }
+
+    Ok(())
+}
 
 pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
     println!("Connecting to the cluster...");
     let client = Client::try_default().await?;
     println!("Connected");
 
-    install_postgres_operator(&client).await?;
-    if !installer.disable_ingress {
-        install_nginx_operator(&client).await?;
-    }
     create_namespace(&client, &installer.namespace).await?;
-    create_namespace(&client, &installer.operator_namespace).await?;
-    create_crd(&client).await?;
-    create_bionic(&client, installer).await?;
-    create_roles(&client, installer).await?;
-    if !installer.no_operator {
-        create_bionic_operator(&client, &installer.operator_namespace).await?;
-    }
+    create_application(&client, installer).await?;
 
     if installer.development {
         // Open up the postgres port to the devcontainer
@@ -58,7 +68,10 @@ pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
         super::apply::apply(&client, APPLICATION_SERVICE, Some(&installer.namespace)).await?;
     }
     let my_local_ip = local_ip().unwrap();
-    println!("When ready you can access bionic on http://{}", my_local_ip);
+    println!(
+        "When ready you can access the deployment on http://{}",
+        my_local_ip
+    );
     Ok(())
 }
 
@@ -124,17 +137,17 @@ async fn install_postgres_operator(client: &Client) -> Result<()> {
     Ok(())
 }
 
-async fn create_bionic_operator(client: &Client, namespace: &str) -> Result<()> {
-    println!("Installing the Bionic Operator into {}", namespace);
+async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
+    println!("Installing the operator into {}", namespace);
     let app_labels = serde_json::json!({
-        "app": "bionic-gpt-operator",
+        "app": "nails-operator",
     });
 
     let deployment = serde_json::json!({
         "apiVersion": "apps/v1",
         "kind": "Deployment",
         "metadata": {
-            "name": "bionic-gpt-operator-deployment",
+            "name": "nails-operator-deployment",
             "namespace": namespace
         },
         "spec": {
@@ -147,10 +160,10 @@ async fn create_bionic_operator(client: &Client, namespace: &str) -> Result<()> 
                     "labels": app_labels
                 },
                 "spec": {
-                    "serviceAccountName": "bionic-gpt-operator-service-account",
+                    "serviceAccountName": "nails-operator-service-account",
                     "containers": json!([{
-                        "name": "bionic-gpt-operator",
-                        "image": format!("{}:{}", BIONIC_OPERATOR_IMAGE, VERSION)
+                        "name": "nails-operator",
+                        "image": format!("{}:{}", OPERATOR_IMAGE, VERSION)
                     }]),
                 }
             }
@@ -161,7 +174,7 @@ async fn create_bionic_operator(client: &Client, namespace: &str) -> Result<()> 
     let deployment_api: Api<Deployment> = Api::namespaced(client.clone(), namespace);
     deployment_api
         .patch(
-            "bionic-gpt-operator-deployment",
+            "nails-operator-deployment",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(deployment),
         )
@@ -170,21 +183,20 @@ async fn create_bionic_operator(client: &Client, namespace: &str) -> Result<()> 
     Ok(())
 }
 
-async fn create_roles(client: &Client, installer: &super::Installer) -> Result<()> {
+async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     println!("Setting up roles");
-    let sa_api: Api<ServiceAccount> =
-        Api::namespaced(client.clone(), &installer.operator_namespace);
+    let sa_api: Api<ServiceAccount> = Api::namespaced(client.clone(), operator_namespace);
     let service_account = ServiceAccount {
         metadata: ObjectMeta {
-            name: Some("bionic-gpt-operator-service-account".to_string()),
-            namespace: Some(installer.operator_namespace.clone()),
+            name: Some("nails-operator-service-account".to_string()),
+            namespace: Some(operator_namespace.to_string()),
             ..Default::default()
         },
         ..Default::default()
     };
     sa_api
         .patch(
-            "bionic-gpt-operator-service-account",
+            "nails-operator-service-account",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(service_account),
         )
@@ -192,7 +204,7 @@ async fn create_roles(client: &Client, installer: &super::Installer) -> Result<(
     let role_api: Api<ClusterRole> = Api::all(client.clone());
     let role = ClusterRole {
         metadata: ObjectMeta {
-            name: Some("bionic-gpt-operator-cluster-role".to_string()),
+            name: Some("nails-operator-cluster-role".to_string()),
             ..Default::default()
         },
         rules: Some(vec![PolicyRule {
@@ -205,7 +217,7 @@ async fn create_roles(client: &Client, installer: &super::Installer) -> Result<(
     };
     role_api
         .patch(
-            "bionic-gpt-operator-cluster-role",
+            "nails-operator-cluster-role",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(role),
         )
@@ -215,24 +227,24 @@ async fn create_roles(client: &Client, installer: &super::Installer) -> Result<(
     let role_binding_api: Api<ClusterRoleBinding> = Api::all(client.clone());
     let role_binding = ClusterRoleBinding {
         metadata: ObjectMeta {
-            name: Some("bionic-gpt-operator-cluster-role-binding".to_string()),
+            name: Some("nails-operator-cluster-role-binding".to_string()),
             ..Default::default()
         },
         role_ref: RoleRef {
             api_group: "rbac.authorization.k8s.io".to_string(),
             kind: "ClusterRole".to_string(),
-            name: "bionic-gpt-operator-cluster-role".to_string(),
+            name: "nails-operator-cluster-role".to_string(),
         },
         subjects: Some(vec![Subject {
             kind: "ServiceAccount".to_string(),
-            name: "bionic-gpt-operator-service-account".to_string(),
-            namespace: Some(installer.operator_namespace.clone()),
+            name: "nails-operator-service-account".to_string(),
+            namespace: Some(operator_namespace.to_string()),
             ..Default::default()
         }]),
     };
     role_binding_api
         .patch(
-            "bionic-gpt-operator-cluster-role-binding",
+            "nails-operator-cluster-role-binding",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(role_binding),
         )
@@ -240,18 +252,21 @@ async fn create_roles(client: &Client, installer: &super::Installer) -> Result<(
     Ok(())
 }
 
-async fn create_bionic(client: &Client, installer: &super::Installer) -> Result<()> {
-    println!("Installing Bionic Services into {}", &installer.namespace);
+async fn create_application(client: &Client, installer: &super::Installer) -> Result<()> {
+    println!(
+        "Installing application services into {}",
+        &installer.namespace
+    );
     let hostname_url = if let Some(hostname_url) = &installer.hostname_url {
         hostname_url.into()
     } else {
         let my_local_ip = local_ip().unwrap();
         format!("http://{:?}", my_local_ip)
     };
-    let bionic_api: Api<Bionic> = Api::namespaced(client.clone(), &installer.namespace);
-    let bionic = Bionic::new(
-        "bionic-gpt",
-        BionicSpec {
+    let app_api: Api<NailsApp> = Api::namespaced(client.clone(), &installer.namespace);
+    let app = NailsApp::new(
+        "nails-app",
+        NailsAppSpec {
             replicas: 1,
             version: VERSION.into(),
             gpu: Some(installer.gpu),
@@ -262,38 +277,38 @@ async fn create_bionic(client: &Client, installer: &super::Installer) -> Result<
             testing: Some(installer.testing),
             development: Some(installer.development),
             hostname_url,
-            hash_bionicgpt: "".to_string(),
-            hash_bionicgpt_pipeline_job: "".to_string(),
-            hash_bionicgpt_db_migrations: "".to_string(),
-            bionic_db_disk_size: installer.bionic_db_disk_size,
+            hash_app: "".to_string(),
+            hash_app_pipeline_job: "".to_string(),
+            hash_app_db_migrations: "".to_string(),
+            primary_db_disk_size: installer.primary_db_disk_size,
             keycloak_db_disk_size: installer.keycloak_db_disk_size,
         },
     );
-    bionic_api
+    app_api
         .patch(
-            "bionic-gpt",
+            "nails-app",
             &PatchParams::apply(crate::MANAGER).force(),
-            &Patch::Apply(bionic),
+            &Patch::Apply(app),
         )
         .await?;
     Ok(())
 }
 
 async fn create_crd(client: &Client) -> Result<(), Error> {
-    println!("Installing Bionic CRD");
-    let crd = Bionic::crd();
+    println!("Installing NailsApp CRD");
+    let crd = NailsApp::crd();
     let crds: Api<CustomResourceDefinition> = Api::all(client.clone());
     crds.patch(
-        "bionics.bionic-gpt.com",
+        "nailsapps.nails-cli.dev",
         &PatchParams::apply(crate::MANAGER).force(),
         &Patch::Apply(crd),
     )
     .await?;
 
-    println!("Waiting for Bionic CRD");
+    println!("Waiting for NailsApp CRD");
     let establish = await_condition(
         crds,
-        "bionics.bionic-gpt.com",
+        "nailsapps.nails-cli.dev",
         conditions::is_crd_established(),
     );
     let _ = tokio::time::timeout(std::time::Duration::from_secs(10), establish)

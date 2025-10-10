@@ -1,6 +1,6 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::BionicSpec;
+use crate::operator::crd::NailsAppSpec;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Service;
 use kube::api::DeleteParams;
@@ -10,7 +10,7 @@ pub const NAME: &str = "embeddings-api";
 pub const PORT: u16 = 80;
 
 // An API for embeddings
-pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result<(), Error> {
+pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
     deployment::deployment(
         client.clone(),
         deployment::ServiceDeployment {

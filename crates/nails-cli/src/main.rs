@@ -5,7 +5,7 @@ mod services;
 use anyhow::Result;
 use clap::Parser;
 
-const MANAGER: &str = "bionic-gpt-operator";
+const MANAGER: &str = "nails-operator";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -14,6 +14,9 @@ async fn main() -> Result<()> {
     match &cli.command {
         cli::Commands::Install(installer) => {
             cli::install::install(installer).await?;
+        }
+        cli::Commands::Init(initializer) => {
+            cli::install::init(initializer).await?;
         }
         cli::Commands::Operator {} => {
             operator::operator().await?;

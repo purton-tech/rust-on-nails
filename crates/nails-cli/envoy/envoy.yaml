@@ -77,5 +77,5 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: bionic-gpt
+                address: nails-app
                 port_value: 7903

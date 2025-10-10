@@ -10,7 +10,7 @@ pub fn summary() -> Summary {
                     Page {
                         date: "",
                         title: "Introduction",
-                        description: "Introducing Bionic",
+                        description: "Introducing Nails",
                         folder: "docs/",
                         markdown: include_str!("../content/docs/index.md"),
                         image: None,
@@ -22,7 +22,9 @@ pub fn summary() -> Summary {
                         title: "Development Environment as Code",
                         description: "Development Environment as Code",
                         folder: "docs/ide-setup/dev-env-as-code",
-                        markdown: include_str!("../content/docs/ide-setup/dev-env-as-code/index.md"),
+                        markdown: include_str!(
+                            "../content/docs/ide-setup/dev-env-as-code/index.md"
+                        ),
                         image: None,
                         author_image: None,
                         author: None,

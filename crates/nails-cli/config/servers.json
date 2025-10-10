@@ -1,12 +1,12 @@
 {
     "Servers": {
         "1": {
-            "Name": "Bionic Database",
+            "Name": "Application Database",
             "Group": "Servers",
-            "Host": "bionic-db-cluster-rw",
+            "Host": "nails-db-cluster-rw",
             "Port": 5432,
-            "MaintenanceDB": "bionic-gpt",
-            "Username": "bionic_readonly",
+            "MaintenanceDB": "nails_app",
+            "Username": "application_readonly",
             "PassFile": "/pgadmin4/passfile",
             "SavePassword": true,
             "ConnectionParameters": {

@@ -1,7 +1,7 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::BionicSpec;
-use crate::services::bionic::BIONIC_NAME;
+use crate::operator::crd::NailsAppSpec;
+use crate::services::application::APPLICATION_NAME;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::{Secret, Service};
 use kube::api::{DeleteParams, PostParams};
@@ -12,7 +12,7 @@ use serde_json::json;
 use url::Url;
 
 // Oauth2 Proxy handles are authentication as our Open ID Connect provider
-pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result<(), Error> {
+pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
     let whitelist_domain = Url::parse(&spec.hostname_url);
     let whitelist_domain = if let Ok(host) = &whitelist_domain {
         host.host_str().unwrap_or_default()
@@ -115,7 +115,11 @@ pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result
     Ok(())
 }
 
-async fn oauthproxy_secret(namespace: &str, spec: BionicSpec, client: Client) -> Result<(), Error> {
+async fn oauthproxy_secret(
+    namespace: &str,
+    spec: NailsAppSpec,
+    client: Client,
+) -> Result<(), Error> {
     let secret_api: Api<Secret> = Api::namespaced(client, namespace);
     let secret = secret_api.get("oidc-secret").await;
     if secret.is_err() {
@@ -127,10 +131,10 @@ async fn oauthproxy_secret(namespace: &str, spec: BionicSpec, client: Client) ->
                 "namespace": namespace
             },
             "stringData": {
-                "client-id": BIONIC_NAME,
+                "client-id": APPLICATION_NAME,
                 "client-secret": "69b26b08-12fe-48a2-85f0-6ab223f45777",
                 "redirect-uri": format!("{}/oauth2/callback", spec.hostname_url),
-                "issuer-url": format!("http://keycloak:7910/oidc/realms/{}", BIONIC_NAME),
+                "issuer-url": format!("http://keycloak:7910/oidc/realms/{}", APPLICATION_NAME),
                 "cookie-secret": rand_base64()
             }
         }))?;

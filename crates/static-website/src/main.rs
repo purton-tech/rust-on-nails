@@ -15,7 +15,7 @@ use tower_livereload::LiveReloadLayer;
 
 pub mod routes {
 
-    pub const SIGN_IN_UP: &str = "https://app.bionic-gpt.com";
+    pub const SIGN_IN_UP: &str = "https://app.nails.dev";
 
     pub mod blog {
         use axum_extra::routing::TypedPath;

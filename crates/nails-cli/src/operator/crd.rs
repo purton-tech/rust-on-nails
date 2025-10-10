@@ -2,17 +2,17 @@ use kube::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// A Bionic resource.
+/// Nails application custom resource specification.
 #[derive(CustomResource, Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[kube(
-    group = "bionic-gpt.com",
+    group = "nails-cli.dev",
     version = "v1",
-    kind = "Bionic",
-    plural = "bionics",
+    kind = "NailsApp",
+    plural = "nailsapps",
     derive = "PartialEq",
     namespaced
 )]
-pub struct BionicSpec {
+pub struct NailsAppSpec {
     pub replicas: i32,
     pub version: String,
     pub gpu: Option<bool>,
@@ -22,14 +22,14 @@ pub struct BionicSpec {
     pub observability: Option<bool>,
     pub development: Option<bool>,
     pub testing: Option<bool>,
-    pub bionic_db_disk_size: i32,
+    pub primary_db_disk_size: i32,
     pub keycloak_db_disk_size: i32,
     #[serde(rename = "hostname-url")]
     pub hostname_url: String,
-    #[serde(rename = "hash-bionicgpt")]
-    pub hash_bionicgpt: String,
-    #[serde(rename = "hash-bionicgpt-rag-engine")]
-    pub hash_bionicgpt_pipeline_job: String,
-    #[serde(rename = "hash-bionicgpt-db-migrations")]
-    pub hash_bionicgpt_db_migrations: String,
+    #[serde(rename = "hash-app")]
+    pub hash_app: String,
+    #[serde(rename = "hash-app-pipeline")]
+    pub hash_app_pipeline_job: String,
+    #[serde(rename = "hash-app-db-migrations")]
+    pub hash_app_db_migrations: String,
 }

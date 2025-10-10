@@ -14,7 +14,7 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/kubernetes-complicated/index.md"),
                     image: Some("/blog/kubernetes-complicated/kubernetes.webp"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
                 Page {
                     date: "2025-01-28",
@@ -24,7 +24,7 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/react-backends/index.md"),
                     image: Some("/blog/react-backends/backend-army.png"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
                 Page {
                     date: "2024-12-24",
@@ -34,7 +34,7 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/version-0.1/index.md"),
                     image: Some("/blog/version-0.1/example-app.png"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
                 Page {
                     date: "2025-01-09",
@@ -44,7 +44,7 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/sql-vs-nosql/index.md"),
                     image: Some("/blog/sql-vs-nosql/sql-vs-nosql.png"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
                 Page {
                     date: "2025-01-10",
@@ -54,7 +54,7 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/mpa-vs-spa/index.md"),
                     image: Some("/blog/mpa-vs-spa/mpa-vs-spa.png"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
                 Page {
                     date: "2025-01-15",
@@ -64,9 +64,9 @@ pub fn summary() -> Summary {
                     markdown: include_str!("../content/blog/rust-complicated/index.md"),
                     image: Some("/blog/rust-complicated/rust.jpg"),
                     author_image: Some("/blog-authors/ian-purton.jpeg"),
-                    author: Some("Ian Purton")
+                    author: Some("Ian Purton"),
                 },
-            ]
-        }]
+            ],
+        }],
     }
 }

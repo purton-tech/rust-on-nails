@@ -26,7 +26,7 @@ Add the following to `crates/web-assets/images/favicon.svg`
 
 ## Using Cache Busters
 
-We'll use [Cache Busters](https://github.com/bionic-gpt/cache-busters) to generate code that allows to access assets in a typesafe way. Cache busters also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Images.
+We'll use [Cache Busters](https://github.com/nails-app/cache-busters) to generate code that allows to access assets in a typesafe way. Cache busters also handles hashing so that we never have to worry about the browser deploying the wrong CSS or Images.
 
 
 Create a  `crates/web-assets/build.rs` so that the `main` method looks like the following.

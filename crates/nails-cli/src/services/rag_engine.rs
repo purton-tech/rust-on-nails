@@ -1,24 +1,20 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::BionicSpec;
+use crate::operator::crd::NailsAppSpec;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Service;
 use kube::api::DeleteParams;
 use kube::{Api, Client};
 use serde_json::json;
 
-pub const NAME: &str = "bionic-rag-engine";
+pub const NAME: &str = "nails-rag-engine";
 
 // The RAG Engine
-pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result<(), Error> {
-    let image_name = if spec.hash_bionicgpt_pipeline_job.is_empty() {
-        format!("{}:{}", super::BIONICGPT_RAG_ENGINE_IMAGE, spec.version)
+pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
+    let image_name = if spec.hash_app_pipeline_job.is_empty() {
+        format!("{}:{}", super::PIPELINE_IMAGE, spec.version)
     } else {
-        format!(
-            "{}@{}",
-            super::BIONICGPT_RAG_ENGINE_IMAGE,
-            spec.hash_bionicgpt_pipeline_job
-        )
+        format!("{}@{}", super::PIPELINE_IMAGE, spec.hash_app_pipeline_job)
     };
 
     // We used to call this something else, upgarde any existing

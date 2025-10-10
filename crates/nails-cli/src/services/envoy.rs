@@ -1,6 +1,6 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::BionicSpec;
+use crate::operator::crd::NailsAppSpec;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::{ConfigMap, Service};
 use kube::api::{DeleteParams, Patch, PatchParams};
@@ -10,7 +10,7 @@ use serde_json::json;
 const ENVOY_YAML: &str = include_str!("../../envoy/envoy.yaml");
 
 // We are using envoy to add security headers to all responses from the main application.
-pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result<(), Error> {
+pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
     // Put the envoy.yaml into a ConfigMap
     let config_map = serde_json::json!({
         "apiVersion": "v1",

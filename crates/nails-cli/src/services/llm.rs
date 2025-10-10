@@ -1,6 +1,6 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::BionicSpec;
+use crate::operator::crd::NailsAppSpec;
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Service;
 use kube::api::DeleteParams;
@@ -9,7 +9,7 @@ use kube::{Api, Client};
 pub const NAME: &str = "llm-api";
 
 // Large Language Model
-pub async fn deploy(client: Client, spec: BionicSpec, namespace: &str) -> Result<(), Error> {
+pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
     deployment::deployment(
         client.clone(),
         deployment::ServiceDeployment {

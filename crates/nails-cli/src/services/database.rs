@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use crate::error::Error;
-use crate::services::bionic::BIONIC_NAME;
+use crate::services::application::APPLICATION_NAME;
 use k8s_openapi::api::core::v1::Secret;
 use kube::api::{DeleteParams, ObjectMeta};
 use kube::CustomResource;
@@ -63,7 +63,7 @@ pub async fn deploy(
 ) -> Result<Option<String>, Error> {
     // If the cluster config exists, then do nothing.
     let cluster_api: Api<Cluster> = Api::namespaced(client.clone(), namespace);
-    let cluster = cluster_api.get("bionic-db-cluster").await;
+    let cluster = cluster_api.get("nails-db-cluster").await;
     if cluster.is_ok() {
         return Ok(None);
     }
@@ -74,7 +74,7 @@ pub async fn deploy(
 
     let cluster = Cluster {
         metadata: ObjectMeta {
-            name: Some("bionic-db-cluster".to_string()),
+            name: Some("nails-db-cluster".to_string()),
             namespace: Some(namespace.to_string()),
             ..Default::default()
         },
@@ -82,18 +82,18 @@ pub async fn deploy(
             instances: 1,
             bootstrap: BootstrapSpec {
                 initdb: InitDBSpec {
-                    database: BIONIC_NAME.to_string(),
+                    database: APPLICATION_NAME.to_string(),
                     owner: "db-owner".to_string(),
                     secret: SecretSpec {
                         name: "db-owner".to_string(),
                     },
                     post_init_sql: Some(vec![
                         format!(
-                            "CREATE ROLE bionic_application LOGIN ENCRYPTED PASSWORD '{}'",
+                            "CREATE ROLE application_user LOGIN ENCRYPTED PASSWORD '{}'",
                             app_database_password
                         ),
                         format!(
-                            "CREATE ROLE bionic_readonly LOGIN ENCRYPTED PASSWORD '{}'",
+                            "CREATE ROLE application_readonly LOGIN ENCRYPTED PASSWORD '{}'",
                             readonly_database_password
                         ),
                     ]),
@@ -114,21 +114,21 @@ pub async fn deploy(
     secret_data.insert(
         "migrations-url".to_string(),
         format!(
-            "postgres://db-owner:{}@bionic-db-cluster-rw:5432/bionic-gpt?sslmode=disable",
+            "postgres://db-owner:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
             dbowner_password
         ),
     );
     secret_data.insert(
         "application-url".to_string(),
         format!(
-            "postgres://bionic_application:{}@bionic-db-cluster-rw:5432/bionic-gpt?sslmode=disable",
+            "postgres://application_user:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
             app_database_password
         ),
     );
     secret_data.insert(
         "readonly-url".to_string(),
         format!(
-            "postgres://bionic_readonly:{}@bionic-db-cluster-rw:5432/bionic-gpt?sslmode=disable",
+            "postgres://application_readonly:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
             readonly_database_password
         ),
     );
@@ -176,8 +176,8 @@ pub fn rand_hex() -> String {
 pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
     // Remove deployments
     let api: Api<Cluster> = Api::namespaced(client.clone(), namespace);
-    if api.get("bionic-db-cluster").await.is_ok() {
-        api.delete("bionic-db-cluster", &DeleteParams::default())
+    if api.get("nails-db-cluster").await.is_ok() {
+        api.delete("nails-db-cluster", &DeleteParams::default())
             .await?;
     }
 

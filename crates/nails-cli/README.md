@@ -1,4 +1,4 @@
-## The Bionic Cli and Kubernetes Operator
+## The Nails CLI and Kubernetes Operator
 
 Run and see the CLI help
 
@@ -23,7 +23,7 @@ sudo /usr/local/bin/k3s-uninstall.sh
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server --write-kubeconfig-mode="644"' sh -
 ```
 
-## Install Bionic into a cluster
+## Install the application into a cluster
 
 The `.kube/config` is already mapped in by `devcontainer.json`
 
@@ -36,12 +36,14 @@ export KUBECONFIG=/workspace/tmp/kubeconfig
 Then run
 
 ```sh
+cargo run --bin k8s-operator -- init
 cargo run --bin k8s-operator -- install
 ```
 
 ## Testing the Operator
 
 ```sh
+cargo run --bin k8s-operator -- init
 cargo run --bin k8s-operator -- install --no-operator --testing --grafana --hostname-url http://192.168.178.57
 ```
 

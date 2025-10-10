@@ -29,7 +29,7 @@ pub async fn deploy_nginx(client: &Client, namespace: &str) -> Result<()> {
 
     apply::apply(client, &config_map.to_string(), Some(namespace)).await?;
 
-    // Bionic with the migrations as a sidecar
+    // Application with the migrations as a sidecar
     deployment::deployment(
         client.clone(),
         deployment::ServiceDeployment {
