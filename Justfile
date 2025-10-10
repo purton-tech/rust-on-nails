@@ -12,11 +12,14 @@ dev-setup:
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
-    mkdir -p ~/.kube
-    GW_IP=`ip route | awk '/default/ {print $$3}'`
-    k3d kubeconfig get k3d-k3d-nails | sed "s|server: https://0\.0\.0\.0:|server: https://$${GW_IP}:|g" > ~/.kube/config
-    kubectl config use-context k3d-k3d-nails >/dev/null
-
+    sudo apt-get update -qq && sudo apt-get install -y -qq iproute2
+    k3d kubeconfig write k3d-nails --kubeconfig-merge-default
+    sed -i "s/127\.0\.0\.1/$(ip route | awk '/default/ {print $3}')/g; s/0\.0\.0\.0/$(ip route | awk '/default/ {print $3}')/g" "$HOME/.kube/config"
+    # Disable TLS verification for local dev
+    sed -i '/certificate-authority-data/d' "$HOME/.kube/config"
+    sed -i '/cluster:/a \ \ \ \ insecure-skip-tls-verify: true' "$HOME/.kube/config"
+    echo "✅ kubeconfig updated and TLS verification disabled"
+    
 watch:
     mold -run cargo watch --workdir /workspace/ -w crates/web-server -w crates/web-pages -w crates/web-assets -w crates/db --no-gitignore -x "run --bin web-server"
 
