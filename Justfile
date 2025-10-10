@@ -2,8 +2,8 @@ list:
     just --list
 
 dev-init:
-    k3d cluster delete
-    k3d cluster create --agents 1 -p "30000-30001:30000-30001@agent:0"
+    k3d cluster delete k3s-nails
+    k3d cluster create k3s-nails --agents 1 -p "30000-30001:30000-30001@agent:0"
 
 dev-setup:
     cargo run --bin k8s-operator -- install --no-operator --testing --development --hostname-url http://localhost:30000
@@ -11,8 +11,8 @@ dev-setup:
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
-    k3d kubeconfig write k3s-default --kubeconfig-merge-default
-    
+    sudo apt-get update -qq && sudo apt-get install -y -qq iproute2 && GW_IP=$(ip route | awk '/default/ {print $3}') && kubectl config set-cluster k3d-k3s-nails --server="https://$GW_IP:46733" --insecure-skip-tls-verify=true
+
 watch:
     mold -run cargo watch --workdir /workspace/ -w crates/web-server -w crates/web-pages -w crates/web-assets -w crates/db --no-gitignore -x "run --bin web-server"
 
