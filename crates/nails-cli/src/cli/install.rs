@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::operator::crd::NailsApp;
-use crate::operator::crd::NailsAppSpec;
-use anyhow::Result;
+use anyhow::{anyhow, bail, Result};
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Namespace;
 use k8s_openapi::api::core::v1::ServiceAccount;
@@ -23,6 +22,8 @@ use kube_runtime::wait::await_condition;
 use kube_runtime::wait::Condition;
 use local_ip_address::local_ip;
 use serde_json::json;
+use std::path::Path;
+use tokio::fs;
 
 const OPERATOR_IMAGE: &str = "ghcr.io/nails/manager";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -62,17 +63,20 @@ pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
     let client = Client::try_default().await?;
     println!("Connected");
 
-    create_namespace(&client, &installer.namespace).await?;
-    create_application(&client, installer).await?;
+    let namespace = manifest_namespace(&installer.manifest)?;
+    let manifest = fs::read_to_string(&installer.manifest).await?;
+
+    create_namespace(&client, &namespace).await?;
+    super::apply::apply(&client, &manifest, Some(&namespace)).await?;
 
     if installer.development {
         // Open up the postgres port to the devcontainer
         println!("🚀 Mapping Postgres to port 30001");
-        super::super::cli::apply::apply(&client, POSTGRES_SERVICE, Some(&installer.namespace))
+        super::super::cli::apply::apply(&client, POSTGRES_SERVICE, Some(&namespace))
             .await
             .unwrap();
         println!("🚀 Mapping Nginx to port 30000");
-        super::apply::apply(&client, APPLICATION_SERVICE, Some(&installer.namespace)).await?;
+        super::apply::apply(&client, APPLICATION_SERVICE, Some(&namespace)).await?;
     }
     let my_local_ip = local_ip().unwrap();
     println!(
@@ -295,48 +299,6 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     Ok(())
 }
 
-async fn create_application(client: &Client, installer: &super::Installer) -> Result<()> {
-    println!(
-        "Installing application services into {}",
-        &installer.namespace
-    );
-    let hostname_url = if let Some(hostname_url) = &installer.hostname_url {
-        hostname_url.into()
-    } else {
-        let my_local_ip = local_ip().unwrap();
-        format!("http://{:?}", my_local_ip)
-    };
-    let app_api: Api<NailsApp> = Api::namespaced(client.clone(), &installer.namespace);
-    let app = NailsApp::new(
-        "nails-app",
-        NailsAppSpec {
-            replicas: 1,
-            version: VERSION.into(),
-            gpu: Some(installer.gpu),
-            saas: Some(installer.saas),
-            disable_ingress: Some(installer.disable_ingress),
-            pgadmin: Some(installer.pgadmin),
-            observability: Some(installer.observability),
-            testing: Some(installer.testing),
-            development: Some(installer.development),
-            hostname_url,
-            hash_app: "".to_string(),
-            hash_app_pipeline_job: "".to_string(),
-            hash_app_db_migrations: "".to_string(),
-            primary_db_disk_size: installer.primary_db_disk_size,
-            keycloak_db_disk_size: installer.keycloak_db_disk_size,
-        },
-    );
-    app_api
-        .patch(
-            "nails-app",
-            &PatchParams::apply(crate::MANAGER).force(),
-            &Patch::Apply(app),
-        )
-        .await?;
-    Ok(())
-}
-
 async fn create_crd(client: &Client) -> Result<(), Error> {
     println!("Installing NailsApp CRD");
     let crd = NailsApp::crd();
@@ -358,6 +320,17 @@ async fn create_crd(client: &Client) -> Result<(), Error> {
         .await
         .unwrap();
     Ok(())
+}
+
+fn manifest_namespace(path: &Path) -> Result<String> {
+    let stem = path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .ok_or_else(|| anyhow!("Unable to determine namespace from manifest filename"))?;
+    if stem.is_empty() {
+        bail!("Manifest filename must not be empty");
+    }
+    Ok(stem.to_string())
 }
 
 async fn create_namespace(client: &Client, namespace: &str) -> Result<Namespace> {

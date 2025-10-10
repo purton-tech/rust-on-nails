@@ -2,11 +2,8 @@ use super::crd::NailsApp;
 use super::finalizer;
 use crate::error::Error;
 use crate::services::application;
-use crate::services::chunking_engine;
 use crate::services::database;
-use crate::services::embeddings_engine;
 use crate::services::envoy;
-use crate::services::http_mock;
 use crate::services::ingress;
 use crate::services::keycloak;
 use crate::services::keycloak_db;
@@ -17,7 +14,6 @@ use crate::services::nginx::deploy_nginx;
 use crate::services::oauth2_proxy;
 use crate::services::observability;
 use crate::services::pgadmin;
-use crate::services::rag_engine;
 use crate::services::tgi;
 use k8s_openapi::api::core::v1::Pod;
 use kube::api::ListParams;
@@ -71,8 +67,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 
     let observability = app.spec.observability.unwrap_or_default();
 
-    let testing = app.spec.testing.unwrap_or_default();
-
     let development = app.spec.development.unwrap_or_default();
 
     let current_version = get_current_application_version(&client, &namespace).await?;
@@ -108,7 +102,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                     .await?;
 
             application::deploy(client.clone(), app.spec.clone(), &namespace).await?;
-            rag_engine::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             envoy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             keycloak::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             oauth2_proxy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
@@ -116,7 +109,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                 ingress::deploy(client.clone(), &namespace, pgadmin, observability).await?;
             }
 
-            if development || testing {
+            if development {
                 deploy_nginx(&client, &namespace).await.unwrap();
             }
 
@@ -124,8 +117,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             if gpu {
                 tgi::deploy(client.clone(), &namespace).await?;
                 llm_lite::deploy(client.clone(), &namespace).await?;
-            } else if testing {
-                http_mock::deploy(client.clone(), llm::NAME, 11434, &namespace).await?;
             } else {
                 llm::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             }
@@ -146,25 +137,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                     &namespace,
                 )
                 .await?;
-            }
-            if testing {
-                http_mock::deploy(
-                    client.clone(),
-                    chunking_engine::NAME,
-                    chunking_engine::PORT,
-                    &namespace,
-                )
-                .await?;
-                http_mock::deploy(
-                    client.clone(),
-                    embeddings_engine::NAME,
-                    embeddings_engine::PORT,
-                    &namespace,
-                )
-                .await?;
-            } else {
-                chunking_engine::deploy(client.clone(), app.spec.clone(), &namespace).await?;
-                embeddings_engine::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             }
             Ok(Action::requeue(Duration::from_secs(10)))
         }
@@ -187,12 +159,9 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             mailhog::delete(client.clone(), &namespace).await?;
 
             if !development {
-                rag_engine::delete(client.clone(), &namespace).await?;
                 application::delete(client.clone(), &namespace).await?;
             }
             database::delete(client.clone(), &namespace).await?;
-            chunking_engine::delete(client.clone(), &namespace).await?;
-            embeddings_engine::delete(client.clone(), &namespace).await?;
             if pgadmin {
                 pgadmin::delete(client.clone(), &namespace).await?;
             }
