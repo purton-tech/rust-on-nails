@@ -17,7 +17,6 @@ pub mod pgadmin;
 pub mod tgi;
 
 const APPLICATION_IMAGE: &str = "ghcr.io/nails/application";
-const PIPELINE_IMAGE: &str = "ghcr.io/nails/pipeline";
 const DB_MIGRATIONS_IMAGE: &str = "ghcr.io/nails/db-migrations";
 
 const ENVOYPROXY_IMAGE: &str = "envoyproxy/envoy:v1.28.0";
