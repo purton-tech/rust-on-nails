@@ -14,6 +14,7 @@ use k8s_openapi::apiextensions_apiserver::pkg::apis::apiextensions::v1::CustomRe
 use kube::api::ObjectMeta;
 use kube::api::Patch;
 use kube::api::PatchParams;
+use kube::api::PostParams;
 use kube::Api;
 use kube::Client;
 use kube::CustomResourceExt;
@@ -27,8 +28,13 @@ const OPERATOR_IMAGE: &str = "ghcr.io/nails/manager";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const CNPG_YAML: &str = include_str!("../../config/cnpg-1.22.1.yaml");
 const NGINX_YAML: &str = include_str!("../../config/nginx-ingress.yaml");
+const KEYCLOAK_CRD_KEYCLOAKS: &str = include_str!("../../config/keycloak-crd-keycloaks.yaml");
+const KEYCLOAK_CRD_REALM_IMPORTS: &str =
+    include_str!("../../config/keycloak-crd-keycloakrealmimports.yaml");
+const KEYCLOAK_OPERATOR_YAML: &str = include_str!("../../config/keycloak-operator.yaml");
 const POSTGRES_SERVICE: &str = include_str!("../../config/postgres-service-dev.yaml");
 const APPLICATION_SERVICE: &str = include_str!("../../config/application-service-dev.yaml");
+const KEYCLOAK_OPERATOR_NAMESPACE: &str = "keycloak";
 
 pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
     println!("Connecting to the cluster...");
@@ -36,6 +42,7 @@ pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
     println!("Connected");
 
     install_postgres_operator(&client).await?;
+    install_keycloak_operator(&client).await?;
     if !initializer.disable_ingress {
         install_nginx_operator(&client).await?;
     }
@@ -130,6 +137,42 @@ async fn install_postgres_operator(client: &Client) -> Result<()> {
         "cnpg-controller-manager",
         is_deployment_available(),
     );
+    let _ = tokio::time::timeout(std::time::Duration::from_secs(120), establish)
+        .await
+        .unwrap();
+
+    Ok(())
+}
+
+async fn install_keycloak_operator(client: &Client) -> Result<()> {
+    println!("Installing Keycloak Operator");
+    create_namespace(client, KEYCLOAK_OPERATOR_NAMESPACE).await?;
+
+    super::apply::apply(client, KEYCLOAK_CRD_KEYCLOAKS, None).await?;
+    super::apply::apply(client, KEYCLOAK_CRD_REALM_IMPORTS, None).await?;
+    super::apply::apply(
+        client,
+        KEYCLOAK_OPERATOR_YAML,
+        Some(KEYCLOAK_OPERATOR_NAMESPACE),
+    )
+    .await?;
+
+    fn is_deployment_available() -> impl Condition<Deployment> {
+        |obj: Option<&Deployment>| {
+            if let Some(deployment) = &obj {
+                if let Some(status) = &deployment.status {
+                    if let Some(phase) = &status.available_replicas {
+                        return phase >= &1;
+                    }
+                }
+            }
+            false
+        }
+    }
+
+    println!("Waiting for Keycloak Operator to be Available");
+    let deploys: Api<Deployment> = Api::namespaced(client.clone(), KEYCLOAK_OPERATOR_NAMESPACE);
+    let establish = await_condition(deploys, "keycloak-operator", is_deployment_available());
     let _ = tokio::time::timeout(std::time::Duration::from_secs(120), establish)
         .await
         .unwrap();
@@ -321,20 +364,28 @@ async fn create_namespace(client: &Client, namespace: &str) -> Result<Namespace>
     println!("Creating namespace {}", namespace);
     // Define the API object for Namespace
     let namespaces: Api<Namespace> = Api::all(client.clone());
+    match namespaces.get(namespace).await {
+        Ok(ns) => Ok(ns),
+        Err(kube::Error::Api(err)) if err.code == 404 => {
+            let new_namespace = Namespace {
+                metadata: ObjectMeta {
+                    name: Some(namespace.to_string()),
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
 
-    let new_namespace = Namespace {
-        metadata: ObjectMeta {
-            name: Some(namespace.to_string()),
-            ..Default::default()
-        },
-        ..Default::default()
-    };
-    let ns = namespaces
-        .patch(
-            namespace,
-            &PatchParams::apply(crate::MANAGER).force(),
-            &Patch::Apply(new_namespace),
-        )
-        .await?;
-    Ok(ns)
+            match namespaces
+                .create(&PostParams::default(), &new_namespace)
+                .await
+            {
+                Ok(ns) => Ok(ns),
+                Err(kube::Error::Api(err)) if err.code == 409 => {
+                    Ok(namespaces.get(namespace).await?)
+                }
+                Err(err) => Err(err.into()),
+            }
+        }
+        Err(err) => Err(err.into()),
+    }
 }

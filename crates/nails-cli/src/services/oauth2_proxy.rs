@@ -134,7 +134,7 @@ async fn oauthproxy_secret(
                 "client-id": APPLICATION_NAME,
                 "client-secret": "69b26b08-12fe-48a2-85f0-6ab223f45777",
                 "redirect-uri": format!("{}/oauth2/callback", spec.hostname_url),
-                "issuer-url": format!("http://keycloak:7910/oidc/realms/{}", APPLICATION_NAME),
+                "issuer-url": format!("http://keycloak-service:8080/oidc/realms/{}", APPLICATION_NAME),
                 "cookie-secret": rand_base64()
             }
         }))?;

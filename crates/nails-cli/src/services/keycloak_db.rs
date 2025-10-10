@@ -82,7 +82,7 @@ pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
     }
 
     let secret_api: Api<Secret> = Api::namespaced(client, namespace);
-    if api.get("keycloak-db-owner").await.is_ok() {
+    if secret_api.get("keycloak-db-owner").await.is_ok() {
         secret_api
             .delete("keycloak-db-owner", &DeleteParams::default())
             .await?;

@@ -57,7 +57,7 @@ data:
     ingress:
     - hostname: "*"
       path: /oidc
-      service: http://keycloak:7910
+      service: http://keycloak-service:8080
       originRequest:
         headers:
           X-Forwarded-Proto: https

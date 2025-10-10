@@ -25,7 +25,6 @@ const PIPELINE_IMAGE: &str = "ghcr.io/nails/pipeline";
 const DB_MIGRATIONS_IMAGE: &str = "ghcr.io/nails/db-migrations";
 
 const ENVOYPROXY_IMAGE: &str = "envoyproxy/envoy:v1.28.0";
-const KEYCLOAK_IMAGE: &str = "quay.io/keycloak/keycloak:23.0";
 const OAUTH2_PROXY_IMAGE: &str = "quay.io/oauth2-proxy/oauth2-proxy:v7.5.1";
 const LITE_LLM_IMAGE: &str = "ghcr.io/berriai/litellm:main-v1.10.3";
 const TGI_IMAGE: &str = "ghcr.io/huggingface/text-generation-inference:1.2";

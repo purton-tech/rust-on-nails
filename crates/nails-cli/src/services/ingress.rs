@@ -50,9 +50,9 @@ pub async fn deploy(
             path_type: "Prefix".to_string(),
             backend: IngressBackend {
                 service: Some(IngressServiceBackend {
-                    name: "keycloak".to_string(),
+                    name: "keycloak-service".to_string(),
                     port: Some(ServiceBackendPort {
-                        number: Some(7910),
+                        number: Some(8080),
                         ..Default::default()
                     }),
                 }),
