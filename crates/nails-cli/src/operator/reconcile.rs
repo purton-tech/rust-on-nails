@@ -8,13 +8,11 @@ use crate::services::ingress;
 use crate::services::keycloak;
 use crate::services::keycloak_db;
 use crate::services::llm;
-use crate::services::llm_lite;
 use crate::services::mailhog;
 use crate::services::nginx::deploy_nginx;
 use crate::services::oauth2_proxy;
 use crate::services::observability;
 use crate::services::pgadmin;
-use crate::services::tgi;
 use k8s_openapi::api::core::v1::Pod;
 use kube::api::ListParams;
 use kube::Api;
@@ -58,8 +56,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 
     let namespace: String = app.namespace().unwrap_or("default".to_string());
     let name = app.name_any();
-
-    let gpu = app.spec.gpu.unwrap_or_default();
 
     let pgadmin = app.spec.pgadmin.unwrap_or_default();
 
@@ -114,12 +110,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             }
 
             mailhog::deploy(client.clone(), &namespace).await?;
-            if gpu {
-                tgi::deploy(client.clone(), &namespace).await?;
-                llm_lite::deploy(client.clone(), &namespace).await?;
-            } else {
-                llm::deploy(client.clone(), app.spec.clone(), &namespace).await?;
-            }
+            llm::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             if pgadmin {
                 pgadmin::deploy(
                     client.clone(),
@@ -141,12 +132,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             Ok(Action::requeue(Duration::from_secs(10)))
         }
         AppAction::Delete => {
-            if gpu {
-                tgi::delete(client.clone(), &namespace).await?;
-                llm_lite::delete(client.clone(), &namespace).await?;
-            } else {
-                llm::delete(client.clone(), &namespace).await?;
-            }
+            llm::delete(client.clone(), &namespace).await?;
 
             envoy::delete(client.clone(), &namespace).await?;
             keycloak::delete(client.clone(), &namespace).await?;

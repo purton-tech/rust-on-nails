@@ -36,8 +36,6 @@ spec:
                   type: string
                 hash-app-db-migrations:
                   type: string
-                gpu:  # Do we want to setup a GPU model? Default is false
-                  type: boolean
                 pgadmin:  # Install PgAdmin
                   type: boolean
                 testing:  # Testing Mode
@@ -45,6 +43,3 @@ spec:
               required:
               - replicas
               - version
-              - hash-app
-              - hash-app-pipeline
-              - hash-app-db-migrations

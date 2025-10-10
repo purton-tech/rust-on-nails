@@ -21,7 +21,9 @@ use kube_runtime::conditions;
 use kube_runtime::wait::await_condition;
 use kube_runtime::wait::Condition;
 use local_ip_address::local_ip;
+use serde::Deserialize;
 use serde_json::json;
+use serde_yaml::Value;
 use std::path::Path;
 use tokio::fs;
 
@@ -63,8 +65,8 @@ pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
     let client = Client::try_default().await?;
     println!("Connected");
 
-    let namespace = manifest_namespace(&installer.manifest)?;
     let manifest = fs::read_to_string(&installer.manifest).await?;
+    let namespace = manifest_namespace(&manifest, &installer.manifest)?;
 
     create_namespace(&client, &namespace).await?;
     super::apply::apply(&client, &manifest, Some(&namespace)).await?;
@@ -322,15 +324,40 @@ async fn create_crd(client: &Client) -> Result<(), Error> {
     Ok(())
 }
 
-fn manifest_namespace(path: &Path) -> Result<String> {
-    let stem = path
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .ok_or_else(|| anyhow!("Unable to determine namespace from manifest filename"))?;
-    if stem.is_empty() {
-        bail!("Manifest filename must not be empty");
+fn manifest_namespace(manifest: &str, source: &Path) -> Result<String> {
+    let docs = serde_yaml::Deserializer::from_str(manifest);
+    for doc in docs {
+        let value = Value::deserialize(doc)?;
+        if value
+            .get("kind")
+            .and_then(Value::as_str)
+            .map(|kind| kind.eq_ignore_ascii_case("NailsApp"))
+            .unwrap_or(false)
+        {
+            let namespace = value
+                .get("metadata")
+                .and_then(|metadata| metadata.get("namespace"))
+                .and_then(Value::as_str)
+                .ok_or_else(|| {
+                    anyhow!(
+                        "Manifest {} missing metadata.namespace for NailsApp",
+                        source.display()
+                    )
+                })?;
+            if namespace.trim().is_empty() {
+                bail!(
+                    "Manifest {} defines an empty metadata.namespace",
+                    source.display()
+                );
+            }
+            return Ok(namespace.to_string());
+        }
     }
-    Ok(stem.to_string())
+
+    bail!(
+        "Manifest {} does not contain a NailsApp resource",
+        source.display()
+    )
 }
 
 async fn create_namespace(client: &Client, namespace: &str) -> Result<Namespace> {

@@ -15,7 +15,6 @@ use serde::{Deserialize, Serialize};
 pub struct NailsAppSpec {
     pub replicas: i32,
     pub version: String,
-    pub gpu: Option<bool>,
     pub saas: Option<bool>,
     pub disable_ingress: Option<bool>,
     pub pgadmin: Option<bool>,
@@ -26,10 +25,13 @@ pub struct NailsAppSpec {
     pub keycloak_db_disk_size: i32,
     #[serde(rename = "hostname-url")]
     pub hostname_url: String,
-    #[serde(rename = "hash-app")]
-    pub hash_app: String,
-    #[serde(rename = "hash-app-pipeline")]
-    pub hash_app_pipeline_job: String,
-    #[serde(rename = "hash-app-db-migrations")]
-    pub hash_app_db_migrations: String,
+    #[serde(rename = "hash-app", skip_serializing_if = "Option::is_none")]
+    pub hash_app: Option<String>,
+    #[serde(rename = "hash-app-pipeline", skip_serializing_if = "Option::is_none")]
+    pub hash_app_pipeline_job: Option<String>,
+    #[serde(
+        rename = "hash-app-db-migrations",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub hash_app_db_migrations: Option<String>,
 }

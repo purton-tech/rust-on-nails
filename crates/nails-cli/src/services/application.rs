@@ -195,21 +195,20 @@ pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Resu
         )
         .await?;
 
-    let image_name = if spec.hash_app.is_empty() {
-        format!("{}:{}", super::APPLICATION_IMAGE, spec.version)
-    } else {
-        format!("{}@{}", super::APPLICATION_IMAGE, spec.hash_app)
+    let hashed_image = |base: &str, default_tag: &str, hash: &Option<String>| -> String {
+        if let Some(value) = hash.as_ref().filter(|value| !value.is_empty()) {
+            format!("{}@{}", base, value)
+        } else {
+            format!("{}:{}", base, default_tag)
+        }
     };
 
-    let migrations_image_name = if spec.hash_app_db_migrations.is_empty() {
-        format!("{}:{}", super::DB_MIGRATIONS_IMAGE, spec.version)
-    } else {
-        format!(
-            "{}@{}",
-            super::DB_MIGRATIONS_IMAGE,
-            spec.hash_app_db_migrations
-        )
-    };
+    let image_name = hashed_image(super::APPLICATION_IMAGE, &spec.version, &spec.hash_app);
+    let migrations_image_name = hashed_image(
+        super::DB_MIGRATIONS_IMAGE,
+        &spec.version,
+        &spec.hash_app_db_migrations,
+    );
 
     // Application with the migrations as a sidecar
     deployment::deployment(
