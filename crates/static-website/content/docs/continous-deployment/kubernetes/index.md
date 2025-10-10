@@ -85,6 +85,22 @@ the CLI:
 2. Creates that namespace if it does not exist.
 3. Applies the manifest plus supporting Kubernetes objects.
 
+A minimal manifest needs the version, replica count, and disk sizing for the two CloudNativePG clusters. The hash fields are optional and only required when you want to pin images.
+
+```yaml
+apiVersion: nails-cli.dev/v1
+kind: NailsApp
+metadata:
+  name: nails-app
+  namespace: nails-demo
+spec:
+  replicas: 1
+  version: 1.11.33
+  primary_db_disk_size: 20
+  keycloak_db_disk_size: 10
+  hostname-url: https://localhost
+```
+
 ### What the operator does for you
 
 When the operator sees a NailsApp it:

@@ -6,6 +6,8 @@ metadata:
 spec:
   replicas: 1
   version: 1.11.33
+  primary_db_disk_size: 20
+  keycloak_db_disk_size: 10
 
   # PgAdmin - Uncomment to install PgAdmin
   # pgadmin: true
