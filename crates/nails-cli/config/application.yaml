@@ -1,0 +1,24 @@
+apiVersion: nails-cli.dev/v1
+kind: NailsApp
+metadata:
+  name: nails-app
+  namespace: nails 
+spec:
+  replicas: 1 
+  version: 1.11.33
+  
+  # PgAdmin - Uncomment to install PgAdmin
+  # pgadmin: true
+  # TGI GPU inference engine
+  # gpu: true
+  # Testing mode
+  # testing: true
+
+  # Use by Oauth2 proxy to know where to redirect and also keycloak (if installed)
+  # to know how to set the openid configuration
+  hostname-url: https://localhost
+
+  # Image hashes to protect against supply chain attacks.
+  hash-app: sha256:2d25587aa3e2f99a67f6708c98b1a577fcecef29c48cd3053552c0e309b16b67
+  hash-app-rag-engine: sha256:891c40ceda2ca6b23602692213d859fbae0b07fd3f93cca7d4a3881f9b7fe577
+  hash-app-db-migrations: sha256:b7a536aeb4c4e01aa6be1f7b8c7fe07b79b3389bc534180e9c4927fd16e52196
