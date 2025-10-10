@@ -16,8 +16,8 @@ This repository mixes several deliverables that move at different speeds. To kee
 
 ## Platform Agent (`crates/nails-cli`)
 - **Purpose**: Provide the internal developer platform that installs operators into Kubernetes clusters for Rust on Nails applications.
-- **Primary tasks**: Extend the `k8s-operator` binary, manage Helm-like manifests under `config/`, and maintain integrations with Envoy and Keycloak.
-- **Working locally**: `cargo run --bin k8s-operator -- -h` to inspect commands. Use `cargo run --bin k8s-operator -- operator` to run the controller loop, and the `init`/`install` subcommands to configure a cluster. The dev container already maps your kubeconfig—fall back to `tmp/kubeconfig` if needed.
+- **Primary tasks**: Extend the `nails-cli` binary, manage Helm-like manifests under `config/`, and maintain integrations with Envoy and Keycloak.
+- **Working locally**: `cargo run --bin nails-cli -- -h` to inspect commands. Use `cargo run --bin nails-cli -- operator` to run the controller loop, and the `init`/`install` subcommands to configure a cluster. The dev container already maps your kubeconfig—fall back to `tmp/kubeconfig` if needed.
 - **Before shipping**: `cargo fmt`, `cargo clippy -- -D warnings`, and `cargo test`. When changing cluster assets, test against a local K3s install (`curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server --write-kubeconfig-mode="644"' sh -`). Document any new flags in `README.md`.
 
 ## Cross-Cutting Expectations

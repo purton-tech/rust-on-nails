@@ -53,7 +53,7 @@ Our internal developer portal lives in the `nails-cli` crate. It installs the pl
 ### Install the platform operators
 
 ```sh
-cargo run --bin k8s-operator -- init
+cargo run --bin nails-cli -- init
 ```
 
 This command:
@@ -76,7 +76,7 @@ That sequence applies a sample NailsApp manifest, maps NodePorts for the app and
 Each NailsApp describes one namespace. When you run:
 
 ```sh
-cargo run --bin k8s-operator -- install --manifest demo-nails-app.yaml
+cargo run --bin nails-cli -- install --manifest demo-nails-app.yaml
 ```
 
 the CLI:
@@ -114,7 +114,7 @@ If you enable development mode, the operator exposes the application on `http://
 You can re-run the operator any time:
 
 ```sh
-cargo run --bin k8s-operator -- operator
+cargo run --bin nails-cli -- operator
 ```
 
 It will reconcile existing NailsApp resources, upgrade components when you change the version, and clean up databases and secrets on deletion.

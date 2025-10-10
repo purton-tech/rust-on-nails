@@ -3,13 +3,13 @@
 Run and see the CLI help
 
 ```sh
-cargo run --bin k8s-operator -- -h
+cargo run --bin nails-cli -- -h
 ```
 
 ## Run as an Operator
 
 ```sh
-cargo run --bin k8s-operator -- operator
+cargo run --bin nails-cli -- operator
 ```
 
 ## (Re-)install K3's
@@ -36,19 +36,22 @@ export KUBECONFIG=/workspace/tmp/kubeconfig
 Then run
 
 ```sh
-cargo run --bin k8s-operator -- init
-cargo run --bin k8s-operator -- install
+cargo run --bin nails-cli -- init
+cargo run --bin nails-cli -- install --manifest ../../demo-nails-app.yaml
 ```
 
 ## Testing the Operator
 
+Install the manifests without the in-cluster controller so you can iterate on the binary locally and observe the resources it creates:
+
 ```sh
-cargo run --bin k8s-operator -- init
-cargo run --bin k8s-operator -- install --no-operator --testing --grafana --hostname-url http://192.168.178.57
+cargo run --bin nails-cli -- init --no-operator
+cargo run --bin nails-cli -- install --manifest ../../demo-nails-app.yaml --development
 ```
 
-Then
+Then run the operator locally and confirm it reconciles `NailsApplication` objects:
 
 ```sh
-cargo run --bin k8s-operator -- operator
+cargo run --bin nails-cli -- operator
+kubectl get nailsapplications --all-namespaces --watch
 ```

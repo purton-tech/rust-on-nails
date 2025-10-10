@@ -6,8 +6,9 @@ dev-init:
     k3d cluster create k3s-nails --agents 1 -p "30000-30001:30000-30001@agent:0"
 
 dev-setup:
-    cargo run --bin k8s-operator -- install --no-operator --testing --development --hostname-url http://localhost:30000
-    cargo run --bin k8s-operator -- operator
+    cargo run --bin nails-cli -- init --no-operator
+    cargo run --bin nails-cli -- install --manifest demo-nails-app.yaml --development
+    cargo run --bin nails-cli -- operator
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
