@@ -1,8 +1,6 @@
-use std::collections::BTreeMap;
-
 use crate::error::Error;
 use k8s_openapi::api::core::v1::{Secret, Service};
-use k8s_openapi::ByteString;
+use k8s_openapi::api::networking::v1::NetworkPolicy;
 use kube::api::{DeleteParams, Patch, PatchParams};
 use kube::core::dynamic::{ApiResource, DynamicObject};
 use kube::core::gvk::GroupVersionKind;
@@ -17,8 +15,6 @@ pub const KEYCLOAK_SERVICE_NAME: &str = "keycloak-service";
 pub const KEYCLOAK_INTERNAL_URL: &str = "http://keycloak-service.keycloak.svc.cluster.local:8080";
 pub const KEYCLOAK_REALM_BASE_PATH: &str = "/oidc/realms";
 
-const INITIAL_ADMIN_SECRET: &str = "keycloak-initial-admin";
-const KEYCLOAK_SECRET: &str = "keycloak-secrets";
 const KEYCLOAK_INSTALL_HINT: &str =
     "Keycloak operator is not installed. Run `nails-cli init` or apply the manifests in `crates/nails-cli/config` before reconciling.";
 
@@ -33,12 +29,10 @@ pub struct RealmConfig {
 }
 
 pub async fn bootstrap(client: Client) -> Result<(), Error> {
-    ensure_admin_secrets(client.clone(), super::database::rand_hex()).await?;
+    cleanup_bootstrap_conflicts(client.clone()).await?;
     apply_keycloak_cr(client.clone()).await?;
     apply_static_realms(client.clone()).await?;
 
-    crate::services::network_policy::default_deny(client, KEYCLOAK_NAME, KEYCLOAK_NAMESPACE)
-        .await?;
     Ok(())
 }
 
@@ -48,7 +42,7 @@ pub async fn ensure_realm(client: Client, config: &RealmConfig) -> Result<(), Er
     let resource_name = format!("keycloak-realm-{}", config.realm);
 
     let realm_resource = json!({
-        "apiVersion": "keycloak.org/v2alpha1",
+        "apiVersion": format!("{}/{}", KEYCLOAK_API_GROUP, "v2alpha1"),
         "kind": "KeycloakRealmImport",
         "metadata": {
             "name": resource_name,
@@ -106,60 +100,6 @@ pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
             .delete(&resource_name, &DeleteParams::default())
             .await?;
     }
-    Ok(())
-}
-
-async fn ensure_admin_secrets(client: Client, fallback_password: String) -> Result<(), Error> {
-    let secret_api: Api<Secret> = Api::namespaced(client, KEYCLOAK_NAMESPACE);
-    let existing_password = match secret_api.get(KEYCLOAK_SECRET).await {
-        Ok(secret) => extract_password(secret),
-        Err(_) => None,
-    };
-
-    let admin_password = existing_password.unwrap_or(fallback_password);
-
-    let mut secret_data = BTreeMap::new();
-    secret_data.insert("admin-password".to_string(), admin_password.clone());
-
-    let legacy_secret = json!({
-        "apiVersion": "v1",
-        "kind": "Secret",
-        "metadata": {
-            "name": KEYCLOAK_SECRET,
-            "namespace": KEYCLOAK_NAMESPACE
-        },
-        "stringData": secret_data
-    });
-
-    secret_api
-        .patch(
-            KEYCLOAK_SECRET,
-            &PatchParams::apply(crate::MANAGER).force(),
-            &Patch::Apply(legacy_secret),
-        )
-        .await?;
-
-    let initial_admin_secret = json!({
-        "apiVersion": "v1",
-        "kind": "Secret",
-        "metadata": {
-            "name": INITIAL_ADMIN_SECRET,
-            "namespace": KEYCLOAK_NAMESPACE
-        },
-        "stringData": {
-            "username": "admin",
-            "password": admin_password
-        }
-    });
-
-    secret_api
-        .patch(
-            INITIAL_ADMIN_SECRET,
-            &PatchParams::apply(crate::MANAGER).force(),
-            &Patch::Apply(initial_admin_secret),
-        )
-        .await?;
-
     Ok(())
 }
 
@@ -279,11 +219,32 @@ fn realm_values() -> Result<Vec<Value>, Error> {
     Ok(realms)
 }
 
-fn extract_password(secret: Secret) -> Option<String> {
-    secret
-        .data
-        .and_then(|mut data| data.remove("admin-password"))
-        .and_then(|byte_string: ByteString| String::from_utf8(byte_string.0).ok())
+async fn cleanup_bootstrap_conflicts(client: Client) -> Result<(), Error> {
+    let secret_api: Api<Secret> = Api::namespaced(client.clone(), KEYCLOAK_NAMESPACE);
+    if secret_api
+        .get("keycloak-initial-admin")
+        .await
+        .map(|_| ())
+        .is_ok()
+    {
+        let _ = secret_api
+            .delete("keycloak-initial-admin", &DeleteParams::default())
+            .await;
+    }
+
+    let network_policy_api: Api<NetworkPolicy> = Api::namespaced(client, KEYCLOAK_NAMESPACE);
+    if network_policy_api
+        .get("keycloak-network-policy")
+        .await
+        .map(|_| ())
+        .is_ok()
+    {
+        let _ = network_policy_api
+            .delete("keycloak-network-policy", &DeleteParams::default())
+            .await;
+    }
+
+    Ok(())
 }
 
 async fn ensure_namespace_service(client: Client, namespace: &str) -> Result<(), Error> {
