@@ -42,7 +42,7 @@ pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Resu
                 }),
                 json!({"name": "OAUTH2_PROXY_EMAIL_DOMAINS", "value": "*"}),
                 json!({"name": "OAUTH2_PROXY_COOKIE_SECURE", "value": "false"}),
-                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": "http://envoy:7901"}),
+                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:7903", APPLICATION_NAME)}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAM_TIMEOUT", "value": "600s"}),
                 json!({
                     "name":

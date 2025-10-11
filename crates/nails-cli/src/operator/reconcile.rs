@@ -3,7 +3,6 @@ use super::finalizer;
 use crate::error::Error;
 use crate::services::application;
 use crate::services::database;
-use crate::services::envoy;
 use crate::services::ingress;
 use crate::services::keycloak;
 use crate::services::keycloak_db;
@@ -98,7 +97,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                     .await?;
 
             application::deploy(client.clone(), app.spec.clone(), &namespace).await?;
-            envoy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             keycloak::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             oauth2_proxy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             if !disable_ingress || development {
@@ -134,7 +132,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
         AppAction::Delete => {
             llm::delete(client.clone(), &namespace).await?;
 
-            envoy::delete(client.clone(), &namespace).await?;
             keycloak::delete(client.clone(), &namespace).await?;
             keycloak_db::delete(client.clone(), &namespace).await?;
             oauth2_proxy::delete(client.clone(), &namespace).await?;

@@ -14,7 +14,7 @@ pub async fn deploy_nginx(client: &Client, namespace: &str) -> Result<()> {
 
     let image_name = "nginx:1.27.2".to_string();
 
-    // Put the envoy.yaml into a ConfigMap
+    // Put the nginx config into a ConfigMap
     let config_map = serde_json::json!({
         "apiVersion": "v1",
         "kind": "ConfigMap",
