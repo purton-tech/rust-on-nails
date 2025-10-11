@@ -176,6 +176,7 @@ pub async fn ensure_secret(
         .await?;
 
     Ok(RealmConfig {
+        namespace: namespace.to_string(),
         realm,
         client_id,
         client_secret,

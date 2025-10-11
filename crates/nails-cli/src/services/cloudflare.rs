@@ -30,9 +30,7 @@ spec:
         - $TARGET_URL
 "#;
 
-const QUICK_TUNNEL_TARGET: &str =
-    "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80";
-const KEYCLOAK_URL: &str = "http://keycloak-service.keycloak.svc.cluster.local:8080";
+const INGRESS_TARGET: &str = "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80";
 
 pub async fn deploy(
     client: &Client,
@@ -44,10 +42,10 @@ pub async fn deploy(
         let yaml = CLOUDFLARE_YAML
             .replace("$TUNNEL_TOKEN", token)
             .replace("$TUNNEL_NAME", tunnel_name)
-            .replace("$KEYCLOAK_URL", KEYCLOAK_URL);
+            .replace("$INGRESS_TARGET", INGRESS_TARGET);
         apply::apply(client, &yaml, Some(namespace)).await
     } else {
-        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", QUICK_TUNNEL_TARGET);
+        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", INGRESS_TARGET);
         apply::apply(client, &yaml, Some(namespace)).await
     }
 }

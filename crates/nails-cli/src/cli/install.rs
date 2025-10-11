@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::operator::crd::NailsApp;
 use crate::services::{cloudflare, keycloak, keycloak_db};
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Namespace;
 use k8s_openapi::api::core::v1::ServiceAccount;
@@ -209,6 +209,9 @@ async fn install_keycloak_operator(client: &Client) -> Result<()> {
 
     super::apply::apply(client, KEYCLOAK_CRD_KEYCLOAKS, None).await?;
     super::apply::apply(client, KEYCLOAK_CRD_REALM_IMPORTS, None).await?;
+
+    wait_for_crd(client, "keycloaks.k8s.keycloak.org").await?;
+    wait_for_crd(client, "keycloakrealmimports.k8s.keycloak.org").await?;
     super::apply::apply(
         client,
         KEYCLOAK_OPERATOR_YAML,
@@ -236,6 +239,15 @@ async fn install_keycloak_operator(client: &Client) -> Result<()> {
         .await
         .unwrap();
 
+    Ok(())
+}
+
+async fn wait_for_crd(client: &Client, name: &str) -> Result<()> {
+    let crds: Api<CustomResourceDefinition> = Api::all(client.clone());
+    let establish = await_condition(crds.clone(), name, conditions::is_crd_established());
+    tokio::time::timeout(std::time::Duration::from_secs(60), establish)
+        .await
+        .context(format!("Timed out waiting for CRD {}", name))??;
     Ok(())
 }
 

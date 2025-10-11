@@ -2,7 +2,7 @@
     "realm": "nails-app",
     "registrationAllowed": true,
     "registrationEmailAsUsername": true,
-    "enabled": "true",
+    "enabled": true,
     "sslRequired": "none",
     "clients": [
         {
@@ -21,7 +21,7 @@
     "realm": "observability",
     "registrationAllowed": false,
     "registrationEmailAsUsername": true,
-    "enabled": "true",
+    "enabled": true,
     "sslRequired": "none",
     "clients": [
         {
