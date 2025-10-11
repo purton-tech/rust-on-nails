@@ -301,6 +301,18 @@ pub fn summary() -> Summary {
                 pages: vec![
                     Page {
                         date: "",
+                        title: "Deployed Application Topology",
+                        description: "Understand the operator-managed workloads",
+                        folder: "docs/continous-deployment/deployment-architecture",
+                        markdown: include_str!(
+                            "../content/docs/continous-deployment/deployment-architecture/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
                         title: "Deploying to Kubernetes",
                         description: "Deploying to Kubernetes",
                         folder: "docs/continous-deployment/kubernetes",
