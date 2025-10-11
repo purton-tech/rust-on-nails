@@ -4,7 +4,6 @@ use crate::error::Error;
 use crate::services::database;
 use crate::services::ingress;
 use crate::services::keycloak;
-use crate::services::keycloak_db;
 use crate::services::llm;
 use crate::services::mailhog;
 use crate::services::nginx::deploy_nginx;
@@ -91,12 +90,10 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                 &override_db_password,
             )
             .await?;
-            let keycloak_db_pass =
-                keycloak_db::deploy(client.clone(), &namespace, app.spec.keycloak_db_disk_size)
-                    .await?;
-
-            keycloak::deploy(client.clone(), app.spec.clone(), &namespace).await?;
-            oauth2_proxy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
+            let realm_config =
+                oauth2_proxy::ensure_secret(client.clone(), &namespace, &app.spec).await?;
+            keycloak::ensure_realm(client.clone(), &realm_config).await?;
+            oauth2_proxy::deploy(client.clone(), &app.spec, &namespace).await?;
             if !disable_ingress || development {
                 ingress::deploy(client.clone(), &namespace, pgadmin, observability).await?;
             }
@@ -108,13 +105,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             mailhog::deploy(client.clone(), &namespace).await?;
             llm::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             if pgadmin {
-                pgadmin::deploy(
-                    client.clone(),
-                    primary_db_pass.clone(),
-                    keycloak_db_pass,
-                    &namespace,
-                )
-                .await?;
+                pgadmin::deploy(client.clone(), primary_db_pass.clone(), None, &namespace).await?;
             }
             if observability {
                 observability::deploy(
@@ -131,7 +122,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             llm::delete(client.clone(), &namespace).await?;
 
             keycloak::delete(client.clone(), &namespace).await?;
-            keycloak_db::delete(client.clone(), &namespace).await?;
             oauth2_proxy::delete(client.clone(), &namespace).await?;
 
             if !disable_ingress {

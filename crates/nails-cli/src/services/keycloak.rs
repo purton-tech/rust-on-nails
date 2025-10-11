@@ -1,70 +1,112 @@
 use std::collections::BTreeMap;
 
 use crate::error::Error;
-use crate::operator::crd::NailsAppSpec;
 use k8s_openapi::api::core::v1::Secret;
 use k8s_openapi::ByteString;
 use kube::api::{DeleteParams, Patch, PatchParams};
 use kube::core::dynamic::{ApiResource, DynamicObject};
 use kube::core::gvk::GroupVersionKind;
 use kube::{Api, Client};
-use serde_json::{json, Map, Value};
-use url::Url;
+use serde_json::{json, Value};
 
 const CONFIG_JSON: &str = include_str!("../../keycloak/realm.json");
+pub const KEYCLOAK_NAMESPACE: &str = "keycloak";
 pub const KEYCLOAK_NAME: &str = "keycloak";
+pub const KEYCLOAK_INTERNAL_URL: &str = "http://keycloak-service.keycloak.svc.cluster.local:8080";
+pub const KEYCLOAK_REALM_BASE_PATH: &str = "/oidc/realms";
+
 const INITIAL_ADMIN_SECRET: &str = "keycloak-initial-admin";
 const KEYCLOAK_SECRET: &str = "keycloak-secrets";
 const KEYCLOAK_INSTALL_HINT: &str =
     "Keycloak operator is not installed. Run `nails-cli init` or apply the manifests in `crates/nails-cli/config` before reconciling.";
 
-pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
-    ensure_admin_secrets(client.clone(), namespace, super::database::rand_hex()).await?;
+#[derive(Clone, Debug)]
+pub struct RealmConfig {
+    pub realm: String,
+    pub client_id: String,
+    pub client_secret: String,
+    pub redirect_uris: Vec<String>,
+    pub allow_registration: bool,
+}
 
-    apply_keycloak_cr(client.clone(), namespace, spec).await?;
-    apply_realm_imports(client.clone(), namespace).await?;
+pub async fn bootstrap(client: Client) -> Result<(), Error> {
+    ensure_admin_secrets(client.clone(), super::database::rand_hex()).await?;
+    apply_keycloak_cr(client.clone()).await?;
+    apply_static_realms(client.clone()).await?;
 
-    crate::services::network_policy::default_deny(client, KEYCLOAK_NAME, namespace).await?;
-
+    crate::services::network_policy::default_deny(client, KEYCLOAK_NAME, KEYCLOAK_NAMESPACE)
+        .await?;
     Ok(())
 }
 
-pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
-    let keycloak_api = keycloak_api(client.clone(), namespace);
-    if keycloak_api.get(KEYCLOAK_NAME).await.is_ok() {
-        keycloak_api
-            .delete(KEYCLOAK_NAME, &DeleteParams::default())
+pub async fn ensure_realm(client: Client, config: &RealmConfig) -> Result<(), Error> {
+    let realm_api = keycloak_realm_import_api(client, KEYCLOAK_NAMESPACE);
+    let resource_name = format!("keycloak-realm-{}", config.realm);
+
+    let realm_resource = json!({
+        "apiVersion": "keycloak.org/v2alpha1",
+        "kind": "KeycloakRealmImport",
+        "metadata": {
+            "name": resource_name,
+            "namespace": KEYCLOAK_NAMESPACE,
+        },
+        "spec": {
+            "keycloakCRName": KEYCLOAK_NAME,
+            "realm": {
+                "realm": config.realm,
+                "enabled": true,
+                "registrationAllowed": config.allow_registration,
+                "registrationEmailAsUsername": true,
+                "sslRequired": "none",
+                "clients": [
+                    {
+                        "clientId": config.client_id,
+                        "clientAuthenticatorType": "client-secret",
+                        "secret": config.client_secret,
+                        "redirectUris": config.redirect_uris,
+                        "protocol": "openid-connect",
+                        "publicClient": false,
+                        "directAccessGrantsEnabled": true,
+                        "standardFlowEnabled": true,
+                        "bearerOnly": false,
+                        "consentRequired": false,
+                        "frontchannelLogout": true,
+                        "webOrigins": ["*"],
+                    }
+                ]
+            }
+        }
+    });
+
+    match realm_api
+        .patch(
+            &resource_name,
+            &PatchParams::apply(crate::MANAGER).force(),
+            &Patch::Apply(realm_resource),
+        )
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(kube::Error::Api(err)) if err.code == 404 => {
+            Err(Error::DependencyMissing(KEYCLOAK_INSTALL_HINT))
+        }
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub async fn delete(client: Client, realm: &str) -> Result<(), Error> {
+    let realm_api = keycloak_realm_import_api(client, KEYCLOAK_NAMESPACE);
+    let resource_name = format!("keycloak-realm-{}", realm);
+    if realm_api.get(&resource_name).await.is_ok() {
+        realm_api
+            .delete(&resource_name, &DeleteParams::default())
             .await?;
     }
-
-    let realm_import_api = keycloak_realm_import_api(client.clone(), namespace);
-    for realm_name in realm_names()? {
-        let resource_name = format!("keycloak-realm-{}", realm_name);
-        if realm_import_api.get(&resource_name).await.is_ok() {
-            realm_import_api
-                .delete(&resource_name, &DeleteParams::default())
-                .await?;
-        }
-    }
-
-    let secret_api: Api<Secret> = Api::namespaced(client, namespace);
-    for secret_name in [KEYCLOAK_SECRET, INITIAL_ADMIN_SECRET] {
-        if secret_api.get(secret_name).await.is_ok() {
-            secret_api
-                .delete(secret_name, &DeleteParams::default())
-                .await?;
-        }
-    }
-
     Ok(())
 }
 
-async fn ensure_admin_secrets(
-    client: Client,
-    namespace: &str,
-    fallback_password: String,
-) -> Result<(), Error> {
-    let secret_api: Api<Secret> = Api::namespaced(client, namespace);
+async fn ensure_admin_secrets(client: Client, fallback_password: String) -> Result<(), Error> {
+    let secret_api: Api<Secret> = Api::namespaced(client, KEYCLOAK_NAMESPACE);
     let existing_password = match secret_api.get(KEYCLOAK_SECRET).await {
         Ok(secret) => extract_password(secret),
         Err(_) => None,
@@ -72,17 +114,17 @@ async fn ensure_admin_secrets(
 
     let admin_password = existing_password.unwrap_or(fallback_password);
 
-    let mut legacy_secret_data = BTreeMap::new();
-    legacy_secret_data.insert("admin-password".to_string(), admin_password.clone());
+    let mut secret_data = BTreeMap::new();
+    secret_data.insert("admin-password".to_string(), admin_password.clone());
 
     let legacy_secret = json!({
         "apiVersion": "v1",
         "kind": "Secret",
         "metadata": {
             "name": KEYCLOAK_SECRET,
-            "namespace": namespace
+            "namespace": KEYCLOAK_NAMESPACE
         },
-        "stringData": legacy_secret_data
+        "stringData": secret_data
     });
 
     secret_api
@@ -98,7 +140,7 @@ async fn ensure_admin_secrets(
         "kind": "Secret",
         "metadata": {
             "name": INITIAL_ADMIN_SECRET,
-            "namespace": namespace
+            "namespace": KEYCLOAK_NAMESPACE
         },
         "stringData": {
             "username": "admin",
@@ -117,27 +159,21 @@ async fn ensure_admin_secrets(
     Ok(())
 }
 
-async fn apply_keycloak_cr(
-    client: Client,
-    namespace: &str,
-    spec: NailsAppSpec,
-) -> Result<(), Error> {
-    let keycloak_api = keycloak_api(client, namespace);
+async fn apply_keycloak_cr(client: Client) -> Result<(), Error> {
+    let keycloak_api = keycloak_api(client, KEYCLOAK_NAMESPACE);
 
-    let instances = if spec.replicas > 0 { spec.replicas } else { 1 };
-
-    let mut keycloak_resource = json!({
+    let keycloak_resource = json!({
         "apiVersion": "keycloak.org/v2alpha1",
         "kind": "Keycloak",
         "metadata": {
             "name": KEYCLOAK_NAME,
-            "namespace": namespace,
+            "namespace": KEYCLOAK_NAMESPACE,
             "labels": {
                 "app": KEYCLOAK_NAME
             }
         },
         "spec": {
-            "instances": instances,
+            "instances": 1,
             "http": {
                 "relativePath": "/oidc"
             },
@@ -159,28 +195,16 @@ async fn apply_keycloak_cr(
                 "secret": {
                     "name": INITIAL_ADMIN_SECRET
                 }
+            },
+            "hostname": {
+                "strict": false,
+                "backchannelDynamic": true
+            },
+            "proxy": {
+                "headers": "xforwarded"
             }
         }
     });
-
-    if let Some(spec_obj) = keycloak_resource
-        .get_mut("spec")
-        .and_then(Value::as_object_mut)
-    {
-        let mut hostname_config = Map::new();
-        hostname_config.insert("strict".into(), Value::Bool(false));
-        if let Some(hostname) = parsed_hostname(&spec.hostname_url) {
-            hostname_config.insert("hostname".into(), Value::String(hostname));
-        }
-        hostname_config.insert("backchannelDynamic".into(), Value::Bool(true));
-        spec_obj.insert("hostname".into(), Value::Object(hostname_config));
-        spec_obj.insert(
-            "proxy".into(),
-            json!({
-                "headers": "xforwarded"
-            }),
-        );
-    }
 
     match keycloak_api
         .patch(
@@ -190,18 +214,16 @@ async fn apply_keycloak_cr(
         )
         .await
     {
-        Ok(_) => {}
+        Ok(_) => Ok(()),
         Err(kube::Error::Api(err)) if err.code == 404 => {
-            return Err(Error::DependencyMissing(KEYCLOAK_INSTALL_HINT));
+            Err(Error::DependencyMissing(KEYCLOAK_INSTALL_HINT))
         }
-        Err(err) => return Err(err.into()),
+        Err(err) => Err(err.into()),
     }
-
-    Ok(())
 }
 
-async fn apply_realm_imports(client: Client, namespace: &str) -> Result<(), Error> {
-    let realm_api = keycloak_realm_import_api(client, namespace);
+async fn apply_static_realms(client: Client) -> Result<(), Error> {
+    let realm_api = keycloak_realm_import_api(client, KEYCLOAK_NAMESPACE);
     let params = PatchParams::apply(crate::MANAGER).force();
 
     for realm in realm_values()? {
@@ -217,7 +239,7 @@ async fn apply_realm_imports(client: Client, namespace: &str) -> Result<(), Erro
             "kind": "KeycloakRealmImport",
             "metadata": {
                 "name": resource_name,
-                "namespace": namespace,
+                "namespace": KEYCLOAK_NAMESPACE,
             },
             "spec": {
                 "keycloakCRName": KEYCLOAK_NAME,
@@ -259,26 +281,6 @@ fn realm_values() -> Result<Vec<Value>, Error> {
         other => vec![other],
     };
     Ok(realms)
-}
-
-fn realm_names() -> Result<Vec<String>, Error> {
-    realm_values().map(|realms| {
-        realms
-            .into_iter()
-            .filter_map(|realm| {
-                realm
-                    .get("realm")
-                    .and_then(Value::as_str)
-                    .map(ToString::to_string)
-            })
-            .collect()
-    })
-}
-
-fn parsed_hostname(url: &str) -> Option<String> {
-    Url::parse(url)
-        .ok()
-        .and_then(|parsed| parsed.host_str().map(|host| host.to_string()))
 }
 
 fn extract_password(secret: Secret) -> Option<String> {

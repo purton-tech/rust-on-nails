@@ -80,6 +80,7 @@ pub async fn deploy(
     Ok(Some(database_password))
 }
 
+#[allow(dead_code)]
 pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
     // Remove deployments
     let api: Api<Cluster> = Api::namespaced(client.clone(), namespace);

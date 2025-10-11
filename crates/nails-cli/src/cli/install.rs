@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::operator::crd::NailsApp;
+use crate::services::{cloudflare, keycloak, keycloak_db};
 use anyhow::{anyhow, bail, Result};
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::Namespace;
@@ -37,12 +38,12 @@ const KEYCLOAK_CRD_REALM_IMPORTS: &str =
 const KEYCLOAK_OPERATOR_YAML: &str = include_str!("../../config/keycloak-operator.yaml");
 const POSTGRES_SERVICE: &str = include_str!("../../config/postgres-service-dev.yaml");
 const APPLICATION_SERVICE: &str = include_str!("../../config/application-service-dev.yaml");
-const KEYCLOAK_OPERATOR_NAMESPACE: &str = "keycloak";
+const KEYCLOAK_DB_SIZE_GIB: i32 = 10;
 
 pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
-    println!("Connecting to the cluster...");
+    println!("🔌 Connecting to the cluster...");
     let client = Client::try_default().await?;
-    println!("Connected");
+    println!("✅ Connected");
 
     install_postgres_operator(&client).await?;
     install_keycloak_operator(&client).await?;
@@ -57,13 +58,15 @@ pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
         create_operator(&client, &initializer.operator_namespace).await?;
     }
 
+    bootstrap_keycloak_namespace(&client).await?;
+
     Ok(())
 }
 
 pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
-    println!("Connecting to the cluster...");
+    println!("🔌 Connecting to the cluster...");
     let client = Client::try_default().await?;
-    println!("Connected");
+    println!("✅ Connected");
 
     let manifest = fs::read_to_string(&installer.manifest).await?;
     let namespace = manifest_namespace(&manifest, &installer.manifest)?;
@@ -80,16 +83,41 @@ pub async fn install(installer: &crate::cli::Installer) -> Result<()> {
         println!("🚀 Mapping Nginx to port 30000");
         super::apply::apply(&client, APPLICATION_SERVICE, Some(&namespace)).await?;
     }
+
+    let tunnel_namespace = installer
+        .cloudflare_namespace
+        .as_deref()
+        .unwrap_or(namespace.as_str());
+    let tunnel_name = installer
+        .cloudflare_tunnel_name
+        .as_deref()
+        .unwrap_or(namespace.as_str());
+    let tunnel_token = installer
+        .cloudflare_token
+        .as_deref()
+        .filter(|token| !token.trim().is_empty());
+    if tunnel_token.is_some() {
+        println!(
+            "☁️ Deploying Cloudflare tunnel '{}' in namespace '{}'",
+            tunnel_name, tunnel_namespace
+        );
+    } else {
+        println!(
+            "☁️ Launching Cloudflare quick tunnel in namespace '{}' (random URL)",
+            tunnel_namespace
+        );
+    }
+    cloudflare::deploy(&client, tunnel_namespace, tunnel_name, tunnel_token).await?;
     let my_local_ip = local_ip().unwrap();
     println!(
-        "When ready you can access the deployment on http://{}",
+        "🌐 When ready you can access the deployment on http://{}",
         my_local_ip
     );
     Ok(())
 }
 
 async fn install_nginx_operator(client: &Client) -> Result<()> {
-    println!("Installing Nginx Ingress Operator");
+    println!("🌐 Installing Nginx Ingress Operator");
     super::apply::apply(client, NGINX_YAML, None).await?;
 
     fn is_deployment_available() -> impl Condition<Deployment> {
@@ -105,7 +133,7 @@ async fn install_nginx_operator(client: &Client) -> Result<()> {
         }
     }
 
-    println!("Waiting for Nginx Operator to be Available");
+    println!("⏳ Waiting for Nginx Operator to be Available");
     let deploys: Api<Deployment> = Api::namespaced(client.clone(), "ingress-nginx");
     let establish = await_condition(
         deploys,
@@ -119,8 +147,33 @@ async fn install_nginx_operator(client: &Client) -> Result<()> {
     Ok(())
 }
 
+async fn bootstrap_keycloak_namespace(client: &Client) -> Result<()> {
+    println!(
+        "🗄️ Ensuring Keycloak database in namespace {}",
+        keycloak::KEYCLOAK_NAMESPACE
+    );
+    match keycloak_db::deploy(
+        client.clone(),
+        keycloak::KEYCLOAK_NAMESPACE,
+        KEYCLOAK_DB_SIZE_GIB,
+    )
+    .await?
+    {
+        Some(_) => println!("✅ Keycloak database created."),
+        None => println!("ℹ️ Keycloak database already present."),
+    }
+
+    println!(
+        "🛡️ Ensuring Keycloak instance in namespace {}",
+        keycloak::KEYCLOAK_NAMESPACE
+    );
+    keycloak::bootstrap(client.clone()).await?;
+
+    Ok(())
+}
+
 async fn install_postgres_operator(client: &Client) -> Result<()> {
-    println!("Installing Cloud Native Postgres Operator (CNPG)");
+    println!("🐘 Installing Cloud Native Postgres Operator (CNPG)");
     super::apply::apply(client, CNPG_YAML, None).await?;
 
     fn is_deployment_available() -> impl Condition<Deployment> {
@@ -136,7 +189,7 @@ async fn install_postgres_operator(client: &Client) -> Result<()> {
         }
     }
 
-    println!("Waiting for Cloud Native Postgres Controller Manager");
+    println!("⏳ Waiting for Cloud Native Postgres Controller Manager");
     let deploys: Api<Deployment> = Api::namespaced(client.clone(), "cnpg-system");
     let establish = await_condition(
         deploys,
@@ -151,15 +204,15 @@ async fn install_postgres_operator(client: &Client) -> Result<()> {
 }
 
 async fn install_keycloak_operator(client: &Client) -> Result<()> {
-    println!("Installing Keycloak Operator");
-    create_namespace(client, KEYCLOAK_OPERATOR_NAMESPACE).await?;
+    println!("🛡️ Installing Keycloak Operator");
+    create_namespace(client, keycloak::KEYCLOAK_NAMESPACE).await?;
 
     super::apply::apply(client, KEYCLOAK_CRD_KEYCLOAKS, None).await?;
     super::apply::apply(client, KEYCLOAK_CRD_REALM_IMPORTS, None).await?;
     super::apply::apply(
         client,
         KEYCLOAK_OPERATOR_YAML,
-        Some(KEYCLOAK_OPERATOR_NAMESPACE),
+        Some(keycloak::KEYCLOAK_NAMESPACE),
     )
     .await?;
 
@@ -176,8 +229,8 @@ async fn install_keycloak_operator(client: &Client) -> Result<()> {
         }
     }
 
-    println!("Waiting for Keycloak Operator to be Available");
-    let deploys: Api<Deployment> = Api::namespaced(client.clone(), KEYCLOAK_OPERATOR_NAMESPACE);
+    println!("⏳ Waiting for Keycloak Operator to be Available");
+    let deploys: Api<Deployment> = Api::namespaced(client.clone(), keycloak::KEYCLOAK_NAMESPACE);
     let establish = await_condition(deploys, "keycloak-operator", is_deployment_available());
     let _ = tokio::time::timeout(std::time::Duration::from_secs(120), establish)
         .await
@@ -187,7 +240,7 @@ async fn install_keycloak_operator(client: &Client) -> Result<()> {
 }
 
 async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
-    println!("Installing the operator into {}", namespace);
+    println!("🤖 Installing the operator into {}", namespace);
     let app_labels = serde_json::json!({
         "app": "nails-operator",
     });
@@ -233,7 +286,7 @@ async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
 }
 
 async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
-    println!("Setting up roles");
+    println!("🔐 Setting up roles");
     let sa_api: Api<ServiceAccount> = Api::namespaced(client.clone(), operator_namespace);
     let service_account = ServiceAccount {
         metadata: ObjectMeta {
@@ -302,7 +355,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
 }
 
 async fn create_crd(client: &Client) -> Result<(), Error> {
-    println!("Installing NailsApp CRD");
+    println!("📜 Installing NailsApp CRD");
     let crd = NailsApp::crd();
     let crds: Api<CustomResourceDefinition> = Api::all(client.clone());
     crds.patch(
@@ -312,7 +365,7 @@ async fn create_crd(client: &Client) -> Result<(), Error> {
     )
     .await?;
 
-    println!("Waiting for NailsApp CRD");
+    println!("⏳ Waiting for NailsApp CRD");
     let establish = await_condition(
         crds,
         "nailsapps.nails-cli.dev",
@@ -361,7 +414,7 @@ fn manifest_namespace(manifest: &str, source: &Path) -> Result<String> {
 }
 
 async fn create_namespace(client: &Client, namespace: &str) -> Result<Namespace> {
-    println!("Creating namespace {}", namespace);
+    println!("📦 Creating namespace {}", namespace);
     // Define the API object for Namespace
     let namespaces: Api<Namespace> = Api::all(client.clone());
     match namespaces.get(namespace).await {
