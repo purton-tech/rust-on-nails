@@ -7,6 +7,9 @@ pub enum Error {
         #[from]
         source: kube::Error,
     },
+    /// Raised when an operator dependency has not been installed in the cluster.
+    #[error("{0}")]
+    DependencyMissing(&'static str),
     /// Error in user input or application resource definition, typically missing fields.
     //#[error("Invalid application CRD: {0}")]
     //UserInput(String),

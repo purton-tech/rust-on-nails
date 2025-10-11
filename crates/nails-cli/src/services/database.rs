@@ -39,6 +39,8 @@ pub struct StorageSpec {
     pub size: String,
 }
 
+pub const CNPG_INSTALL_HINT: &str = "CloudNativePG operator is not installed. Run `nails-cli init` or apply `crates/nails-cli/config/cnpg-1.22.1.yaml` before reconciling.";
+
 /// Corresponds to the Cluster resource
 #[derive(CustomResource, Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[kube(
@@ -108,7 +110,13 @@ pub async fn deploy(
         },
     };
 
-    cluster_api.create(&PostParams::default(), &cluster).await?;
+    match cluster_api.create(&PostParams::default(), &cluster).await {
+        Ok(_) => {}
+        Err(kube::Error::Api(err)) if err.code == 404 => {
+            return Err(Error::DependencyMissing(CNPG_INSTALL_HINT));
+        }
+        Err(err) => return Err(err.into()),
+    }
 
     let mut secret_data = BTreeMap::new();
     secret_data.insert(

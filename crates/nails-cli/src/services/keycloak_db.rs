@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use super::database::{
     rand_hex, BootstrapSpec, Cluster, ClusterSpec, InitDBSpec, SecretSpec, StorageSpec,
+    CNPG_INSTALL_HINT,
 };
 use crate::error::Error;
 use k8s_openapi::api::core::v1::Secret;
@@ -49,7 +50,13 @@ pub async fn deploy(
             },
         },
     };
-    cluster_api.create(&PostParams::default(), &cluster).await?;
+    match cluster_api.create(&PostParams::default(), &cluster).await {
+        Ok(_) => {}
+        Err(kube::Error::Api(err)) if err.code == 404 => {
+            return Err(Error::DependencyMissing(CNPG_INSTALL_HINT));
+        }
+        Err(err) => return Err(err.into()),
+    }
 
     let mut secret_data = BTreeMap::new();
     secret_data.insert("username".to_string(), "keycloak-db-owner".to_string());

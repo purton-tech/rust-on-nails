@@ -10,6 +10,9 @@ dev-setup:
     cargo run --bin nails-cli -- install --manifest demo-nails-app.yaml --development
     cargo run --bin nails-cli -- operator
 
+codex: 
+    sudo npm install -g @openai/codex
+
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
     sudo apt-get update -qq && sudo apt-get install -y -qq iproute2

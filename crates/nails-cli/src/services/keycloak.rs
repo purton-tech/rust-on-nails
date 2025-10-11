@@ -15,6 +15,8 @@ const CONFIG_JSON: &str = include_str!("../../keycloak/realm.json");
 pub const KEYCLOAK_NAME: &str = "keycloak";
 const INITIAL_ADMIN_SECRET: &str = "keycloak-initial-admin";
 const KEYCLOAK_SECRET: &str = "keycloak-secrets";
+const KEYCLOAK_INSTALL_HINT: &str =
+    "Keycloak operator is not installed. Run `nails-cli init` or apply the manifests in `crates/nails-cli/config` before reconciling.";
 
 pub async fn deploy(client: Client, spec: NailsAppSpec, namespace: &str) -> Result<(), Error> {
     ensure_admin_secrets(client.clone(), namespace, super::database::rand_hex()).await?;
@@ -180,13 +182,20 @@ async fn apply_keycloak_cr(
         );
     }
 
-    keycloak_api
+    match keycloak_api
         .patch(
             KEYCLOAK_NAME,
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(keycloak_resource),
         )
-        .await?;
+        .await
+    {
+        Ok(_) => {}
+        Err(kube::Error::Api(err)) if err.code == 404 => {
+            return Err(Error::DependencyMissing(KEYCLOAK_INSTALL_HINT));
+        }
+        Err(err) => return Err(err.into()),
+    }
 
     Ok(())
 }
@@ -216,9 +225,16 @@ async fn apply_realm_imports(client: Client, namespace: &str) -> Result<(), Erro
             }
         });
 
-        realm_api
+        match realm_api
             .patch(&resource_name, &params, &Patch::Apply(realm_resource))
-            .await?;
+            .await
+        {
+            Ok(_) => {}
+            Err(kube::Error::Api(err)) if err.code == 404 => {
+                return Err(Error::DependencyMissing(KEYCLOAK_INSTALL_HINT));
+            }
+            Err(err) => return Err(err.into()),
+        }
     }
 
     Ok(())
