@@ -21,9 +21,9 @@
   <text x="340" y="120" class="body" text-anchor="middle">Authz headers</text>
 
   <rect x="500" y="40" width="180" height="120" class="box"/>
-  <text x="590" y="70" class="title" text-anchor="middle">nails-app</text>
-  <text x="590" y="100" class="body" text-anchor="middle">UI + APIs</text>
-  <text x="590" y="120" class="body" text-anchor="middle">Rust on Nails</text>
+  <text x="590" y="70" class="title" text-anchor="middle">Your App</text>
+  <text x="590" y="100" class="body" text-anchor="middle">Service: nails-app</text>
+  <text x="590" y="120" class="body" text-anchor="middle">Port 7903</text>
 
   <line x1="190" y1="85" x2="250" y2="85" stroke="#1f2933" stroke-width="2" marker-end="url(#arrow)"/>
   <line x1="430" y1="85" x2="500" y2="85" stroke="#1f2933" stroke-width="2" marker-end="url(#arrow)"/>

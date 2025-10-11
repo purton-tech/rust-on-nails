@@ -2,10 +2,10 @@
 
 ![Nails platform components](./deployment-architecture.svg)
 
-Rust on Nails ships an opinionated set of Kubernetes workloads that turn a freshly provisioned
-namespace into a complete application platform. This page walks through the moving pieces that are
-rolled out by `nails-cli` so you know where requests travel, which workloads own authentication, and
-how state is managed.
+Rust on Nails ships an opinionated set of Kubernetes workloads that surround your application with
+the services it needs. The operator provisions the platform pieces; you deploy your own web
+application. This page walks through how the moving parts fit together so you know where requests
+travel, which workloads own authentication, and how state is managed.
 
 ## Traffic Flow
 
@@ -13,16 +13,17 @@ how state is managed.
    for the application domain into the cluster.
 2. **OAuth2 Proxy** guards the application surface area. Requests are authenticated with Keycloak
    using the OpenID Connect flow. Authenticated requests are forwarded to the main app service.
-3. **Nails Application** serves the UI and APIs. It reads and writes application data through the
-   PostgreSQL cluster that the operator also manages.
+3. **Your Nails Application** serves the UI and APIs. Deploy it as a Kubernetes `Service` named
+   `nails-app` on port `7903` so the surrounding components can reach it. The app reads and writes
+   application data through the PostgreSQL cluster that the operator manages.
 4. **Keycloak** performs the identity workflow for both end users and administrators. OAuth2 Proxy
    relies on it for session validation and token issuance.
 
 ## Core Services
 
-- **nails-app** – The Rust web application. It exposes port `7903`, runs database migrations in an
-  init container, and reads configuration from the secrets and config maps produced during
-  reconciliation.
+- **nails-app** – Your Rust web application. Publish it with a `Service` named `nails-app`
+  targeting port `7903`. Handle your own deployment spec, migrations, and configuration; the
+  supporting services expect to find this endpoint.
 - **oauth2-proxy** – Handles login, session cookies, and passes authenticated requests to
   `nails-app`. It no longer relies on an Envoy sidecar; upstreams target the app service directly.
 - **keycloak-service** – Manages user identities, realms, and clients. The operator provisions a

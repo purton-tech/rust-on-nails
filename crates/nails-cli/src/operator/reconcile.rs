@@ -1,7 +1,6 @@
 use super::crd::NailsApp;
 use super::finalizer;
 use crate::error::Error;
-use crate::services::application;
 use crate::services::database;
 use crate::services::ingress;
 use crate::services::keycloak;
@@ -96,7 +95,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
                 keycloak_db::deploy(client.clone(), &namespace, app.spec.keycloak_db_disk_size)
                     .await?;
 
-            application::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             keycloak::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             oauth2_proxy::deploy(client.clone(), app.spec.clone(), &namespace).await?;
             if !disable_ingress || development {
@@ -141,9 +139,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
             }
             mailhog::delete(client.clone(), &namespace).await?;
 
-            if !development {
-                application::delete(client.clone(), &namespace).await?;
-            }
             database::delete(client.clone(), &namespace).await?;
             if pgadmin {
                 pgadmin::delete(client.clone(), &namespace).await?;
