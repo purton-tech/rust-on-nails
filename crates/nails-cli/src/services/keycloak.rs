@@ -134,11 +134,21 @@ async fn apply_keycloak_cr(client: Client) -> Result<(), Error> {
             },
             "hostname": {
                 "strict": false,
-                "backchannelDynamic": true
+                "backchannelDynamic": false
             },
             "proxy": {
                 "headers": "xforwarded"
-            }
+            },
+            "env": [
+                {
+                    "name": "KC_HTTP_ENABLED",
+                    "value": "true"
+                },
+                {
+                    "name": "KC_PROXY",
+                    "value": "edge"
+                }
+            ]
         }
     });
 
