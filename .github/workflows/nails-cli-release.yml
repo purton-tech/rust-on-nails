@@ -26,7 +26,9 @@ jobs:
         run: earthly --version 
 
       - name: Run Earthly build
-        run: earthly --ci --platform=linux/amd64 +nails-cli
+        run: earthly --allow-privileged --output --ci +nails-cli
 
-      - name: List build output
-        run: ls -lh ./nails
+      - name: Upload executable to release
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gh release upload ${{ steps.get_latest_release.outputs.latest_release }} ./nails-cli --clobber
