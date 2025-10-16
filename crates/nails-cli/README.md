@@ -55,5 +55,3 @@ Then run the operator locally and confirm it reconciles `NailsApplication` objec
 cargo run --bin nails-cli -- operator
 kubectl get nailsapplications --all-namespaces --watch
 ```
-
-Try it

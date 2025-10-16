@@ -6,9 +6,12 @@ on:
       image_tag:
         description: 'Image tag to publish (defaults to dev)'
         required: false
-  release:
-    types:
-      - published
+  push:
+    paths:
+      - 'crates/nails-cli/**'
+  pull_request:
+    paths:
+      - 'crates/nails-cli/**'
 
 jobs:
   build-and-push:
@@ -35,13 +38,6 @@ jobs:
         id: tag
         run: |
           set -euo pipefail
-          event_name="${{ github.event_name }}"
-
-          if [ "$event_name" = "release" ]; then
-            echo "value=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           input_tag="${{ github.event.inputs.image_tag }}"
           if [ -n "$input_tag" ]; then
             echo "value=$input_tag" >> "$GITHUB_OUTPUT"
@@ -50,16 +46,25 @@ jobs:
           fi
 
       - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build operator image (PR)
+        if: github.event_name == 'pull_request'
+        env:
+          IMAGE_TAG: ${{ steps.tag.outputs.value }}
+        run: earthly --ci +nails-operator-image --IMAGE ${IMAGE_NAME}:${IMAGE_TAG}
+
       - name: Build and push operator image
+        if: github.event_name != 'pull_request'
         env:
           IMAGE_TAG: ${{ steps.tag.outputs.value }}
         run: earthly --ci --push +nails-operator-image --IMAGE ${IMAGE_NAME}:${IMAGE_TAG}
 
       - name: Confirm published image
+        if: github.event_name != 'pull_request'
         run: echo "Published ${IMAGE_NAME}:${{ steps.tag.outputs.value }}"
