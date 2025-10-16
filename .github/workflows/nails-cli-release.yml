@@ -48,20 +48,6 @@ jobs:
 
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-      - name: Confirm crate version matches tag
-        id: crate_version
-        run: |
-          tag="${{ steps.release_tag.outputs.tag }}"
-          stripped_tag="${tag#v}"
-          crate_version=$(cargo metadata --no-deps --format-version 1 --manifest-path crates/nails-cli/Cargo.toml | jq -r '.packages[0].version')
-
-          if [ "$crate_version" != "$stripped_tag" ]; then
-            echo "Crate version ($crate_version) does not match release tag ($tag)" >&2
-            exit 1
-          fi
-
-          echo "version=$crate_version" >> "$GITHUB_OUTPUT"
-
       - name: Prepare release asset
         id: prepare_asset
         run: |
@@ -69,18 +55,6 @@ jobs:
           artifact_name="nails-cli-${tag}-x86_64-unknown-linux-gnu"
           cp ./nails "$artifact_name"
           echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
-
-      - name: Publish nails-cli crate
-        if: github.event_name == 'release'
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          if [ -z "$CARGO_REGISTRY_TOKEN" ]; then
-            echo "CARGO_REGISTRY_TOKEN secret is required to publish" >&2
-            exit 1
-          fi
-
-          cargo publish -p nails-cli --locked --token "$CARGO_REGISTRY_TOKEN"
 
       - name: Upload binary to release
         env:
