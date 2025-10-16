@@ -26,6 +26,7 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server --write-kubeconfig-mode=
 ## Install the application into a cluster
 
 The `.kube/config` is already mapped in by `devcontainer.json`
+c
 
 If that one doesn't work copy `~/.kube/config` to `tmp/kubeconfig` then
 
