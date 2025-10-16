@@ -30,19 +30,33 @@ jobs:
       - name: List build output
         run: ls -lh ./nails
 
-      - name: Get latest release
-        id: get_latest_release
+      - name: Determine release tag
+        id: release_tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          if [ -z "$latest_release" ]; then
-            echo "No releases found; cannot upload artifact" >&2
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="${{ github.event.release.tag_name }}"
+          else
+            tag=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          fi
+
+          if [ -z "$tag" ]; then
+            echo "Unable to determine release tag" >&2
             exit 1
           fi
-          echo "latest_release=$latest_release" >> "$GITHUB_OUTPUT"
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release asset
+        id: prepare_asset
+        run: |
+          tag="${{ steps.release_tag.outputs.tag }}"
+          artifact_name="nails-cli-${tag}-x86_64-unknown-linux-gnu"
+          cp ./nails "$artifact_name"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
 
       - name: Upload binary to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ steps.get_latest_release.outputs.latest_release }}" ./nails --clobber
+        run: gh release upload "${{ steps.release_tag.outputs.tag }}" "${{ steps.prepare_asset.outputs.artifact_name }}" --clobber
