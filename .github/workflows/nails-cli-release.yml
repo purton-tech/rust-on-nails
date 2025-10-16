@@ -19,13 +19,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Earthly
-        uses: earthly/actions/setup-earthly@v1
-        with:
-          version: v0.7.11
+      - name: Download latest earthly
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
-      - name: Earthly bootstrap
-        run: earthly bootstrap
+      - name: Earthly version
+        run: earthly --version 
 
       - name: Run Earthly build
         run: earthly --ci --platform=linux/amd64 +nails-cli
