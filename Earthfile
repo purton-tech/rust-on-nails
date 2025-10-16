@@ -1,45 +1,28 @@
-VERSION 0.7
+VERSION 0.8
 
-target +nails-cli:
-    FROM purtontech/rust-on-nails-devcontainer:1.3.18
-    WORKDIR /workspace
+FROM purtontech/rust-on-nails-devcontainer:1.3.18
 
-    RUN apt-get update && \
-        apt-get install -y --no-install-recommends pkg-config libssl-dev && \
-        rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
 
-    COPY Cargo.toml Cargo.lock ./
-    RUN mkdir -p crates/nails-cli
-    COPY crates/nails-cli/Cargo.toml crates/nails-cli/Cargo.toml
+USER vscode
 
-    RUN cargo fetch --locked
+nails-cli:
 
-    COPY . .
-    RUN cargo build --release --locked -p nails-cli
 
-    RUN install -d /out
-    RUN install -m 0755 target/release/nails-cli /out/nails
+    COPY --dir crates crates
+    COPY --dir Cargo.lock Cargo.toml .
 
-    SAVE ARTIFACT /out/nails AS LOCAL nails
+    RUN cargo build --release -p nails-cli
 
-target +nails-operator-image:
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/nails-cli
+
+nails-operator-image:
     ARG IMAGE=purtontech/nails-operator:dev
 
-    FROM purtontech/rust-on-nails-devcontainer:1.3.18 AS build
-    WORKDIR /workspace
+    COPY --dir crates crates
+    COPY --dir Cargo.lock Cargo.toml .
 
-    RUN apt-get update && \
-        apt-get install -y --no-install-recommends pkg-config libssl-dev && \
-        rm -rf /var/lib/apt/lists/*
-
-    COPY Cargo.toml Cargo.lock ./
-    RUN mkdir -p crates/nails-cli
-    COPY crates/nails-cli/Cargo.toml crates/nails-cli/Cargo.toml
-
-    RUN cargo fetch --locked
-
-    COPY . .
-    RUN cargo build --release --locked -p nails-cli
+    RUN cargo build --release -p nails-cli
 
     FROM docker.io/debian:bookworm-slim
     RUN apt-get update && \
