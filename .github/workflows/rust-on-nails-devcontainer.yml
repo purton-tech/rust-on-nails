@@ -8,6 +8,7 @@ on:
       - 'dev-env-as-code/**'
       - 'nails-devcontainer/**'
       - '.github/workflows/**'
+      - 'crates/**'
       # Exclude this as it is set by semantic release
       - '!dev-env-as-code/Dockerfile.devcontainer'
       - '!nails-devcontainer/Dockerfile'
