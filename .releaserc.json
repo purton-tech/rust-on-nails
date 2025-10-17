@@ -3,7 +3,14 @@
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
-      "@semantic-release/github",
+      ["@semantic-release/github", {
+        "assets": [
+          {
+            "path": "nails-cli",
+            "label": "nails-cli-linux-amd64"
+          }
+        ]
+      }],
       ["@semantic-release/exec", {
         "publishCmd": "./release.sh ${nextRelease.version}",
         "execCwd": "./"

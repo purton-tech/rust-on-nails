@@ -2,81 +2,39 @@ name: Rust on Nails Pipeline
 
 on:
   workflow_dispatch:
-    inputs:
-      operator_image_tag:
-        description: 'Image tag to publish for the operator (defaults to dev)'
-        required: false
   push:
-    paths:
-      - 'crates/nails-cli/**'
-      - 'dev-env-as-code/**'
-      - 'nails-devcontainer/**'
-      - '.github/workflows/**'
-      - '!dev-env-as-code/Dockerfile.devcontainer'
-      - '!nails-devcontainer/Dockerfile'
-      - 'rust-on-nails.com/**'
-  pull_request:
-    paths:
-      - 'crates/nails-cli/**'
-      - 'dev-env-as-code/**'
-      - 'nails-devcontainer/**'
-      - '.github/workflows/**'
-      - '!dev-env-as-code/Dockerfile.devcontainer'
-      - '!nails-devcontainer/Dockerfile'
-      - 'rust-on-nails.com/**'
+    branches:
+      - main
 
 jobs:
-  changes:
-    name: Detect Changes
+  build:
+    name: Build and Release
     runs-on: ubuntu-latest
-    outputs:
-      platform: ${{ steps.defaults.outputs.platform || steps.filter.outputs.platform }}
-      devcontainer: ${{ steps.defaults.outputs.devcontainer || steps.filter.outputs.devcontainer }}
-      docs: ${{ steps.defaults.outputs.docs || steps.filter.outputs.docs }}
+    permissions:
+      contents: write
+      packages: write
+    env:
+      DEVCONTAINER_NAME: purtontech/rust-on-nails-devcontainer
+      OPERATOR_IMAGE_NAME: purtontech/nails-operator
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Default to run all jobs on manual dispatch
-        id: defaults
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "platform=true" >> "$GITHUB_OUTPUT"
-          echo "devcontainer=true" >> "$GITHUB_OUTPUT"
-          echo "docs=true" >> "$GITHUB_OUTPUT"
-
-      - name: Filter paths
-        id: filter
-        if: github.event_name != 'workflow_dispatch'
-        uses: dorny/paths-filter@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
         with:
-          filters: |
-            platform:
-              - 'crates/nails-cli/**'
-            devcontainer:
-              - 'dev-env-as-code/**'
-              - 'nails-devcontainer/**'
-              - '.github/workflows/**'
-              - '!dev-env-as-code/Dockerfile.devcontainer'
-              - '!nails-devcontainer/Dockerfile'
-            docs:
-              - 'rust-on-nails.com/**'
+          platforms: all
 
-  platform:
-    name: Build CLI and Operator
-    needs: changes
-    if: needs.changes.outputs.platform == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-    env:
-      IMAGE_NAME: ghcr.io/rust-on-nails/nails-operator
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Download latest earthly
         run: sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'
@@ -87,111 +45,24 @@ jobs:
       - name: Build Nails CLI
         run: earthly --allow-privileged --output --ci +nails-cli
 
-      - name: Resolve latest release tag
-        id: latest_release
+      - name: Build and push operator image (latest)
+        run: earthly --ci --push +nails-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
+
+      - name: Build and push DevContainer image (latest)
         run: |
-          latest_release=$(curl -s "https://api.github.com/repos/purton-tech/rust-on-nails/tags" | jq -r '.[0].name')
-          echo "latest_release=$latest_release" >> "$GITHUB_OUTPUT"
-
-      - name: Upload executable to release
-        if: github.ref == 'refs/heads/main'
-        env:
-          RELEASE_TAG: ${{ steps.latest_release.outputs.latest_release }}
-        run: gh release upload "$RELEASE_TAG" ./nails-cli --clobber
-
-      - name: Resolve operator image tag
-        id: image_tag
-        env:
-          INPUT_IMAGE_TAG: ${{ github.event.inputs.operator_image_tag }}
-        run: |
-          set -euo pipefail
-          if [ -n "${INPUT_IMAGE_TAG:-}" ]; then
-            echo "value=${INPUT_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=dev" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Log in to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build operator image (validation)
-        if: github.event_name == 'pull_request'
-        env:
-          IMAGE_TAG: ${{ steps.image_tag.outputs.value }}
-        run: earthly --ci +nails-operator-image --IMAGE ${IMAGE_NAME}:${IMAGE_TAG}
-
-      - name: Build and push operator image
-        if: github.event_name != 'pull_request'
-        env:
-          IMAGE_TAG: ${{ steps.image_tag.outputs.value }}
-        run: earthly --ci --push +nails-operator-image --IMAGE ${IMAGE_NAME}:${IMAGE_TAG}
-
-      - name: Confirm published image
-        if: github.event_name != 'pull_request'
-        run: echo "Published ${IMAGE_NAME}:${{ steps.image_tag.outputs.value }}"
-
-  devcontainer:
-    name: Build DevContainer Image
-    needs: changes
-    if: needs.changes.outputs.devcontainer == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CONTAINER_NAME: purtontech/rust-on-nails-devcontainer
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push multi-architecture image
-        run: |
-          docker buildx create --use
           docker buildx build --platform linux/amd64,linux/arm64 \
-            -t $CONTAINER_NAME:latest \
+            -t $DEVCONTAINER_NAME:latest \
             --push dev-env-as-code
 
-      - name: Semantic release
-        id: semantic_release
+      - name: Configure git user
         run: |
-          npm i -D @semantic-release/exec
-          npm i -D @codedependant/semantic-release-docker
-          npm i -D @semantic-release/git
-          npx semantic-release
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Publish templates
-        uses: devcontainers/action@v1
-        with:
-          publish-templates: "true"
-          base-path-to-templates: "./nails-devcontainer"
-          generate-docs: "true"
+      - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  spellcheck:
-    name: Spell Check Docs
-    needs: changes
-    if: needs.changes.outputs.docs == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Spell check
-        run: docker run --rm -v $(pwd)/rust-on-nails.com/content:/workdir tmaier/markdown-spellcheck:latest --report "**/*.md"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: npx --yes -p semantic-release -p @semantic-release/github -p @semantic-release/exec -p @codedependant/semantic-release-docker -p @semantic-release/git semantic-release
