@@ -14,7 +14,7 @@ nails-cli:
 
     RUN cargo build --release -p nails-cli
 
-    SAVE ARTIFACT target/release/nails-cli
+    SAVE ARTIFACT target/release/nails-cli AS LOCAL ./nails-cli
 
 nails-operator-image:
     ARG IMAGE=purtontech/nails-operator:dev
