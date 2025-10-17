@@ -45,6 +45,18 @@ jobs:
       - name: Build Nails CLI
         run: earthly --allow-privileged --output --ci +nails-cli
 
+      - name: Prepare CLI artifact
+        run: |
+          set -euo pipefail
+          SRC=$(find . -type f -name nails-cli -not -path "./nails-cli" | head -n 1 || true)
+          if [ -z "$SRC" ]; then
+            echo "nails-cli binary not found in the workspace"
+            find . -maxdepth 4 -type f -name nails-cli
+            exit 1
+          fi
+          cp "$SRC" ./nails-cli
+          chmod +x ./nails-cli
+
       - name: Build and push operator image (latest)
         run: earthly --ci --push +nails-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
 
