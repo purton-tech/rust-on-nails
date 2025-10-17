@@ -48,14 +48,20 @@ jobs:
       - name: Prepare CLI artifact
         run: |
           set -euo pipefail
-          SRC=$(find . -type f -name nails-cli -not -path "./nails-cli" | head -n 1 || true)
-          if [ -z "$SRC" ]; then
-            echo "nails-cli binary not found in the workspace"
-            find . -maxdepth 4 -type f -name nails-cli
-            exit 1
+          if [ -f "./nails-cli" ]; then
+            echo "Found nails-cli at repository root"
+            chmod +x ./nails-cli
+          else
+            SRC=$(find . -type f -name nails-cli | head -n 1 || true)
+            if [ -z "$SRC" ]; then
+              echo "nails-cli binary not found in the workspace"
+              find . -maxdepth 4 -type f -name nails-cli
+              exit 1
+            fi
+            echo "Copying nails-cli from $SRC"
+            cp "$SRC" ./nails-cli
+            chmod +x ./nails-cli
           fi
-          cp "$SRC" ./nails-cli
-          chmod +x ./nails-cli
 
       - name: Build and push operator image (latest)
         run: earthly --ci --push +nails-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
