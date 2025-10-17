@@ -28,6 +28,12 @@ jobs:
       - name: Run Earthly build
         run: earthly --allow-privileged --output --ci +nails-cli
 
+      - name: Get latest release info
+        id: get_latest_release
+        run: |
+          latest_release=$(curl  "https://api.github.com/repos/purton-tech/rust-on-nails/tags" | jq -r '.[0].name')
+          echo "::set-output name=latest_release::$latest_release"
+
       - name: Upload executable to release
         if: github.ref == 'refs/heads/main'
         run: |
