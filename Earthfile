@@ -29,7 +29,7 @@ nails-operator-image:
         apt-get install -y --no-install-recommends ca-certificates && \
         rm -rf /var/lib/apt/lists/*
 
-    COPY --chown=1001:1001 +build/nails-cli /usr/local/bin/nails
+    COPY --chown=1001:1001 +nails-cli/nails-cli /usr/local/bin/nails
 
     RUN useradd --system --home /nonexistent --shell /usr/sbin/nologin nails
     USER nails
