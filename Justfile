@@ -3,7 +3,7 @@ list:
 
 dev-init:
     k3d cluster delete k3d-nails
-    k3d cluster create k3d-nails --agents 1 -p "30000-30001:30000-30001@agent:0"
+    k3d cluster create k3d-nails
 
 dev-setup:
     cargo run --bin nails-cli -- init --no-operator

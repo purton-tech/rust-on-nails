@@ -1,4 +1,5 @@
 pub mod apply;
+pub mod init;
 pub mod install;
 pub mod licence;
 pub mod status;
@@ -31,9 +32,6 @@ pub struct Initializer {
     /// Install ingress
     #[arg(long, default_value_t = false)]
     pub disable_ingress: bool,
-    /// Namespace for application components
-    #[arg(long, default_value = "nails")]
-    pub namespace: String,
     /// Namespace for the operator
     #[arg(long, default_value = "nails-system")]
     pub operator_namespace: String,
@@ -73,7 +71,7 @@ pub struct StatusArgs {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Install the application into Kubernetes
+    /// Install an application into Kubernetes
     Install(Installer),
     /// Install the required operators into Kubernetes
     Init(Initializer),

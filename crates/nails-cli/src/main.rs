@@ -16,7 +16,7 @@ async fn main() -> Result<()> {
             cli::install::install(installer).await?;
         }
         cli::Commands::Init(initializer) => {
-            cli::install::init(initializer).await?;
+            cli::init::init(initializer).await?;
         }
         cli::Commands::Operator {} => {
             operator::operator().await?;
