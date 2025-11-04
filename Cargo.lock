@@ -3390,6 +3390,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
+name = "stack-cli-website"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "axum-extra",
+ "daisy_rsx",
+ "dioxus",
+ "dioxus-ssr",
+ "pulldown-cmark",
+ "serde",
+ "syntect",
+ "tokio",
+ "tower-http 0.5.2",
+ "tower-livereload",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "static-website"
 version = "0.1.0"
 dependencies = [
