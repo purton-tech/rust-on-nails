@@ -1,4 +1,4 @@
-use crate::routes::{blog, docs, marketing};
+use crate::routes::{docs, marketing};
 use dioxus::prelude::*;
 
 #[derive(PartialEq, Clone, Eq, Debug)]
@@ -98,12 +98,6 @@ pub fn Navigation(mobile_menu: Option<Element>, section: Section) -> Element {
                             a {
                                 href: marketing::Index {}.to_string(),
                                 "Home"
-                            }
-                        }
-                        li {
-                            a {
-                                href: blog::Index {}.to_string(),
-                                "Blog"
                             }
                         }
                     }

@@ -4,7 +4,6 @@ use std::path::Path;
 
 use dioxus::prelude::*;
 
-use crate::layouts::blog::{BlogList, BlogPost};
 use crate::layouts::docs::Document;
 use crate::layouts::pages::MarkdownPage;
 use crate::pages::home::home_page;
@@ -39,19 +38,6 @@ impl Page {
     }
 }
 
-pub async fn generate_blog_list(summary: Summary) {
-    let page_ele = rsx! {
-        BlogList {
-            summary
-        }
-    };
-    let html = crate::render(page_ele);
-
-    let mut file = File::create("dist/blog/index.html").expect("Unable to create file");
-    file.write_all(html.as_bytes())
-        .expect("Unable to write to file");
-}
-
 pub async fn generate_home_page() {
     let html = home_page();
 
@@ -66,23 +52,6 @@ pub fn generate(summary: Summary) {
     let dst = format!("dist/{}", summary.source_folder);
     let dst = Path::new(&dst);
     copy_folder(src, dst).unwrap();
-
-    for category in summary.categories {
-        for page in category.pages {
-            let page_ele = rsx! {
-                BlogPost {
-                    post: page
-                }
-            };
-
-            let html = crate::render(page_ele);
-            let file = format!("dist/{}/index.html", page.folder);
-
-            let mut file = File::create(&file).expect("Unable to create file");
-            file.write_all(html.as_bytes())
-                .expect("Unable to write to file");
-        }
-    }
 }
 
 pub fn generate_docs(summary: Summary) {

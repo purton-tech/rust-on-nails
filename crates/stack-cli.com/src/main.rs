@@ -64,7 +64,7 @@ async fn main() {
     generator::generate_docs(docs_summary::summary());
     generator::generate_pages(pages_summary::summary()).await;
     //generator::generate(blog_summary::summary());
-    generator::generate_blog_list(blog_summary::summary()).await;
+    //generator::generate_blog_list(blog_summary::summary()).await;
     let src = Path::new("assets");
     let dst = Path::new("dist");
     generator::copy_folder(src, dst).expect("Couldn't copy folder");
