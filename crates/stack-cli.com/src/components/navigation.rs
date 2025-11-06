@@ -89,7 +89,7 @@ pub fn Navigation(mobile_menu: Option<Element>, section: Section) -> Element {
                                 span {
                                     class: "pl-3 flex flex-row gap-2",
                                     strong {
-                                        "Rust on Nails"
+                                        "STACK"
                                     }
                                 }
                             }
