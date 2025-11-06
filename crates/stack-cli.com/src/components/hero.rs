@@ -6,18 +6,18 @@ pub fn Hero() -> Element {
         section {
             h1 {
                 class: "text-6xl max-w-3xl mx-auto text-center pb-6 font-semibold capitalize",
-                "Create stunning full stack web applications in Rust"
+                "Install a production-ready Rust platform on Kubernetes"
             }
             h2 {
                 class: "subtitle max-w-3xl mx-auto text-center text-lg",
-                "Highly performant and secure applications in a language you love "
+                "Stack bundles the operators, policies, and tooling you need to ship secure Rust services in your own cluster."
             }
             div {
                 class: "flex flex-row justify-center mt-8 mb-8",
                 a {
                     class: "btn btn-neutral md:btn-md rounded-full",
-                    href: "/docs",
-                    "Get Started"
+                    href: "#install-stack",
+                    "Install Stack CLI"
                 }
             }
             div {
