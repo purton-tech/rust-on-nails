@@ -6,195 +6,151 @@ use crate::layouts::layout::Layout;
 use dioxus::prelude::*;
 
 pub fn home_page() -> String {
+    let install_script = r#"export STACK_VERSION=v1.3.25
+curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_VERSION}/nails-cli \
+  && chmod +x ./nails-cli \
+  && sudo mv ./nails-cli /usr/local/bin/stack"#;
+
+    let features = vec![
+        (
+            "Managed PostgreSQL",
+            "Provision CloudNativePG with secure credentials, read-only roles, and the pgvector extension ready for AI workloads.",
+        ),
+        (
+            "Identity & Access Control",
+            "Deploy Keycloak with dedicated storage, wire it to OAuth2 Proxy, and enforce single sign-on across your apps.",
+        ),
+        (
+            "Ingress & Connectivity",
+            "Bootstrap NGINX ingress, lock it down with network policies, and expose services safely through Cloudflare tunnels.",
+        ),
+        (
+            "Operational Observability",
+            "Install dashboards and scraping rules so Grafana lights up with application, database, and platform metrics on day one.",
+        ),
+        (
+            "Developer Tooling",
+            "Ship PGAdmin, MailHog, and other helper services to inspect data, test email flows, and unblock your team instantly.",
+        ),
+        (
+            "Built-in AI Services",
+            "Run the bundled LLM API next to your application to experiment with generative workloads without leaving the cluster.",
+        ),
+    ];
+
+    let benefits = vec![
+        (
+            "Accelerate platform setup",
+            "Import a battle-tested set of operators with one command instead of stitching together manifests by hand.",
+        ),
+        (
+            "Stay secure by default",
+            "Stack templates secrets, OAuth flows, and network policies so every environment starts hardened.",
+        ),
+        (
+            "Standardise every cluster",
+            "Roll the same blueprint into dev, staging, and production to reduce snowflake drift and unexpected outages.",
+        ),
+        (
+            "Focus on your Rust services",
+            "Let Stack own the infrastructure glue so your team can ship business features instead of wrangling YAML.",
+        ),
+    ];
+
     let page = rsx! {
         Layout {
             title: "Stack",
-            description: "The Industry Standard For Enterprise Generative AI",
+            description: "Install the Stack CLI to pull curated operators into your Kubernetes cluster.",
             mobile_menu: None,
             section: Section::Home,
 
             div {
                 class: "p-5 mt-16 mx-auto max-w-5xl",
-                Hero {
-                }
+                Hero {}
 
                 ProblemSolution {
                     video: "https://www.youtube.com/embed/Wd8EqeAeeck?si=BETsJN_94VoyQrcI",
-                    title: "Server side rendering and a sprinkle of interactivity",
-                    subtitle: "SSR gives you a low code simple way to build applications and we gave you several ways to add interactivity when needed.",
-                    claim: "and join hundreds of global installations!"
+                    title: "Install curated operators in minutes",
+                    subtitle: "Stack turns Kubernetes into a managed platform for your Rust teams by automating identity, data, observability, and AI services.",
+                    claim: "Trusted by teams standardising Rust delivery"
                 }
             }
 
-
-            // Section heading
-            div {
-                class: "py-8 text-center",
-                h1 {
-                    class: "text-3xl font-semibold",
-                    "All your web application needs, covered"
+            section {
+                id: "install-stack",
+                class: "mt-20 px-5",
+                div {
+                    class: "max-w-4xl mx-auto bg-base-200 border border-base-300 rounded-2xl p-8",
+                    h2 {
+                        class: "text-3xl font-semibold text-center",
+                        "Install the Stack CLI"
+                    }
+                    p {
+                        class: "mt-4 text-center text-base-content/80",
+                        "Download the CLI and bring the Stack platform into any Kubernetes cluster with a single command."
+                    }
+                    pre {
+                        class: "mt-6 bg-black text-white text-sm rounded-xl p-5 overflow-x-auto",
+                        code {
+                            class: "language-bash",
+                            "{install_script}"
+                        }
+                    }
                 }
             }
 
-            // Grid container
-            div {
-                class: "max-w-7xl mx-auto px-4",
-
-                // First row of cards
+            section {
+                class: "mt-20 px-5",
                 div {
-                    class: "grid grid-cols-1 md:grid-cols-3 gap-6",
-
-                    // Card 1
-                    div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-blue-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-blue-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "SQL into Functions"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "Auto generate Rust functions from SQL definitions"
-                            }
-                        }
+                    class: "max-w-6xl mx-auto",
+                    h2 {
+                        class: "text-3xl font-semibold text-center",
+                        "Everything a Rust team needs"
                     }
-
-                    // Card 2
-                    div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-purple-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-purple-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "UI Components"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "React like components to buold your UI."
-                            }
-                        }
+                    p {
+                        class: "mt-4 text-center text-base-content/80",
+                        "Stack installs a curated set of services so your applications are ready for production from day one."
                     }
-
-                    // Card 3
                     div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-pink-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-pink-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "Type safe routing"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "Axum for high performance routing"
+                        class: "mt-10 grid grid-cols-1 md:grid-cols-2 gap-6",
+                        for (title, description) in features.iter() {
+                            div {
+                                class: "border border-base-300 rounded-2xl bg-base-200 p-6",
+                                h3 {
+                                    class: "text-xl font-semibold",
+                                    "{title}"
+                                }
+                                p {
+                                    class: "mt-2 text-base-content/80",
+                                    "{description}"
+                                }
                             }
                         }
                     }
                 }
+            }
 
-                // Second row of cards
+            section {
+                class: "mt-20 mb-24 px-5",
                 div {
-                    class: "grid grid-cols-1 md:grid-cols-3 gap-6 mt-6",
-
-                    // Card 4
-                    div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-yellow-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-yellow-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "CI/CD"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "Find emails"
-                            }
-                        }
+                    class: "max-w-5xl mx-auto",
+                    h2 {
+                        class: "text-3xl font-semibold text-center",
+                        "Why teams choose Stack"
                     }
-
-                    // Card 5
                     div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-green-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-green-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "Kubernetes"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "Autosync tools"
-                            }
-                        }
-                    }
-
-                    // Card 6
-                    div {
-                        class: "border border-black",
-                        div {
-                            class: "bg-orange-200 h-32 flex items-center justify-center",
-                            svg {
-                                class: "w-16 h-16 text-orange-600",
-                                fill: "currentColor",
-                                view_box: "0 0 24 24",
-                                circle { cx: "12", cy: "12", r: "10" }
-                            }
-                        }
-                        div {
-                            class: "bg-black p-4",
-                            h2 {
-                                class: "text-lg font-bold text-white",
-                                "Islands"
-                            }
-                            p {
-                                class: "text-sm text-gray-400",
-                                "Scale outreach"
+                        class: "mt-10 grid grid-cols-1 md:grid-cols-2 gap-6",
+                        for (title, description) in benefits.iter() {
+                            div {
+                                class: "border border-base-300 rounded-2xl bg-base-100 p-6",
+                                h3 {
+                                    class: "text-xl font-semibold",
+                                    "{title}"
+                                }
+                                p {
+                                    class: "mt-2 text-base-content/80",
+                                    "{description}"
+                                }
                             }
                         }
                     }
