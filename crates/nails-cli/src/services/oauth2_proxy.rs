@@ -12,8 +12,8 @@ use rand::RngCore;
 use serde_json::json;
 use url::Url;
 
-const OAUTH2_PROXY_IMAGE: &str = "quay.io/oauth2-proxy/oauth2-proxy:v7.5.1";
-const OAUTH2_PROXY_PORT: u16 = 7900;
+pub const OAUTH2_PROXY_IMAGE: &str = "quay.io/oauth2-proxy/oauth2-proxy:v7.5.1";
+pub const OAUTH2_PROXY_PORT: u16 = 7900;
 
 // Oauth2 Proxy handles authentication as our Open ID Connect provider
 pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Result<(), Error> {
