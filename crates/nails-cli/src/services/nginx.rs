@@ -12,7 +12,7 @@ use serde_json::json;
 use super::deployment;
 
 pub const NGINX_NAME: &str = "nginx";
-pub const NGINX_PORT: u16 = 7903;
+pub const NGINX_PORT: u16 = 80;
 const NGINX_CONF: &str = include_str!("../../config/nginx-proxy.conf");
 
 // The web user interface
