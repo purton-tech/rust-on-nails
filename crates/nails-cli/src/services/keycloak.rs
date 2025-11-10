@@ -26,6 +26,7 @@ pub struct RealmConfig {
     pub client_secret: String,
     pub redirect_uris: Vec<String>,
     pub allow_registration: bool,
+    pub public_base_url: String,
 }
 
 pub async fn bootstrap(client: Client) -> Result<(), Error> {
@@ -55,6 +56,9 @@ pub async fn ensure_realm(client: Client, config: &RealmConfig) -> Result<(), Er
                 "registrationAllowed": config.allow_registration,
                 "registrationEmailAsUsername": true,
                 "sslRequired": "none",
+                "attributes": {
+                    "frontendUrl": config.public_base_url
+                },
                 "clients": [
                     {
                         "clientId": config.client_id,

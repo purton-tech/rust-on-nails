@@ -146,6 +146,11 @@ pub async fn ensure_secret(
         .unwrap_or_else(rand_base64);
 
     let redirect_uri = redirect_uri_value(&spec.hostname_url);
+    let external_realm_base = format!(
+        "{}/realms/{}",
+        spec.hostname_url.trim_end_matches('/'),
+        realm
+    );
     let issuer_url = format!(
         "{base}{path}/{realm}",
         base = KEYCLOAK_INTERNAL_URL,
@@ -185,6 +190,7 @@ pub async fn ensure_secret(
         client_secret,
         redirect_uris: vec![redirect_uri],
         allow_registration,
+        public_base_url: external_realm_base,
     })
 }
 
