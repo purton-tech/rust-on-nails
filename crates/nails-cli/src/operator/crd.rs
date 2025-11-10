@@ -13,9 +13,8 @@ use serde::{Deserialize, Serialize};
     namespaced
 )]
 pub struct NailsAppSpec {
-    #[serde(rename = "hostname-url")]
-    pub hostname_url: String,
     pub web: WebContainer,
+    pub auth: Option<AuthConfig>,
 }
 
 /// Web application container reference.
@@ -25,4 +24,14 @@ pub struct WebContainer {
     pub image: String,
     /// Container port exposed by the application (e.g. 7903)
     pub port: u16,
+}
+
+/// Optional authentication configuration.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
+pub struct AuthConfig {
+    /// Public hostname that Cloudflare/Keycloak should use for redirects.
+    #[serde(rename = "hostname-url")]
+    pub hostname_url: Option<String>,
+    /// Static JWT token forwarded by nginx when OIDC is disabled.
+    pub jwt: Option<String>,
 }

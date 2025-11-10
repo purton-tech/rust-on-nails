@@ -4,7 +4,8 @@ metadata:
   name: nails-app
   namespace: nails-demo
 spec:
-  hostname-url: https://nails-demo.example.com
   web:
     image: traefik/whoami:v1.11
     port: 80
+  auth:
+    jwt: "1"

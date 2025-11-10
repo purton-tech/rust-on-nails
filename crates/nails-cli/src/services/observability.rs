@@ -45,11 +45,17 @@ pub async fn deploy(
         "".to_string()
     };
 
+    let hostname_url = spec
+        .auth
+        .as_ref()
+        .and_then(|auth| auth.hostname_url.clone())
+        .unwrap_or_else(|| "http://localhost".to_string());
+
     let yaml = GRAFANA_YAML.replace("$APPLICATION_PASSWORD", &password);
-    let yaml = yaml.replace("$HOSTNAME_URL", &spec.hostname_url);
+    let yaml = yaml.replace("$HOSTNAME_URL", &hostname_url);
     let mut yaml = yaml.replace("$ADMIN_PASSWORD", &super::database::rand_hex());
 
-    if let Ok(url) = url::Url::parse(&spec.hostname_url) {
+    if let Ok(url) = url::Url::parse(&hostname_url) {
         if let Some(domain) = url.host_str() {
             yaml = yaml.replace("$HOSTNAME_DOMAIN", domain);
         } else {

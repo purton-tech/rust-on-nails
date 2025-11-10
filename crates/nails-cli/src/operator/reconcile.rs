@@ -57,12 +57,42 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 
     database::deploy(client.clone(), &namespace, DEFAULT_DB_DISK_SIZE_GB, &None).await?;
 
-    let realm_config = oauth2_proxy::ensure_secret(client.clone(), &namespace, &app.spec).await?;
-    keycloak::ensure_realm(client.clone(), &realm_config).await?;
-    oauth2_proxy::deploy(client.clone(), &app.spec, &namespace).await?;
-    nginx::deploy_nginx(&client, &namespace)
-        .await
-        .map_err(Error::from)?;
+    let auth_hostname = app
+        .spec
+        .auth
+        .as_ref()
+        .and_then(|auth| auth.hostname_url.clone());
+    let jwt_value = app
+        .spec
+        .auth
+        .as_ref()
+        .and_then(|auth| auth.jwt.clone())
+        .unwrap_or_else(|| "1".to_string());
+
+    if let Some(hostname_url) = auth_hostname {
+        let realm_config =
+            oauth2_proxy::ensure_secret(client.clone(), &namespace, &hostname_url).await?;
+        keycloak::ensure_realm(client.clone(), &realm_config).await?;
+        oauth2_proxy::deploy(client.clone(), &namespace, &hostname_url, app.spec.web.port).await?;
+        nginx::deploy_nginx(
+            &client,
+            &namespace,
+            nginx::NginxMode::Oidc,
+            app.spec.web.port,
+        )
+        .await?;
+    } else {
+        cleanup_auth_resources(client.clone(), &namespace).await?;
+        nginx::deploy_nginx(
+            &client,
+            &namespace,
+            nginx::NginxMode::StaticJwt {
+                token: jwt_value.clone(),
+            },
+            app.spec.web.port,
+        )
+        .await?;
+    }
 
     deploy_web_app(&client, &namespace, &app.spec).await?;
 
@@ -91,6 +121,12 @@ async fn deploy_web_app(
     namespace: &str,
     spec: &NailsAppSpec,
 ) -> Result<(), Error> {
+    let hostname_env = spec
+        .auth
+        .as_ref()
+        .and_then(|a| a.hostname_url.clone())
+        .unwrap_or_default();
+
     let mut env = vec![
         json!({
             "name": "DATABASE_URL",
@@ -137,7 +173,7 @@ async fn deploy_web_app(
                 }
             }
         }),
-        json!({"name": "HOSTNAME_URL", "value": spec.hostname_url.clone()}),
+        json!({"name": "HOSTNAME_URL", "value": hostname_env}),
     ];
 
     env.push(json!({"name": "WEB_IMAGE", "value": spec.web.image.clone()}));
@@ -200,5 +236,11 @@ async fn delete_cloudflare_resources(client: &Client, namespace: &str) -> Result
             .await?;
     }
 
+    Ok(())
+}
+
+async fn cleanup_auth_resources(client: Client, namespace: &str) -> Result<(), Error> {
+    oauth2_proxy::delete(client.clone(), namespace).await?;
+    keycloak::delete(client, namespace).await?;
     Ok(())
 }

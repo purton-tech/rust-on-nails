@@ -1,6 +1,5 @@
 use super::deployment;
 use crate::error::Error;
-use crate::operator::crd::NailsAppSpec;
 use crate::services::application::APPLICATION_NAME;
 use crate::services::keycloak::{RealmConfig, KEYCLOAK_INTERNAL_URL, KEYCLOAK_REALM_BASE_PATH};
 use k8s_openapi::api::apps::v1::Deployment;
@@ -16,15 +15,20 @@ pub const OAUTH2_PROXY_IMAGE: &str = "quay.io/oauth2-proxy/oauth2-proxy:v7.5.1";
 pub const OAUTH2_PROXY_PORT: u16 = 7900;
 
 // Oauth2 Proxy handles authentication as our Open ID Connect provider
-pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Result<(), Error> {
-    let whitelist_domain = Url::parse(&spec.hostname_url);
+pub async fn deploy(
+    client: Client,
+    namespace: &str,
+    hostname_url: &str,
+    upstream_port: u16,
+) -> Result<(), Error> {
+    let whitelist_domain = Url::parse(hostname_url);
     let whitelist_domain = if let Ok(host) = &whitelist_domain {
         host.host_str().unwrap_or_default()
     } else {
         ""
     };
 
-    let hostname_base = spec.hostname_url.trim_end_matches('/');
+    let hostname_base = hostname_url.trim_end_matches('/');
     let external_realm_base = format!(
         "{}/realms/{}/protocol/openid-connect",
         hostname_base, namespace
@@ -51,7 +55,7 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
                 }),
                 json!({"name": "OAUTH2_PROXY_EMAIL_DOMAINS", "value": "*"}),
                 json!({"name": "OAUTH2_PROXY_COOKIE_SECURE", "value": "false"}),
-                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, spec.web.port)}),
+                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, upstream_port)}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAM_TIMEOUT", "value": "600s"}),
                 json!({"name": "OAUTH2_PROXY_LOGIN_URL", "value": format!("{}/auth", external_realm_base)}),
                 json!({
@@ -126,7 +130,7 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
 pub async fn ensure_secret(
     client: Client,
     namespace: &str,
-    spec: &NailsAppSpec,
+    hostname_url: &str,
 ) -> Result<RealmConfig, Error> {
     let secret_api: Api<Secret> = Api::namespaced(client, namespace);
     let existing_secret = secret_api.get("oidc-secret").await.ok();
@@ -151,7 +155,7 @@ pub async fn ensure_secret(
         .and_then(|secret| read_secret_field(secret, "cookie-secret"))
         .unwrap_or_else(rand_base64);
 
-    let redirect_uri = redirect_uri_value(&spec.hostname_url);
+    let redirect_uri = redirect_uri_value(hostname_url);
     let issuer_url = format!(
         "{base}{path}/{realm}",
         base = KEYCLOAK_INTERNAL_URL,
@@ -191,11 +195,7 @@ pub async fn ensure_secret(
         client_secret,
         redirect_uris: vec![redirect_uri],
         allow_registration,
-        public_base_url: format!(
-            "{}/realms/{}",
-            spec.hostname_url.trim_end_matches('/'),
-            realm
-        ),
+        public_base_url: format!("{}/realms/{}", hostname_url.trim_end_matches('/'), realm),
     })
 }
 

@@ -85,7 +85,7 @@ the CLI:
 2. Creates that namespace if it does not exist.
 3. Applies the manifest plus supporting Kubernetes objects.
 
-A minimal manifest now only needs the hostname that Cloudflare should advertise plus the container image and exposed port for your web service.
+A minimal manifest now only needs the web container image/port. Authentication is optional and controlled through the `auth` block.
 
 ```yaml
 apiVersion: nails-cli.dev/v1
@@ -94,10 +94,13 @@ metadata:
   name: nails-app
   namespace: nails-demo
 spec:
-  hostname-url: https://nails-demo.example.com
   web:
     image: ghcr.io/nails/demo-app:latest
     port: 7903
+  auth:
+    jwt: "1"
+
+To enable the built-in Keycloak/OAuth2 flow, set `auth.hostname-url` to the public domain you expose (for example `https://nails-demo.example.com`). When `hostname-url` is omitted, nginx forwards every request directly to your app and injects the static JWT you provide so you can gate traffic inside the service.
 ```
 
 ### What the operator does for you

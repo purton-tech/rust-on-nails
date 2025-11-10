@@ -23,8 +23,6 @@ spec:
             spec:
               type: object
               properties:
-                hostname-url:
-                  type: string
                 web:
                   type: object
                   properties:
@@ -36,6 +34,12 @@ spec:
                   required:
                     - image
                     - port
+                auth:
+                  type: object
+                  properties:
+                    hostname-url:
+                      type: string
+                    jwt:
+                      type: string
               required:
-              - hostname-url
               - web
