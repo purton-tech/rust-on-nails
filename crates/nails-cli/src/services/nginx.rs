@@ -1,11 +1,18 @@
 use crate::cli::apply;
+use crate::error::Error;
 use anyhow::Result;
-use kube::Client;
+use k8s_openapi::api::{
+    apps::v1::Deployment as KubeDeployment,
+    core::v1::{ConfigMap, Service},
+};
+use kube::api::DeleteParams;
+use kube::{Api, Client};
 use serde_json::json;
 
 use super::deployment;
 
 pub const NGINX_NAME: &str = "nginx";
+pub const NGINX_PORT: u16 = 7903;
 const NGINX_CONF: &str = include_str!("../../config/nginx-proxy.conf");
 
 // The web user interface
@@ -36,7 +43,7 @@ pub async fn deploy_nginx(client: &Client, namespace: &str) -> Result<()> {
             name: NGINX_NAME.to_string(),
             image_name,
             replicas: 1,
-            port: 7903,
+            port: NGINX_PORT,
             env,
             command: None,
             init_container: None,
@@ -50,6 +57,29 @@ pub async fn deploy_nginx(client: &Client, namespace: &str) -> Result<()> {
         namespace,
     )
     .await?;
+
+    Ok(())
+}
+
+pub async fn delete_nginx(client: Client, namespace: &str) -> Result<(), Error> {
+    let deployments: Api<KubeDeployment> = Api::namespaced(client.clone(), namespace);
+    if deployments.get(NGINX_NAME).await.is_ok() {
+        deployments
+            .delete(NGINX_NAME, &DeleteParams::default())
+            .await?;
+    }
+
+    let services: Api<Service> = Api::namespaced(client.clone(), namespace);
+    if services.get(NGINX_NAME).await.is_ok() {
+        services
+            .delete(NGINX_NAME, &DeleteParams::default())
+            .await?;
+    }
+
+    let configs: Api<ConfigMap> = Api::namespaced(client.clone(), namespace);
+    if configs.get(NGINX_NAME).await.is_ok() {
+        configs.delete(NGINX_NAME, &DeleteParams::default()).await?;
+    }
 
     Ok(())
 }

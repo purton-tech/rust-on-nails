@@ -2,7 +2,7 @@ use super::crd::{NailsApp, NailsAppSpec};
 use super::finalizer;
 use crate::error::Error;
 use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
-use crate::services::{cloudflare, database, deployment, keycloak, oauth2_proxy};
+use crate::services::{cloudflare, database, deployment, keycloak, nginx, oauth2_proxy};
 use k8s_openapi::api::{
     apps::v1::Deployment as KubeDeployment,
     core::v1::{ConfigMap, Secret, Service},
@@ -45,6 +45,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
     if app.meta().deletion_timestamp.is_some() {
         delete_application_resources(&client, &namespace).await?;
         oauth2_proxy::delete(client.clone(), &namespace).await?;
+        nginx::delete_nginx(client.clone(), &namespace).await?;
         keycloak::delete(client.clone(), &namespace).await?;
         delete_cloudflare_resources(&client, &namespace).await?;
         database::delete(client.clone(), &namespace).await?;
@@ -59,6 +60,9 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
     let realm_config = oauth2_proxy::ensure_secret(client.clone(), &namespace, &app.spec).await?;
     keycloak::ensure_realm(client.clone(), &realm_config).await?;
     oauth2_proxy::deploy(client.clone(), &app.spec, &namespace).await?;
+    nginx::deploy_nginx(&client, &namespace)
+        .await
+        .map_err(Error::from)?;
 
     deploy_web_app(&client, &namespace, &app.spec).await?;
 

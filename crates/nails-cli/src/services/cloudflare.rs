@@ -1,5 +1,5 @@
 use crate::cli::apply;
-use crate::services::oauth2_proxy::OAUTH2_PROXY_PORT;
+use crate::services::nginx::{NGINX_NAME, NGINX_PORT};
 use anyhow::Result;
 use kube::Client;
 
@@ -37,20 +37,21 @@ pub async fn deploy(
     tunnel_name: &str,
     token: Option<&str>,
 ) -> Result<()> {
-    let oauth_target = format!(
-        "http://oauth2-proxy.{namespace}.svc.cluster.local:{port}",
+    let nginx_target = format!(
+        "http://{nginx}.{namespace}.svc.cluster.local:{port}",
+        nginx = NGINX_NAME,
         namespace = namespace,
-        port = OAUTH2_PROXY_PORT
+        port = NGINX_PORT
     );
 
     if let Some(token) = token {
         let yaml = CLOUDFLARE_YAML
             .replace("$TUNNEL_TOKEN", token)
             .replace("$TUNNEL_NAME", tunnel_name)
-            .replace("$INGRESS_TARGET", &oauth_target);
+            .replace("$INGRESS_TARGET", &nginx_target);
         apply::apply(client, &yaml, Some(namespace)).await
     } else {
-        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", &oauth_target);
+        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", &nginx_target);
         apply::apply(client, &yaml, Some(namespace)).await
     }
 }
