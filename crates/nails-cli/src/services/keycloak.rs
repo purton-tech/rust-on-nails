@@ -53,6 +53,7 @@ pub async fn ensure_realm(client: Client, config: &RealmConfig) -> Result<(), Er
             "keycloakCRName": KEYCLOAK_NAME,
             "realm": {
                 "realm": config.realm,
+                "enabled": true,
                 "registrationAllowed": config.allow_registration,
                 "registrationEmailAsUsername": true,
                 "sslRequired": "none",
