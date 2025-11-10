@@ -13,7 +13,7 @@ pub const KEYCLOAK_NAMESPACE: &str = "keycloak";
 pub const KEYCLOAK_NAME: &str = "keycloak";
 pub const KEYCLOAK_SERVICE_NAME: &str = "keycloak-service";
 pub const KEYCLOAK_INTERNAL_URL: &str = "http://keycloak-service.keycloak.svc.cluster.local:8080";
-pub const KEYCLOAK_REALM_BASE_PATH: &str = "/oidc/realms";
+pub const KEYCLOAK_REALM_BASE_PATH: &str = "/realms";
 
 const KEYCLOAK_INSTALL_HINT: &str =
     "Keycloak operator is not installed. Run `nails-cli init` or apply the manifests in `crates/nails-cli/config` before reconciling.";

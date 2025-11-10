@@ -60,6 +60,20 @@ pub async fn deploy(
             },
         },
         HTTPIngressPath {
+            path: Some("/realms".to_string()),
+            path_type: "Prefix".to_string(),
+            backend: IngressBackend {
+                service: Some(IngressServiceBackend {
+                    name: "keycloak-service".to_string(),
+                    port: Some(ServiceBackendPort {
+                        number: Some(8080),
+                        ..Default::default()
+                    }),
+                }),
+                ..Default::default()
+            },
+        },
+        HTTPIngressPath {
             path: Some("/".to_string()),
             path_type: "Prefix".to_string(),
             backend: IngressBackend {

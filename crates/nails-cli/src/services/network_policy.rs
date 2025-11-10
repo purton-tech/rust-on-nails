@@ -1,4 +1,7 @@
-use super::{application::APPLICATION_NAME, keycloak::KEYCLOAK_NAME};
+use super::{
+    application::APPLICATION_NAME,
+    keycloak::{KEYCLOAK_NAME, KEYCLOAK_NAMESPACE},
+};
 use crate::error::Error;
 use k8s_openapi::api::networking::v1::NetworkPolicy;
 use kube::api::{Patch, PatchParams};
@@ -38,6 +41,11 @@ pub async fn default_deny(client: Client, name: &str, namespace: &str) -> Result
             {
                 "to": [
                     { "namespaceSelector": { "matchLabels": { "kubernetes.io/metadata.name": namespace } } }
+                ]
+            },
+            {
+                "to": [
+                    { "namespaceSelector": { "matchLabels": { "kubernetes.io/metadata.name": KEYCLOAK_NAMESPACE } } }
                 ]
             },
             {

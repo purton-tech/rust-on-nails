@@ -85,7 +85,7 @@ pub async fn status(args: &crate::cli::StatusArgs) -> Result<()> {
         if let Some(url) = extract_cloudflare_url(&logs) {
             let base = url.trim_end_matches('/');
             println!("☁️ Cloudflare URL: {}", base);
-            println!("   Keycloak login: {}/oidc", base);
+            println!("   Keycloak login: {}/realms/{}", base, args.namespace);
         } else {
             println!("☁️ Cloudflare URL: (not found in recent logs – is the tunnel running?)");
         }
