@@ -1,7 +1,7 @@
 use super::deployment;
 use crate::error::Error;
 use crate::operator::crd::NailsAppSpec;
-use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
+use crate::services::application::APPLICATION_NAME;
 use crate::services::keycloak::{RealmConfig, KEYCLOAK_INTERNAL_URL, KEYCLOAK_REALM_BASE_PATH};
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::{Secret, Service};
@@ -46,7 +46,7 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
                 }),
                 json!({"name": "OAUTH2_PROXY_EMAIL_DOMAINS", "value": "*"}),
                 json!({"name": "OAUTH2_PROXY_COOKIE_SECURE", "value": "false"}),
-                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, APPLICATION_PORT)}),
+                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, spec.web.port)}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAM_TIMEOUT", "value": "600s"}),
                 json!({
                     "name":

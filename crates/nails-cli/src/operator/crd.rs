@@ -23,4 +23,6 @@ pub struct NailsAppSpec {
 pub struct WebContainer {
     /// Fully-qualified container image reference (e.g. ghcr.io/org/app:tag)
     pub image: String,
+    /// Container port exposed by the application (e.g. 7903)
+    pub port: u16,
 }

@@ -1,7 +1,7 @@
 use super::crd::{NailsApp, NailsAppSpec};
 use super::finalizer;
 use crate::error::Error;
-use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
+use crate::services::application::APPLICATION_NAME;
 use crate::services::{cloudflare, database, deployment, keycloak, nginx, oauth2_proxy};
 use k8s_openapi::api::{
     apps::v1::Deployment as KubeDeployment,
@@ -148,7 +148,7 @@ async fn deploy_web_app(
             name: APPLICATION_NAME.to_string(),
             image_name: spec.web.image.clone(),
             replicas: WEB_APP_REPLICAS,
-            port: APPLICATION_PORT,
+            port: spec.web.port,
             env,
             init_container: None,
             command: None,

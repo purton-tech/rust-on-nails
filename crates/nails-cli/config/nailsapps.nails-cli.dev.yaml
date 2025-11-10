@@ -30,8 +30,12 @@ spec:
                   properties:
                     image:
                       type: string
+                    port:
+                      type: integer
+                      format: int32
                   required:
                     - image
+                    - port
               required:
               - hostname-url
               - web

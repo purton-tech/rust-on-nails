@@ -85,7 +85,7 @@ the CLI:
 2. Creates that namespace if it does not exist.
 3. Applies the manifest plus supporting Kubernetes objects.
 
-A minimal manifest now only needs the hostname that Cloudflare should advertise plus the container image for your web service.
+A minimal manifest now only needs the hostname that Cloudflare should advertise plus the container image and exposed port for your web service.
 
 ```yaml
 apiVersion: nails-cli.dev/v1
@@ -97,6 +97,7 @@ spec:
   hostname-url: https://nails-demo.example.com
   web:
     image: ghcr.io/nails/demo-app:latest
+    port: 7903
 ```
 
 ### What the operator does for you
@@ -105,7 +106,7 @@ When the operator sees a NailsApp it:
 
 - Provisions a CloudNativePG cluster dedicated to the namespace.
 - Creates the `database-urls` and `db-owner` secrets with connection strings and credentials.
-- Deploys your web container (referenced by `spec.web.image`) as the `nails-app` Deployment wired up with those database secrets.
+- Deploys your web container (referenced by `spec.web.image`/`spec.web.port`) as the `nails-app` Deployment wired up with those database secrets.
 - Keeps the Deployment in sync with the manifest and tears it down alongside the database when you delete the resource.
 
 You can re-run the operator any time:
