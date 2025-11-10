@@ -2,8 +2,11 @@ use super::crd::{NailsApp, NailsAppSpec};
 use super::finalizer;
 use crate::error::Error;
 use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
-use crate::services::{database, deployment};
-use k8s_openapi::api::{apps::v1::Deployment as KubeDeployment, core::v1::Service};
+use crate::services::{cloudflare, database, deployment, keycloak, oauth2_proxy};
+use k8s_openapi::api::{
+    apps::v1::Deployment as KubeDeployment,
+    core::v1::{ConfigMap, Secret, Service},
+};
 use kube::api::DeleteParams;
 use kube::{Api, Client, Resource, ResourceExt};
 use kube_runtime::controller::Action;
@@ -12,6 +15,9 @@ use std::{sync::Arc, time::Duration};
 
 const DEFAULT_DB_DISK_SIZE_GB: i32 = 20;
 const WEB_APP_REPLICAS: i32 = 1;
+const CLOUDFLARE_DEPLOYMENT_NAME: &str = "cloudflared";
+const CLOUDFLARE_SECRET_NAME: &str = "cloudflare-credentials";
+const CLOUDFLARE_CONFIG_NAME: &str = "cloudflared";
 
 /// Context injected with each `reconcile` and `on_error` method invocation.
 pub struct ContextData {
@@ -38,6 +44,9 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 
     if app.meta().deletion_timestamp.is_some() {
         delete_application_resources(&client, &namespace).await?;
+        oauth2_proxy::delete(client.clone(), &namespace).await?;
+        keycloak::delete(client.clone(), &namespace).await?;
+        delete_cloudflare_resources(&client, &namespace).await?;
         database::delete(client.clone(), &namespace).await?;
         finalizer::delete(client, &name, &namespace).await?;
         return Ok(Action::await_change());
@@ -47,7 +56,15 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 
     database::deploy(client.clone(), &namespace, DEFAULT_DB_DISK_SIZE_GB, &None).await?;
 
+    let realm_config = oauth2_proxy::ensure_secret(client.clone(), &namespace, &app.spec).await?;
+    keycloak::ensure_realm(client.clone(), &realm_config).await?;
+    oauth2_proxy::deploy(client.clone(), &app.spec, &namespace).await?;
+
     deploy_web_app(&client, &namespace, &app.spec).await?;
+
+    cloudflare::deploy(&client, &namespace, &namespace, None)
+        .await
+        .map_err(Error::from)?;
 
     Ok(Action::requeue(Duration::from_secs(10)))
 }
@@ -151,6 +168,31 @@ async fn delete_application_resources(client: &Client, namespace: &str) -> Resul
     if services.get(APPLICATION_NAME).await.is_ok() {
         services
             .delete(APPLICATION_NAME, &DeleteParams::default())
+            .await?;
+    }
+
+    Ok(())
+}
+
+async fn delete_cloudflare_resources(client: &Client, namespace: &str) -> Result<(), Error> {
+    let deployments: Api<KubeDeployment> = Api::namespaced(client.clone(), namespace);
+    if deployments.get(CLOUDFLARE_DEPLOYMENT_NAME).await.is_ok() {
+        deployments
+            .delete(CLOUDFLARE_DEPLOYMENT_NAME, &DeleteParams::default())
+            .await?;
+    }
+
+    let secrets: Api<Secret> = Api::namespaced(client.clone(), namespace);
+    if secrets.get(CLOUDFLARE_SECRET_NAME).await.is_ok() {
+        secrets
+            .delete(CLOUDFLARE_SECRET_NAME, &DeleteParams::default())
+            .await?;
+    }
+
+    let configs: Api<ConfigMap> = Api::namespaced(client.clone(), namespace);
+    if configs.get(CLOUDFLARE_CONFIG_NAME).await.is_ok() {
+        configs
+            .delete(CLOUDFLARE_CONFIG_NAME, &DeleteParams::default())
             .await?;
     }
 

@@ -1,3 +1,5 @@
+use anyhow::Error as AnyhowError;
+
 /// All errors possible to occur during reconciliation
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -18,4 +20,13 @@ pub enum Error {
         #[from]
         source: serde_json::Error,
     },
+    /// Any other error that does not map cleanly to the variants above.
+    #[error("{0}")]
+    Other(String),
+}
+
+impl From<AnyhowError> for Error {
+    fn from(err: AnyhowError) -> Self {
+        Error::Other(err.to_string())
+    }
 }

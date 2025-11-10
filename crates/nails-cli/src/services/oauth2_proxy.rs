@@ -1,7 +1,7 @@
 use super::deployment;
 use crate::error::Error;
 use crate::operator::crd::NailsAppSpec;
-use crate::services::application::APPLICATION_NAME;
+use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
 use crate::services::keycloak::{RealmConfig, KEYCLOAK_INTERNAL_URL, KEYCLOAK_REALM_BASE_PATH};
 use k8s_openapi::api::apps::v1::Deployment;
 use k8s_openapi::api::core::v1::{Secret, Service};
@@ -11,6 +11,9 @@ use rand::rngs::OsRng;
 use rand::RngCore;
 use serde_json::json;
 use url::Url;
+
+const OAUTH2_PROXY_IMAGE: &str = "quay.io/oauth2-proxy/oauth2-proxy:v7.5.1";
+const OAUTH2_PROXY_PORT: u16 = 7900;
 
 // Oauth2 Proxy handles authentication as our Open ID Connect provider
 pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Result<(), Error> {
@@ -26,11 +29,11 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
         client.clone(),
         deployment::ServiceDeployment {
             name: "oauth2-proxy".to_string(),
-            image_name: super::OAUTH2_PROXY_IMAGE.to_string(),
-            replicas: spec.replicas,
-            port: 7900,
+            image_name: OAUTH2_PROXY_IMAGE.to_string(),
+            replicas: 1,
+            port: OAUTH2_PROXY_PORT,
             env: vec![
-                json!({"name": "OAUTH2_PROXY_HTTP_ADDRESS", "value": "0.0.0.0:7900"}),
+                json!({"name": "OAUTH2_PROXY_HTTP_ADDRESS", "value": format!("0.0.0.0:{}", OAUTH2_PROXY_PORT)}),
                 json!({
                     "name":
                     "OAUTH2_PROXY_COOKIE_SECRET",
@@ -43,7 +46,7 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
                 }),
                 json!({"name": "OAUTH2_PROXY_EMAIL_DOMAINS", "value": "*"}),
                 json!({"name": "OAUTH2_PROXY_COOKIE_SECURE", "value": "false"}),
-                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:7903", APPLICATION_NAME)}),
+                json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, APPLICATION_PORT)}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAM_TIMEOUT", "value": "600s"}),
                 json!({
                     "name":
@@ -121,7 +124,7 @@ pub async fn ensure_secret(
 ) -> Result<RealmConfig, Error> {
     let secret_api: Api<Secret> = Api::namespaced(client, namespace);
     let existing_secret = secret_api.get("oidc-secret").await.ok();
-    let allow_registration = spec.saas.unwrap_or(true);
+    let allow_registration = true;
 
     let realm = existing_secret
         .as_ref()
