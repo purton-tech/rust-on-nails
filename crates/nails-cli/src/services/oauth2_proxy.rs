@@ -24,7 +24,12 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
         ""
     };
 
-    // Oauth2 Proxy
+    let hostname_base = spec.hostname_url.trim_end_matches('/');
+    let external_realm_base = format!(
+        "{}/realms/{}/protocol/openid-connect",
+        hostname_base, namespace
+    );
+
     deployment::deployment(
         client.clone(),
         deployment::ServiceDeployment {
@@ -48,6 +53,7 @@ pub async fn deploy(client: Client, spec: &NailsAppSpec, namespace: &str) -> Res
                 json!({"name": "OAUTH2_PROXY_COOKIE_SECURE", "value": "false"}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAMS", "value": format!("http://{}:{}", APPLICATION_NAME, spec.web.port)}),
                 json!({"name": "OAUTH2_PROXY_UPSTREAM_TIMEOUT", "value": "600s"}),
+                json!({"name": "OAUTH2_PROXY_LOGIN_URL", "value": format!("{}/auth", external_realm_base)}),
                 json!({
                     "name":
                     "OAUTH2_PROXY_CLIENT_SECRET",
@@ -146,11 +152,6 @@ pub async fn ensure_secret(
         .unwrap_or_else(rand_base64);
 
     let redirect_uri = redirect_uri_value(&spec.hostname_url);
-    let external_realm_base = format!(
-        "{}/realms/{}",
-        spec.hostname_url.trim_end_matches('/'),
-        realm
-    );
     let issuer_url = format!(
         "{base}{path}/{realm}",
         base = KEYCLOAK_INTERNAL_URL,
@@ -185,12 +186,16 @@ pub async fn ensure_secret(
 
     Ok(RealmConfig {
         namespace: namespace.to_string(),
-        realm,
+        realm: realm.clone(),
         client_id,
         client_secret,
         redirect_uris: vec![redirect_uri],
         allow_registration,
-        public_base_url: external_realm_base,
+        public_base_url: format!(
+            "{}/realms/{}",
+            spec.hostname_url.trim_end_matches('/'),
+            realm
+        ),
     })
 }
 
