@@ -23,23 +23,15 @@ spec:
             spec:
               type: object
               properties:
-                replicas:
-                  type: integer
-                  format: int32
-                version:
-                  type: string
                 hostname-url:
                   type: string
-                hash-app:
-                  type: string
-                hash-app-pipeline:
-                  type: string
-                hash-app-db-migrations:
-                  type: string
-                pgadmin:  # Install PgAdmin
-                  type: boolean
-                testing:  # Testing Mode
-                  type: boolean
+                web:
+                  type: object
+                  properties:
+                    image:
+                      type: string
+                  required:
+                    - image
               required:
-              - replicas
-              - version
+              - hostname-url
+              - web

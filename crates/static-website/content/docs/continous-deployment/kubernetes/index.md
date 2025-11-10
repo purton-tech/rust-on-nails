@@ -85,7 +85,7 @@ the CLI:
 2. Creates that namespace if it does not exist.
 3. Applies the manifest plus supporting Kubernetes objects.
 
-A minimal manifest needs the version, replica count, and disk sizing for the two CloudNativePG clusters. The hash fields are optional and only required when you want to pin images.
+A minimal manifest now only needs the hostname that Cloudflare should advertise plus the container image for your web service.
 
 ```yaml
 apiVersion: nails-cli.dev/v1
@@ -94,11 +94,9 @@ metadata:
   name: nails-app
   namespace: nails-demo
 spec:
-  replicas: 1
-  version: 1.11.33
-  primary_db_disk_size: 20
-  keycloak_db_disk_size: 10
-  hostname-url: https://localhost
+  hostname-url: https://nails-demo.example.com
+  web:
+    image: ghcr.io/nails/demo-app:latest
 ```
 
 ### What the operator does for you
@@ -107,9 +105,8 @@ When the operator sees a NailsApp it:
 
 - Provisions a CloudNativePG cluster dedicated to the namespace.
 - Creates the `database-urls` and `db-owner` secrets with connection strings and credentials.
-- Boots supporting services (Keycloak, Envoy, ingress, optional PgAdmin/observability) according to the manifest flags.
-
-If you enable development mode, the operator exposes the application on `http://localhost:30000` and Postgres on `localhost:30001`—matching the `k3d` port mapping from `dev-init`.
+- Deploys your web container (referenced by `spec.web.image`) as the `nails-app` Deployment wired up with those database secrets.
+- Keeps the Deployment in sync with the manifest and tears it down alongside the database when you delete the resource.
 
 You can re-run the operator any time:
 
@@ -117,4 +114,4 @@ You can re-run the operator any time:
 cargo run --bin nails-cli -- operator
 ```
 
-It will reconcile existing NailsApp resources, upgrade components when you change the version, and clean up databases and secrets on deletion.
+It will reconcile existing NailsApp resources, roll out your updated container image whenever you edit the manifest, and clean up databases and secrets on deletion.

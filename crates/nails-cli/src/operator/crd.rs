@@ -13,25 +13,14 @@ use serde::{Deserialize, Serialize};
     namespaced
 )]
 pub struct NailsAppSpec {
-    pub replicas: i32,
-    pub version: String,
-    pub saas: Option<bool>,
-    pub disable_ingress: Option<bool>,
-    pub pgadmin: Option<bool>,
-    pub observability: Option<bool>,
-    pub development: Option<bool>,
-    pub testing: Option<bool>,
-    pub primary_db_disk_size: i32,
-    pub keycloak_db_disk_size: i32,
     #[serde(rename = "hostname-url")]
     pub hostname_url: String,
-    #[serde(rename = "hash-app", skip_serializing_if = "Option::is_none")]
-    pub hash_app: Option<String>,
-    #[serde(rename = "hash-app-pipeline", skip_serializing_if = "Option::is_none")]
-    pub hash_app_pipeline_job: Option<String>,
-    #[serde(
-        rename = "hash-app-db-migrations",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub hash_app_db_migrations: Option<String>,
+    pub web: WebContainer,
+}
+
+/// Web application container reference.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
+pub struct WebContainer {
+    /// Fully-qualified container image reference (e.g. ghcr.io/org/app:tag)
+    pub image: String,
 }

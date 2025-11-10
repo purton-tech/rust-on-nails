@@ -5,8 +5,7 @@ pub fn summary() -> Summary {
         source_folder: "blog",
         categories: vec![Category {
             name: "TOFU".to_string(),
-            pages: vec![
-            ],
+            pages: vec![],
         }],
     }
 }

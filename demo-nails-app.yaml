@@ -4,6 +4,6 @@ metadata:
   name: nails-app
   namespace: nails-demo
 spec:
-  replicas: 1
-  version: 1.11.33
-  primary_db_disk_size: 20
+  hostname-url: https://nails-demo.example.com
+  web:
+    image: traefik/whoami:v1.11

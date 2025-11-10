@@ -1,4 +1,5 @@
 use crate::cli::apply;
+use crate::services::application::{APPLICATION_NAME, APPLICATION_PORT};
 use anyhow::Result;
 use kube::Client;
 
@@ -30,22 +31,27 @@ spec:
         - $TARGET_URL
 "#;
 
-const INGRESS_TARGET: &str = "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80";
-
 pub async fn deploy(
     client: &Client,
     namespace: &str,
     tunnel_name: &str,
     token: Option<&str>,
 ) -> Result<()> {
+    let application_target = format!(
+        "http://{name}.{namespace}.svc.cluster.local:{port}",
+        name = APPLICATION_NAME,
+        namespace = namespace,
+        port = APPLICATION_PORT
+    );
+
     if let Some(token) = token {
         let yaml = CLOUDFLARE_YAML
             .replace("$TUNNEL_TOKEN", token)
             .replace("$TUNNEL_NAME", tunnel_name)
-            .replace("$INGRESS_TARGET", INGRESS_TARGET);
+            .replace("$INGRESS_TARGET", &application_target);
         apply::apply(client, &yaml, Some(namespace)).await
     } else {
-        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", INGRESS_TARGET);
+        let yaml = CLOUDFLARE_QUICK_YAML.replace("$TARGET_URL", &application_target);
         apply::apply(client, &yaml, Some(namespace)).await
     }
 }
