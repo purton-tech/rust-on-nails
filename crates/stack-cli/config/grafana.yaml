@@ -31,9 +31,9 @@ data:
       - name: Application Database
         type: postgres
         access: proxy
-        url: nails-db-cluster-rw:5432
+        url: stack-db-cluster-rw:5432
         user: application_readonly
-        database: nails_app
+        database: stack_app
         secureJsonData:
           password: $APPLICATION_PASSWORD
         jsonData:

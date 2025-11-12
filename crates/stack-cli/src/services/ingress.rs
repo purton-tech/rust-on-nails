@@ -8,7 +8,7 @@ use k8s_openapi::api::networking::v1::{
 use kube::api::{DeleteParams, ObjectMeta, Patch, PatchParams};
 use kube::{api::Api, Client};
 
-const INGRESS: &str = "nails-ingress";
+const INGRESS: &str = "stack-ingress";
 
 /// Create a deployment and a service.
 /// Include sidecars if needed.

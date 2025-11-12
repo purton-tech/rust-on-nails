@@ -1,12 +1,12 @@
 [{
-    "realm": "nails-app",
+    "realm": "stack-app",
     "registrationAllowed": true,
     "registrationEmailAsUsername": true,
     "enabled": true,
     "sslRequired": "none",
     "clients": [
         {
-            "clientId": "nails-app",
+            "clientId": "stack-app",
             "clientAuthenticatorType": "client-secret",
             "secret": "69b26b08-12fe-48a2-85f0-6ab223f45777",
             "redirectUris": [

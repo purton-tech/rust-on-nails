@@ -1,5 +1,5 @@
 [package]
-name = "nails-cli"
+name = "stack-cli"
 version = "1.11.33"
 edition = "2021"
 

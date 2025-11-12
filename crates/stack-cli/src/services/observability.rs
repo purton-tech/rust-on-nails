@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::{cli::apply, operator::crd::NailsAppSpec};
+use crate::{cli::apply, operator::crd::StackAppSpec};
 use k8s_openapi::api::{apps::v1::Deployment, core::v1::ConfigMap};
 use kube::{
     api::{DeleteParams, Patch, PatchParams},
@@ -15,7 +15,7 @@ const CONFIG_NAME: &str = "grafana-dashboards";
 pub async fn deploy(
     client: Client,
     password: Option<String>,
-    spec: NailsAppSpec,
+    spec: StackAppSpec,
     namespace: &str,
 ) -> Result<(), Error> {
     let config_map = serde_json::json!({

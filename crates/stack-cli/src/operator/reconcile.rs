@@ -1,4 +1,4 @@
-use super::crd::{NailsApp, NailsAppSpec};
+use super::crd::{StackApp, StackAppSpec};
 use super::finalizer;
 use crate::error::Error;
 use crate::services::application::APPLICATION_NAME;
@@ -36,7 +36,7 @@ impl ContextData {
     }
 }
 
-pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<Action, Error> {
+pub async fn reconcile(app: Arc<StackApp>, context: Arc<ContextData>) -> Result<Action, Error> {
     let client: Client = context.client.clone(); // The `Client` is shared -> a clone from the reference is obtained
 
     let namespace: String = app.namespace().unwrap_or("default".to_string());
@@ -107,7 +107,7 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
 /// - `resource`: The erroneous resource.
 /// - `error`: A reference to the `kube::Error` that occurred during reconciliation.
 /// - `_context`: Unused argument. Context Data "injected" automatically by kube-rs.
-pub fn on_error(resource: Arc<NailsApp>, error: &Error, _context: Arc<ContextData>) -> Action {
+pub fn on_error(resource: Arc<StackApp>, error: &Error, _context: Arc<ContextData>) -> Action {
     eprintln!("Reconciliation error:\n{:?}.\n{:?}", error, resource);
     Action::requeue(Duration::from_secs(5))
 }
@@ -115,7 +115,7 @@ pub fn on_error(resource: Arc<NailsApp>, error: &Error, _context: Arc<ContextDat
 async fn deploy_web_app(
     client: &Client,
     namespace: &str,
-    spec: &NailsAppSpec,
+    spec: &StackAppSpec,
 ) -> Result<(), Error> {
     let hostname_env = spec
         .auth

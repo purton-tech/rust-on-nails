@@ -3,9 +3,9 @@
         "1": {
             "Name": "Application Database",
             "Group": "Servers",
-            "Host": "nails-db-cluster-rw",
+            "Host": "stack-db-cluster-rw",
             "Port": 5432,
-            "MaintenanceDB": "nails_app",
+            "MaintenanceDB": "stack_app",
             "Username": "application_readonly",
             "PassFile": "/pgadmin4/passfile",
             "SavePassword": true,

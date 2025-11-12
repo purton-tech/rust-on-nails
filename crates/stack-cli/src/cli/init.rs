@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::operator::crd::NailsApp;
+use crate::operator::crd::StackApp;
 use crate::services::{keycloak, keycloak_db};
 use anyhow::{Context, Result};
 use k8s_openapi::api::apps::v1::Deployment;
@@ -23,7 +23,7 @@ use kube_runtime::wait::await_condition;
 use kube_runtime::wait::Condition;
 use serde_json::json;
 
-const OPERATOR_IMAGE: &str = "ghcr.io/nails/manager";
+const OPERATOR_IMAGE: &str = "ghcr.io/stack/manager";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const CNPG_YAML: &str = include_str!("../../config/cnpg-1.22.1.yaml");
 const NGINX_YAML: &str = include_str!("../../config/nginx-ingress.yaml");
@@ -193,14 +193,14 @@ async fn wait_for_crd(client: &Client, name: &str) -> Result<()> {
 async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
     println!("🤖 Installing the operator into {}", namespace);
     let app_labels = serde_json::json!({
-        "app": "nails-operator",
+        "app": "stack-operator",
     });
 
     let deployment = serde_json::json!({
         "apiVersion": "apps/v1",
         "kind": "Deployment",
         "metadata": {
-            "name": "nails-operator-deployment",
+            "name": "stack-operator-deployment",
             "namespace": namespace
         },
         "spec": {
@@ -213,9 +213,9 @@ async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
                     "labels": app_labels
                 },
                 "spec": {
-                    "serviceAccountName": "nails-operator-service-account",
+                    "serviceAccountName": "stack-operator-service-account",
                     "containers": json!([{
-                        "name": "nails-operator",
+                        "name": "stack-operator",
                         "image": format!("{}:{}", OPERATOR_IMAGE, VERSION)
                     }]),
                 }
@@ -227,7 +227,7 @@ async fn create_operator(client: &Client, namespace: &str) -> Result<()> {
     let deployment_api: Api<Deployment> = Api::namespaced(client.clone(), namespace);
     deployment_api
         .patch(
-            "nails-operator-deployment",
+            "stack-operator-deployment",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(deployment),
         )
@@ -241,7 +241,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     let sa_api: Api<ServiceAccount> = Api::namespaced(client.clone(), operator_namespace);
     let service_account = ServiceAccount {
         metadata: ObjectMeta {
-            name: Some("nails-operator-service-account".to_string()),
+            name: Some("stack-operator-service-account".to_string()),
             namespace: Some(operator_namespace.to_string()),
             ..Default::default()
         },
@@ -249,7 +249,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     };
     sa_api
         .patch(
-            "nails-operator-service-account",
+            "stack-operator-service-account",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(service_account),
         )
@@ -257,7 +257,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     let role_api: Api<ClusterRole> = Api::all(client.clone());
     let role = ClusterRole {
         metadata: ObjectMeta {
-            name: Some("nails-operator-cluster-role".to_string()),
+            name: Some("stack-operator-cluster-role".to_string()),
             ..Default::default()
         },
         rules: Some(vec![PolicyRule {
@@ -270,7 +270,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     };
     role_api
         .patch(
-            "nails-operator-cluster-role",
+            "stack-operator-cluster-role",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(role),
         )
@@ -280,24 +280,24 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     let role_binding_api: Api<ClusterRoleBinding> = Api::all(client.clone());
     let role_binding = ClusterRoleBinding {
         metadata: ObjectMeta {
-            name: Some("nails-operator-cluster-role-binding".to_string()),
+            name: Some("stack-operator-cluster-role-binding".to_string()),
             ..Default::default()
         },
         role_ref: RoleRef {
             api_group: "rbac.authorization.k8s.io".to_string(),
             kind: "ClusterRole".to_string(),
-            name: "nails-operator-cluster-role".to_string(),
+            name: "stack-operator-cluster-role".to_string(),
         },
         subjects: Some(vec![Subject {
             kind: "ServiceAccount".to_string(),
-            name: "nails-operator-service-account".to_string(),
+            name: "stack-operator-service-account".to_string(),
             namespace: Some(operator_namespace.to_string()),
             ..Default::default()
         }]),
     };
     role_binding_api
         .patch(
-            "nails-operator-cluster-role-binding",
+            "stack-operator-cluster-role-binding",
             &PatchParams::apply(crate::MANAGER).force(),
             &Patch::Apply(role_binding),
         )
@@ -306,20 +306,20 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
 }
 
 async fn create_crd(client: &Client) -> Result<(), Error> {
-    println!("📜 Installing NailsApp CRD");
-    let crd = NailsApp::crd();
+    println!("📜 Installing StackApp CRD");
+    let crd = StackApp::crd();
     let crds: Api<CustomResourceDefinition> = Api::all(client.clone());
     crds.patch(
-        "nailsapps.nails-cli.dev",
+        "stackapps.stack-cli.dev",
         &PatchParams::apply(crate::MANAGER).force(),
         &Patch::Apply(crd),
     )
     .await?;
 
-    println!("⏳ Waiting for NailsApp CRD");
+    println!("⏳ Waiting for StackApp CRD");
     let establish = await_condition(
         crds,
-        "nailsapps.nails-cli.dev",
+        "stackapps.stack-cli.dev",
         conditions::is_crd_established(),
     );
     let _ = tokio::time::timeout(std::time::Duration::from_secs(10), establish)

@@ -27,5 +27,5 @@ spec:
         app: llama2-7b
     spec:
       containers:
-      - name: nails-model-server
-        image: ghcr.io/nails/llama-2-7b-chat:1.0.4
+      - name: stack-model-server
+        image: ghcr.io/stack/llama-2-7b-chat:1.0.4

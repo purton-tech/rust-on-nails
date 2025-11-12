@@ -1,9 +1,9 @@
-use super::crd::NailsApp;
+use super::crd::StackApp;
 use kube::api::{Patch, PatchParams};
 use kube::{Api, Client, Error};
 use serde_json::{json, Value};
 
-/// Adds a finalizer record into a NailsApp resource. If the finalizer already exists,
+/// Adds a finalizer record into a StackApp resource. If the finalizer already exists,
 /// this action has no effect.
 ///
 /// # Arguments:
@@ -12,11 +12,11 @@ use serde_json::{json, Value};
 /// - `namespace` - Namespace where the resource with given `name` resides.
 ///
 /// Note: Does not check for resource's existence for simplicity.
-pub async fn add(client: Client, name: &str, namespace: &str) -> Result<NailsApp, Error> {
-    let api: Api<NailsApp> = Api::namespaced(client, namespace);
+pub async fn add(client: Client, name: &str, namespace: &str) -> Result<StackApp, Error> {
+    let api: Api<StackApp> = Api::namespaced(client, namespace);
     let finalizer: Value = json!({
         "metadata": {
-            "finalizers": ["nailsapps.nails-cli.dev/finalizer"]
+            "finalizers": ["stackapps.stack-cli.dev/finalizer"]
         }
     });
 
@@ -24,7 +24,7 @@ pub async fn add(client: Client, name: &str, namespace: &str) -> Result<NailsApp
     api.patch(name, &PatchParams::default(), &patch).await
 }
 
-/// Removes all finalizers from a NailsApp resource. If there are no finalizers already, this
+/// Removes all finalizers from a StackApp resource. If there are no finalizers already, this
 /// action has no effect.
 ///
 /// # Arguments:
@@ -33,8 +33,8 @@ pub async fn add(client: Client, name: &str, namespace: &str) -> Result<NailsApp
 /// - `namespace` - Namespace where the resource with given `name` resides.
 ///
 /// Note: Does not check for resource's existence for simplicity.
-pub async fn delete(client: Client, name: &str, namespace: &str) -> Result<NailsApp, Error> {
-    let api: Api<NailsApp> = Api::namespaced(client, namespace);
+pub async fn delete(client: Client, name: &str, namespace: &str) -> Result<StackApp, Error> {
+    let api: Api<StackApp> = Api::namespaced(client, namespace);
     let finalizer: Value = json!({
         "metadata": {
             "finalizers": null

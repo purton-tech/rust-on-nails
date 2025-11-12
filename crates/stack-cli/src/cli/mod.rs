@@ -20,10 +20,10 @@ pub struct CloudflareInstaller {
     #[arg(long)]
     pub token: String,
     /// The tunnel name
-    #[arg(long, default_value = "nails")]
+    #[arg(long, default_value = "stack")]
     pub name: String,
     /// Namespace for the tunnel deployment
-    #[arg(long, default_value = "nails")]
+    #[arg(long, default_value = "stack")]
     pub namespace: String,
 }
 
@@ -33,7 +33,7 @@ pub struct Initializer {
     #[arg(long, default_value_t = false)]
     pub disable_ingress: bool,
     /// Namespace for the operator
-    #[arg(long, default_value = "nails-system")]
+    #[arg(long, default_value = "stack-system")]
     pub operator_namespace: String,
     /// Skip installing the operator
     #[arg(long, default_value_t = false)]
@@ -42,7 +42,7 @@ pub struct Initializer {
 
 #[derive(Parser)]
 pub struct Installer {
-    /// Path to a NailsApp manifest to apply
+    /// Path to a StackApp manifest to apply
     #[arg(long)]
     manifest: PathBuf,
     /// The setup needed for development. See CONTRIBUTING.md in the main project.
@@ -62,7 +62,7 @@ pub struct Installer {
 #[derive(Parser)]
 pub struct StatusArgs {
     /// Namespace where the application components (including cloudflared) are installed
-    #[arg(long, default_value = "nails")]
+    #[arg(long, default_value = "stack")]
     pub namespace: String,
     /// Namespace where the shared Keycloak installation lives
     #[arg(long, default_value = "keycloak")]
@@ -75,9 +75,9 @@ pub enum Commands {
     Install(Installer),
     /// Install the required operators into Kubernetes
     Init(Initializer),
-    /// Run the Nails Kubernetes Operator
+    /// Run the Stack Kubernetes Operator
     Operator {},
-    /// Run the Nails Kubernetes Operator
+    /// Run the Stack Kubernetes Operator
     Cloudflare(CloudflareInstaller),
     /// Show platform connection details (Keycloak credentials, Cloudflare URL)
     Status(StatusArgs),

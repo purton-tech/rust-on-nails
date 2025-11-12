@@ -5,7 +5,7 @@ mod services;
 use anyhow::Result;
 use clap::Parser;
 
-const MANAGER: &str = "nails-operator";
+const MANAGER: &str = "stack-operator";
 
 #[tokio::main]
 async fn main() -> Result<()> {

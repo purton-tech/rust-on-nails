@@ -9,5 +9,5 @@ spec:
       targetPort: 5432
       nodePort: 30001
   selector:
-    cnpg.io/cluster: nails-db-cluster
+    cnpg.io/cluster: stack-db-cluster
     role: primary

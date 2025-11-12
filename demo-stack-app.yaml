@@ -1,8 +1,8 @@
-apiVersion: nails-cli.dev/v1
-kind: NailsApp
+apiVersion: stack-cli.dev/v1
+kind: StackApp
 metadata:
-  name: nails-app
-  namespace: nails-demo
+  name: stack-app
+  namespace: stack-demo
 spec:
   web:
     image: traefik/whoami:v1.11

@@ -46,22 +46,22 @@ kubectl get nodes
 
 If you are in the Nails devcontainer, `just get-config` patches the API server address so `kubectl` can reach the cluster.
 
-## The Nails Developer Portal
+## The Stack Developer Portal
 
-Our internal developer portal lives in the `nails-cli` crate. It installs the platform operators, creates namespaces from NailsApp manifests, and provisions databases plus credentials. You can run everything manually or use the bundled Just recipes.
+Our internal developer portal lives in the `stack-cli` crate. It installs the platform operators, creates namespaces from StackApp manifests, and provisions databases plus credentials. You can run everything manually or use the bundled Just recipes.
 
 ### Install the platform operators
 
 ```sh
-cargo run --bin nails-cli -- init
+cargo run --bin stack-cli -- init
 ```
 
 This command:
 
 - Installs the CloudNativePG, Keycloak, and ingress operators.
-- Ensures the application namespace (`--namespace`, default `nails`) and the operator namespace (`--operator-namespace`, default `nails-system`) exist.
-- Registers the `NailsApp` CustomResourceDefinition.
-- Deploys the Nails operator itself unless you pass `--no-operator`.
+- Ensures the application namespace (`--namespace`, default `stack`) and the operator namespace (`--operator-namespace`, default `stack-system`) exist.
+- Registers the `StackApp` CustomResourceDefinition.
+- Deploys the Stack operator itself unless you pass `--no-operator`.
 
 In development we typically let `just dev-setup` run the right flags for us:
 
@@ -69,53 +69,53 @@ In development we typically let `just dev-setup` run the right flags for us:
 just dev-setup
 ```
 
-That sequence applies a sample NailsApp manifest, maps NodePorts for the app and Postgres, and starts the operator loop.
+That sequence applies a sample StackApp manifest, maps NodePorts for the app and Postgres, and starts the operator loop.
 
 ### Apply an application manifest
 
-Each NailsApp describes one namespace. When you run:
+Each StackApp describes one namespace. When you run:
 
 ```sh
-cargo run --bin nails-cli -- install --manifest demo-nails-app.yaml
+cargo run --bin stack-cli -- install --manifest demo-stack-app.yaml
 ```
 
 the CLI:
 
-1. Reads the `metadata.namespace` field from the manifest (for example `nails-demo`).
+1. Reads the `metadata.namespace` field from the manifest (for example `stack-demo`).
 2. Creates that namespace if it does not exist.
 3. Applies the manifest plus supporting Kubernetes objects.
 
 A minimal manifest now only needs the web container image/port. Authentication is optional and controlled through the `auth` block.
 
 ```yaml
-apiVersion: nails-cli.dev/v1
-kind: NailsApp
+apiVersion: stack-cli.dev/v1
+kind: StackApp
 metadata:
-  name: nails-app
-  namespace: nails-demo
+  name: stack-app
+  namespace: stack-demo
 spec:
   web:
-    image: ghcr.io/nails/demo-app:latest
+    image: ghcr.io/stack/demo-app:latest
     port: 7903
   auth:
     jwt: "1"
 
-To enable the built-in Keycloak/OAuth2 flow, set `auth.hostname-url` to the public domain you expose (for example `https://nails-demo.example.com`). When `hostname-url` is omitted, nginx forwards every request directly to your app and injects the static JWT you provide so you can gate traffic inside the service.
+To enable the built-in Keycloak/OAuth2 flow, set `auth.hostname-url` to the public domain you expose (for example `https://stack-demo.example.com`). When `hostname-url` is omitted, nginx forwards every request directly to your app and injects the static JWT you provide so you can gate traffic inside the service.
 ```
 
 ### What the operator does for you
 
-When the operator sees a NailsApp it:
+When the operator sees a StackApp it:
 
 - Provisions a CloudNativePG cluster dedicated to the namespace.
 - Creates the `database-urls` and `db-owner` secrets with connection strings and credentials.
-- Deploys your web container (referenced by `spec.web.image`/`spec.web.port`) as the `nails-app` Deployment wired up with those database secrets.
+- Deploys your web container (referenced by `spec.web.image`/`spec.web.port`) as the `stack-app` Deployment wired up with those database secrets.
 - Keeps the Deployment in sync with the manifest and tears it down alongside the database when you delete the resource.
 
 You can re-run the operator any time:
 
 ```sh
-cargo run --bin nails-cli -- operator
+cargo run --bin stack-cli -- operator
 ```
 
-It will reconcile existing NailsApp resources, roll out your updated container image whenever you edit the manifest, and clean up databases and secrets on deletion.
+It will reconcile existing StackApp resources, roll out your updated container image whenever you edit the manifest, and clean up databases and secrets on deletion.

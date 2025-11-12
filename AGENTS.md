@@ -14,10 +14,10 @@ This repository mixes several deliverables that move at different speeds. To kee
 - **Working locally**: Use `devcontainer up` (VS Code) or `devcontainer build --workspace-folder .` to verify changes. Ensure the container exposes port 8080 for the docs server and ships the CLI binaries or aliases referenced in the guides.
 - **Before shipping**: Bump version tags when you change the base image or toolchain. Run at least one full `cargo test` inside the container to make sure the toolchain works.
 
-## Platform Agent (`crates/nails-cli`)
+## Platform Agent (`crates/stack-cli`)
 - **Purpose**: Provide the internal developer platform that installs operators into Kubernetes clusters for Rust on Nails applications.
-- **Primary tasks**: Extend the `nails-cli` binary, manage Helm-like manifests under `config/`, and maintain integrations with Envoy and Keycloak.
-- **Working locally**: `cargo run --bin nails-cli -- -h` to inspect commands. Use `cargo run --bin nails-cli -- operator` to run the controller loop, and the `init`/`install` subcommands to configure a cluster. The dev container already maps your kubeconfig—fall back to `tmp/kubeconfig` if needed.
+- **Primary tasks**: Extend the `stack-cli` binary, manage Helm-like manifests under `config/`, and maintain integrations with Envoy and Keycloak.
+- **Working locally**: `cargo run --bin stack-cli -- -h` to inspect commands. Use `cargo run --bin stack-cli -- operator` to run the controller loop, and the `init`/`install` subcommands to configure a cluster. The dev container already maps your kubeconfig—fall back to `tmp/kubeconfig` if needed.
 - **Before shipping**: `cargo fmt`, `cargo clippy -- -D warnings`, and `cargo test`. When changing cluster assets, test against a local K3s install (`curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server --write-kubeconfig-mode="644"' sh -`). Document any new flags in `README.md`.
 
 ## Cross-Cutting Expectations

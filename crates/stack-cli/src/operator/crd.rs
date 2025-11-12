@@ -2,17 +2,17 @@ use kube::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// Nails application custom resource specification.
+/// Stack application custom resource specification.
 #[derive(CustomResource, Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[kube(
-    group = "nails-cli.dev",
+    group = "stack-cli.dev",
     version = "v1",
-    kind = "NailsApp",
-    plural = "nailsapps",
+    kind = "StackApp",
+    plural = "stackapps",
     derive = "PartialEq",
     namespaced
 )]
-pub struct NailsAppSpec {
+pub struct StackAppSpec {
     pub web: WebContainer,
     pub auth: Option<AuthConfig>,
 }

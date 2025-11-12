@@ -1,15 +1,15 @@
-## The Nails CLI and Kubernetes Operator
+## The Stack CLI and Kubernetes Operator
 
 Run and see the CLI help
 
 ```sh
-cargo run --bin nails-cli -- -h
+cargo run --bin stack-cli -- -h
 ```
 
 ## Run as an Operator
 
 ```sh
-cargo run --bin nails-cli -- operator
+cargo run --bin stack-cli -- operator
 ```
 
 ## (Re-)install K3's
@@ -37,8 +37,8 @@ export KUBECONFIG=/workspace/tmp/kubeconfig
 Then run
 
 ```sh
-cargo run --bin nails-cli -- init
-cargo run --bin nails-cli -- install --manifest ../../demo-nails-app.yaml
+cargo run --bin stack-cli -- init
+cargo run --bin stack-cli -- install --manifest ../../demo-stack-app.yaml
 ```
 
 ## Testing the Operator
@@ -46,15 +46,15 @@ cargo run --bin nails-cli -- install --manifest ../../demo-nails-app.yaml
 Install the manifests without the in-cluster controller so you can iterate on the binary locally and observe the resources it creates:
 
 ```sh
-cargo run --bin nails-cli -- init --no-operator
-cargo run --bin nails-cli -- install --manifest ../../demo-nails-app.yaml --development
+cargo run --bin stack-cli -- init --no-operator
+cargo run --bin stack-cli -- install --manifest ../../demo-stack-app.yaml --development
 ```
 
-Then run the operator locally and confirm it reconciles `NailsApplication` objects:
+Then run the operator locally and confirm it reconciles `StackApp` objects:
 
 ```sh
-cargo run --bin nails-cli -- operator
-kubectl get nailsapplications --all-namespaces --watch
+cargo run --bin stack-cli -- operator
+kubectl get stackapplications --all-namespaces --watch
 ```
 
 Say go

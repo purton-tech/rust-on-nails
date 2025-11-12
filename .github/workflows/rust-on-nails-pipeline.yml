@@ -15,7 +15,7 @@ jobs:
       packages: write
     env:
       DEVCONTAINER_NAME: purtontech/rust-on-nails-devcontainer
-      OPERATOR_IMAGE_NAME: purtontech/nails-operator
+      OPERATOR_IMAGE_NAME: purtontech/stack-operator
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,29 +42,29 @@ jobs:
       - name: Earthly version
         run: earthly --version
 
-      - name: Build Nails CLI
-        run: earthly --allow-privileged --output --ci +nails-cli
+      - name: Build Stack CLI
+        run: earthly --allow-privileged --output --ci +stack-cli
 
       - name: Prepare CLI artifact
         run: |
           set -euo pipefail
-          if [ -f "./nails-cli" ]; then
-            echo "Found nails-cli at repository root"
-            chmod +x ./nails-cli
+          if [ -f "./stack-cli" ]; then
+            echo "Found stack-cli at repository root"
+            chmod +x ./stack-cli
           else
-            SRC=$(find . -type f -name nails-cli | head -n 1 || true)
+            SRC=$(find . -type f -name stack-cli | head -n 1 || true)
             if [ -z "$SRC" ]; then
-              echo "nails-cli binary not found in the workspace"
-              find . -maxdepth 4 -type f -name nails-cli
+              echo "stack-cli binary not found in the workspace"
+              find . -maxdepth 4 -type f -name stack-cli
               exit 1
             fi
-            echo "Copying nails-cli from $SRC"
-            cp "$SRC" ./nails-cli
-            chmod +x ./nails-cli
+            echo "Copying stack-cli from $SRC"
+            cp "$SRC" ./stack-cli
+            chmod +x ./stack-cli
           fi
 
       - name: Build and push operator image (latest)
-        run: earthly --ci --push +nails-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
+        run: earthly --ci --push +stack-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
 
       - name: Build and push DevContainer image (latest)
         run: |

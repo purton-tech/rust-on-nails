@@ -28,7 +28,7 @@ pub async fn deploy(
         "".to_string()
     };
     let passfile = format!(
-        "nails-db-cluster-rw:5432:*:application_readonly:{}",
+        "stack-db-cluster-rw:5432:*:application_readonly:{}",
         password
     );
     let keycloak_passfile = format!(

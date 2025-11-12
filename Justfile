@@ -6,9 +6,9 @@ dev-init:
     k3d cluster create k3d-nails
 
 dev-setup:
-    cargo run --bin nails-cli -- init --no-operator
-    cargo run --bin nails-cli -- install --manifest demo-nails-app.yaml --development
-    cargo run --bin nails-cli -- operator
+    cargo run --bin stack-cli -- init --no-operator
+    cargo run --bin stack-cli -- install --manifest demo-stack-app.yaml --development
+    cargo run --bin stack-cli -- operator
 
 codex: 
     sudo npm install -g @openai/codex
@@ -29,8 +29,8 @@ watch:
 tailwind:
     cd /workspace/crates/web-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
 
-nails:
-    cargo run --bin nails-cli
+stack:
+    cargo run --bin stack-cli
 
 install-codex:
     sudo npm install -g @openai/codex

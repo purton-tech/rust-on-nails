@@ -39,7 +39,7 @@ pub struct StorageSpec {
     pub size: String,
 }
 
-pub const CNPG_INSTALL_HINT: &str = "CloudNativePG operator is not installed. Run `nails-cli init` or apply `crates/nails-cli/config/cnpg-1.22.1.yaml` before reconciling.";
+pub const CNPG_INSTALL_HINT: &str = "CloudNativePG operator is not installed. Run `stack-cli init` or apply `crates/stack-cli/config/cnpg-1.22.1.yaml` before reconciling.";
 
 /// Corresponds to the Cluster resource
 #[derive(CustomResource, Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
@@ -65,7 +65,7 @@ pub async fn deploy(
 ) -> Result<Option<String>, Error> {
     // If the cluster config exists, then do nothing.
     let cluster_api: Api<Cluster> = Api::namespaced(client.clone(), namespace);
-    let cluster = cluster_api.get("nails-db-cluster").await;
+    let cluster = cluster_api.get("stack-db-cluster").await;
     if cluster.is_ok() {
         return Ok(None);
     }
@@ -76,7 +76,7 @@ pub async fn deploy(
 
     let cluster = Cluster {
         metadata: ObjectMeta {
-            name: Some("nails-db-cluster".to_string()),
+            name: Some("stack-db-cluster".to_string()),
             namespace: Some(namespace.to_string()),
             ..Default::default()
         },
@@ -122,21 +122,21 @@ pub async fn deploy(
     secret_data.insert(
         "migrations-url".to_string(),
         format!(
-            "postgres://db-owner:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
+            "postgres://db-owner:{}@stack-db-cluster-rw:5432/stack_app?sslmode=disable",
             dbowner_password
         ),
     );
     secret_data.insert(
         "application-url".to_string(),
         format!(
-            "postgres://application_user:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
+            "postgres://application_user:{}@stack-db-cluster-rw:5432/stack_app?sslmode=disable",
             app_database_password
         ),
     );
     secret_data.insert(
         "readonly-url".to_string(),
         format!(
-            "postgres://application_readonly:{}@nails-db-cluster-rw:5432/nails_app?sslmode=disable",
+            "postgres://application_readonly:{}@stack-db-cluster-rw:5432/stack_app?sslmode=disable",
             readonly_database_password
         ),
     );
@@ -184,8 +184,8 @@ pub fn rand_hex() -> String {
 pub async fn delete(client: Client, namespace: &str) -> Result<(), Error> {
     // Remove deployments
     let api: Api<Cluster> = Api::namespaced(client.clone(), namespace);
-    if api.get("nails-db-cluster").await.is_ok() {
-        api.delete("nails-db-cluster", &DeleteParams::default())
+    if api.get("stack-db-cluster").await.is_ok() {
+        api.delete("stack-db-cluster", &DeleteParams::default())
             .await?;
     }
 
