@@ -2,7 +2,7 @@ use super::crd::{NailsApp, NailsAppSpec};
 use super::finalizer;
 use crate::error::Error;
 use crate::services::application::APPLICATION_NAME;
-use crate::services::{cloudflare, database, deployment, keycloak, nginx, oauth2_proxy};
+use crate::services::{database, deployment, keycloak, nginx, oauth2_proxy};
 use k8s_openapi::api::{
     apps::v1::Deployment as KubeDeployment,
     core::v1::{ConfigMap, Secret, Service},
@@ -95,10 +95,6 @@ pub async fn reconcile(app: Arc<NailsApp>, context: Arc<ContextData>) -> Result<
     }
 
     deploy_web_app(&client, &namespace, &app.spec).await?;
-
-    cloudflare::deploy(&client, &namespace, &namespace, None)
-        .await
-        .map_err(Error::from)?;
 
     Ok(Action::requeue(Duration::from_secs(10)))
 }
