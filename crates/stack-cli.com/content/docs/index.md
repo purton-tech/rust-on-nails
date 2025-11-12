@@ -56,6 +56,7 @@ Looking for a deeper dive? Read the [Stack architecture guide](./architecture/) 
 - Need ingress from the wider internet? Follow the [Cloudflare quick-tunnel guide](./cloudflare/) to create either temporary or authenticated tunnels straight from your StackApp manifest.
 - Curious about what `stack init` installs? The [Keycloak operator](./keycloak-operator/) and [PostgreSQL operator](./postgres-operator/) guides explain the shared services Stack keeps healthy for you.
 - Ready to ship an existing framework? See the [Rails on Kubernetes](./framework/) and [Flask on Kubernetes](./framework/flask/) guides for concrete end-to-end examples.
+- Want a local env? The [Developers workflow](./developers/) page shows how to spin up k3d, patch your kubeconfig, and run the Stack CLI manually.
 
 ## What's next?
 

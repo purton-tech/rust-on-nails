@@ -87,6 +87,19 @@ pub fn summary() -> Summary {
                     },
                 ],
             },
+            Category {
+                name: "Developers".to_string(),
+                pages: vec![Page {
+                    date: "",
+                    title: "Local Workflow",
+                    description: "Use k3d and the Justfile recipes to iterate locally",
+                    folder: "docs/developers/",
+                    markdown: include_str!("../content/docs/developers/index.md"),
+                    image: None,
+                    author_image: None,
+                    author: None,
+                }],
+            },
         ],
     }
 }
