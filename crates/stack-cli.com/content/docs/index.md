@@ -1,6 +1,6 @@
 # Stack Developer Platform
 
-Stack is a developer platform that layers identity, networking, databases, and tooling on top of any Kubernetes cluster. Instead of wiring together operators, CRDs, and manifests by hand, you install Stack once and immediately get a coherent place to deploy applications.
+Stack is a self-hosted deployment platform that layers identity, networking, databases, and tooling on top of any Kubernetes cluster. Instead of wiring together operators, CRDs, and manifests by hand, you install Stack once and immediately get a PaaS-like workflow for your applications.
 
 ![Stack architecture](./architecture-diagram.svg)
 

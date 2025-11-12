@@ -26,7 +26,7 @@ When you run `stack install --manifest app.yaml`, the controller:
 3. Stores connection strings in `database-urls` and `db-owner` secrets.
 4. Wires those secrets into your Deployment’s environment variables so the app, migrations, and helper services can connect securely.
 
-The cluster includes streaming replicas and the `pgvector` extension so you can experiment with AI workloads without extra setup.
+The cluster includes streaming replicas and can enable extensions like `pgvector` so you’re ready for advanced search or embedding workloads when you need them.
 
 ## Development shortcuts
 

@@ -13,7 +13,7 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
     let features = vec![
         (
             "Managed PostgreSQL",
-            "Provision CloudNativePG with secure credentials, read-only roles, and the pgvector extension ready for AI workloads.",
+            "Provision CloudNativePG with dedicated storage, secure credentials, and separate roles for applications, migrations, and read-only traffic.",
         ),
         (
             "Identity & Access Control",
@@ -24,16 +24,12 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
             "Bootstrap NGINX ingress, lock it down with network policies, and expose services safely through Cloudflare tunnels.",
         ),
         (
-            "Operational Observability",
-            "Install dashboards and scraping rules so Grafana lights up with application, database, and platform metrics on day one.",
+            "Secure Namespace Defaults",
+            "Apply OAuth2 Proxy plus NetworkPolicies so every namespace starts with locked-down ingress and hardened traffic paths.",
         ),
         (
             "Developer Tooling",
             "Ship PGAdmin, MailHog, and other helper services to inspect data, test email flows, and unblock your team instantly.",
-        ),
-        (
-            "Built-in AI Services",
-            "Run the bundled LLM API next to your application to experiment with generative workloads without leaving the cluster.",
         ),
     ];
 
@@ -59,7 +55,7 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
     let page = rsx! {
         Layout {
             title: "Stack",
-            description: "Stack converts Kubernetes into a developer platform so you can deploy apps without assembling operators by hand.",
+            description: "Stack turns Kubernetes into a self-hosted PaaS so you can deploy apps without assembling operators by hand.",
             mobile_menu: None,
             section: Section::Home,
 
