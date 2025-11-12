@@ -47,21 +47,11 @@ Stack is a developer platform that layers identity, networking, databases, and t
 
    The controller provisions a dedicated CloudNativePG cluster, injects connection strings into secrets, deploys your container as `stack-app`, and keeps everything in sync with the manifest.
 
-## Chapter: Expose traffic with Cloudflare
+## Operate and debug
 
-Stack can open your cluster to the internet through Cloudflare tunnels directly from your manifest:
-
-- **Quick tunnel (no Cloudflare account).** Omit `--token` and Stack spins up a temporary tunnel that prints an accessible URL once `stack status --manifest demo-stack-app.yaml` runs.
-- **Authenticated tunnel.** Generate a Cloudflare tunnel token and run:
-
-  ```bash
-  stack cloudflare \
-    --manifest demo-stack-app.yaml \
-    --token "$CLOUDFLARE_TUNNEL_TOKEN" \
-    --name stack
-  ```
-
-Every tunnel points at the nginx instance Stack already deployed, so your app, Keycloak, and OAuth2 Proxy immediately become reachable. Because the command reads the `StackApp` manifest you pass in, the tunnel installs directly into the same namespace. Update your `StackApp` manifest with `auth.hostname-url` to enable Keycloak redirects over the new hostname.
+- `stack operator --once` runs a single reconciliation loop locally so you can watch what the controller does without staying connected forever. Drop `--once` to keep it running.
+- `stack status --manifest demo-stack-app.yaml` prints the Keycloak admin credentials and inspects the `cloudflared` pods inside the namespace defined by your manifest. When a quick tunnel is running you will see the temporary HTTPS URL here.
+- Need ingress from the wider internet? Follow the [Cloudflare quick-tunnel guide](./cloudflare/) to create either temporary or authenticated tunnels straight from your StackApp manifest.
 
 ## What's next?
 
