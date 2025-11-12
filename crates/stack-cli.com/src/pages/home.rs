@@ -52,7 +52,7 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
             "Roll the same blueprint into dev, staging, and production to reduce snowflake drift and unexpected outages.",
         ),
         (
-            "Focus on your Rust services",
+            "Focus on your applications",
             "Let Stack own the infrastructure glue so your team can ship business features instead of wrangling YAML.",
         ),
     ];
@@ -60,7 +60,7 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
     let page = rsx! {
         Layout {
             title: "Stack",
-            description: "Install the Stack CLI to pull curated operators into your Kubernetes cluster.",
+            description: "Stack converts Kubernetes into a developer platform so you can deploy apps without assembling operators by hand.",
             mobile_menu: None,
             section: Section::Home,
 
@@ -70,9 +70,9 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
 
                 ProblemSolution {
                     video: "https://www.youtube.com/embed/Wd8EqeAeeck?si=BETsJN_94VoyQrcI",
-                    title: "Install curated operators in minutes",
-                    subtitle: "Stack turns Kubernetes into a managed platform for your Rust teams by automating identity, data, observability, and AI services.",
-                    claim: "Trusted by teams standardising Rust delivery"
+                    title: "Convert Kubernetes into a developer platform",
+                    subtitle: "Stack automates ingress, databases, identity, observability, and Cloudflare tunnels so your team focuses on shipping apps—not stitching YAML.",
+                    claim: "Trusted by teams standardising Kubernetes delivery"
                 }
             }
 
@@ -105,7 +105,7 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
                     class: "max-w-6xl mx-auto",
                     h2 {
                         class: "text-3xl font-semibold text-center",
-                        "Everything a Rust team needs"
+                        "Everything a delivery team needs"
                     }
                     p {
                         class: "mt-4 text-center text-base-content/80",

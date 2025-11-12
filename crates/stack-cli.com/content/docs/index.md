@@ -1,29 +1,70 @@
-# Introduction
+# Stack Developer Platform
 
-![Yay! You're on Nails! screenshot](./yay-your-on-nails.png)
+Stack is a developer platform that layers identity, networking, databases, and tooling on top of any Kubernetes cluster. Instead of wiring together operators, CRDs, and manifests by hand, you install Stack once and immediately get a coherent place to deploy applications.
 
-When creating software it's often a good practice to document the architecture using  a technique called [Architecture Decision Records](https://adr.github.io/).
+![Stack architecture](./architecture-diagram.svg)
 
-An ADR is nothing more than a markdown document that records the title, status, context, decision, and consequences of a particular design choice.
+## Install Stack
 
-When a decision is made it's often helpful to create a small Proof of Concept that illustrates how the decision will play out in the real world. 
+1. **Grab the CLI.**
 
-## This Guide
+   ```bash
+   export STACK_VERSION=v1.3.25
+   curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_VERSION}/stack-cli \
+     && chmod +x ./stack-cli \
+     && sudo mv ./stack-cli /usr/local/bin/stack
+   ```
 
-After running through a few projects creating ADR's I realised a lot of them are re-usable. With the Proofs of Concept which are required to prove an architecture decision you end up with something almost like a tutorial.
+2. **Bootstrap the platform operators into your cluster.**
 
-This guide shows how to get Rust web applications into production.
+   ```bash
+   stack init
+   ```
 
-The following applications were built using decisions that are documented here.
+   This command installs CloudNativePG, Keycloak, ingress, the Stack controller, and custom resource definitions that describe your applications.
 
-## Showcase
+3. **Apply a StackApp manifest.**
 
-The following projects were built using these guidelines
+   ```bash
+   stack install --manifest demo-stack-app.yaml
+   ```
 
-- [Nails App](https://github.com/purton-tech/bionicgpt?campaign=rustonnails)
-- [SkyTrace](https://github.com/purton-tech/skytrace?campaign=rustonnails)
+   A minimal `StackApp` looks like this:
 
-## Architecture
+   ```yaml
+   apiVersion: stack-cli.dev/v1
+   kind: StackApp
+   metadata:
+     name: stack-app
+     namespace: stack-demo
+   spec:
+     web:
+       image: ghcr.io/stack/demo-app:latest
+       port: 7903
+     auth:
+       jwt: "1"
+   ```
 
+   The controller provisions a dedicated CloudNativePG cluster, injects connection strings into secrets, deploys your container as `stack-app`, and keeps everything in sync with the manifest.
 
-![Creating a vault](./architecture-diagram.svg)
+## Chapter: Expose traffic with Cloudflare
+
+Stack can open your cluster to the internet through Cloudflare tunnels. You have two options:
+
+- **Quick tunnel (no Cloudflare account).** Skip the `--token` flag and Stack will create a temporary tunnel that prints an accessible URL in `stack status`.
+- **Authenticated tunnel.** Generate a Cloudflare tunnel token and run:
+
+  ```bash
+  stack cloudflare \
+    --token "$CLOUDFLARE_TUNNEL_TOKEN" \
+    --name stack \
+    --namespace stack-demo
+  ```
+
+Every tunnel points at the nginx instance Stack already deployed, so your app, Keycloak, and OAuth2 Proxy immediately become reachable. Update your `StackApp` manifest with `auth.hostname-url` to enable Keycloak redirects over the new hostname.
+
+## What's next?
+
+- `stack operator` lets you run the reconciliation loop locally for rapid debugging.
+- `stack status` shows Cloudflare URLs, Keycloak credentials, and other platform details.
+- Use the generated CRDs (`stackapps.stack-cli.dev`) from your own automation pipelines to manage namespaces and applications at scale.

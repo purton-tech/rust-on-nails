@@ -97,7 +97,7 @@ pub fn BlogList(summary: Summary) -> Element {
                 class: "lg:max-w-5xl mx-auto text-center mb-12 mt-24",
                 h1 {
                     class: "text-4xl font-extrabold",
-                    "Rust on Nails"
+                    "Stack Platform"
                 }
                 h2 {
                     class: "text-2xl font-bold",

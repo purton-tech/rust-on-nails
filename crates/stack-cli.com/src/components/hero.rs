@@ -6,11 +6,11 @@ pub fn Hero() -> Element {
         section {
             h1 {
                 class: "text-6xl max-w-3xl mx-auto text-center pb-6 font-semibold capitalize",
-                "Install a production-ready Rust platform on Kubernetes"
+                "Turn Kubernetes into a developer platform"
             }
             h2 {
                 class: "subtitle max-w-3xl mx-auto text-center text-lg",
-                "Stack bundles the operators, policies, and tooling you need to ship secure Rust services in your own cluster."
+                "Stack layers ingress, identity, databases, and tooling so your team can deploy apps without wrestling with raw cluster YAML."
             }
             div {
                 class: "flex flex-row justify-center mt-8 mb-8",
