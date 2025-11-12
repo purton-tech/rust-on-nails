@@ -4,6 +4,8 @@ Stack is a developer platform that layers identity, networking, databases, and t
 
 ![Stack architecture](./architecture-diagram.svg)
 
+Looking for a deeper dive? Read the [Stack architecture guide](./architecture/) to see how the operator, CRDs, and supporting services interact.
+
 ## Install Stack
 
 1. **Grab the CLI.**
@@ -52,6 +54,8 @@ Stack is a developer platform that layers identity, networking, databases, and t
 - `stack operator --once` runs a single reconciliation loop locally so you can watch what the controller does without staying connected forever. Drop `--once` to keep it running.
 - `stack status --manifest demo-stack-app.yaml` prints the Keycloak admin credentials and inspects the `cloudflared` pods inside the namespace defined by your manifest. When a quick tunnel is running you will see the temporary HTTPS URL here.
 - Need ingress from the wider internet? Follow the [Cloudflare quick-tunnel guide](./cloudflare/) to create either temporary or authenticated tunnels straight from your StackApp manifest.
+- Curious about what `stack init` installs? The [Keycloak operator](./keycloak-operator/) and [PostgreSQL operator](./postgres-operator/) guides explain the shared services Stack keeps healthy for you.
+- Ready to ship an existing framework? See the [Rails on Kubernetes](./framework/) and [Flask on Kubernetes](./framework/flask/) guides for concrete end-to-end examples.
 
 ## What's next?
 

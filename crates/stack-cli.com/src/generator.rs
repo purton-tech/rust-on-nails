@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use dioxus::prelude::*;
 
@@ -72,7 +72,9 @@ pub fn generate_docs(summary: Summary) {
             };
 
             let html = crate::render(page_ele);
-            let file = format!("dist/{}/index.html", page.folder);
+            let dir: PathBuf = ["dist", page.folder].iter().collect();
+            fs::create_dir_all(&dir).expect("Unable to create docs directory");
+            let file = dir.join("index.html");
 
             let mut file = File::create(&file).expect("Unable to create file");
             file.write_all(html.as_bytes())
