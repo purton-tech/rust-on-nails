@@ -1,7 +1,6 @@
 use crate::components::footer::Footer;
 use crate::components::hero::Hero;
 use crate::components::navigation::Section;
-use crate::components::problem_solution::ProblemSolution;
 use crate::layouts::layout::Layout;
 use dioxus::prelude::*;
 
@@ -68,12 +67,6 @@ curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_
                 class: "p-5 mt-16 mx-auto max-w-5xl",
                 Hero {}
 
-                ProblemSolution {
-                    video: "https://www.youtube.com/embed/Wd8EqeAeeck?si=BETsJN_94VoyQrcI",
-                    title: "Convert Kubernetes into a developer platform",
-                    subtitle: "Stack automates ingress, databases, identity, observability, and Cloudflare tunnels so your team focuses on shipping apps—not stitching YAML.",
-                    claim: "Trusted by teams standardising Kubernetes delivery"
-                }
             }
 
             section {
