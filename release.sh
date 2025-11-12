@@ -6,10 +6,10 @@ CONTAINER_NAME="purtontech/rust-on-nails-devcontainer"
 OPERATOR_IMAGE="purtontech/stack-operator"
 
 echo "Updating files..."
-sed -i "s/repo_version = .*$/repo_version =  \"Github $1\"/" ./rust-on-nails.com/content/_index.fi.md
-sed -i "s/repo_version = .*$/repo_version =  \"Github $1\"/" ./rust-on-nails.com/content/_index.md
 sed -i "s/purtontech\/rust-on-nails-devcontainer:.*$/purtontech\/rust-on-nails-devcontainer:$1 AS development/" ./nails-devcontainer/.devcontainer/Dockerfile
 sed -i "s#purtontech/stack-operator:.*#purtontech/stack-operator:$1#" ./crates/stack-cli/config/operator.yaml
+sed -i "s/export STACK_VERSION=.*/export STACK_VERSION=v$1/" ./crates/stack-cli.com/content/docs/index.md
+sed -i "s/export STACK_VERSION=.*/export STACK_VERSION=v$1/" ./crates/stack-cli.com/src/pages/home.rs
 
 echo "Building and pushing Stack operator image..."
 earthly --ci --push +stack-operator-image --IMAGE ${OPERATOR_IMAGE}:${VERSION}
