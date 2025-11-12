@@ -1,7 +1,9 @@
-use anyhow::{Context, Result};
+use crate::operator::crd::StackApp;
+use anyhow::{anyhow, Context, Result};
 use k8s_openapi::api::core::v1::{Pod, Secret};
 use kube::api::{ListParams, LogParams};
 use kube::{Api, Client, ResourceExt};
+use std::fs;
 
 fn decode_secret_field(secret: &Secret, key: &str) -> Option<String> {
     if let Some(data) = &secret.data {
@@ -50,6 +52,16 @@ pub async fn status(args: &crate::cli::StatusArgs) -> Result<()> {
     let client = Client::try_default().await?;
     println!("✅ Connected");
 
+    let manifest_raw = fs::read_to_string(&args.manifest)
+        .with_context(|| format!("Failed to read manifest at {}", args.manifest.display()))?;
+
+    let stack_app: StackApp =
+        serde_yaml::from_str(&manifest_raw).context("Failed to parse StackApp manifest")?;
+
+    let namespace = stack_app
+        .namespace()
+        .ok_or_else(|| anyhow!("StackApp manifest is missing metadata.namespace"))?;
+
     let keycloak_secret_api: Api<Secret> =
         Api::namespaced(client.clone(), args.keycloak_namespace.as_str());
     let admin_secret = keycloak_secret_api
@@ -64,7 +76,7 @@ pub async fn status(args: &crate::cli::StatusArgs) -> Result<()> {
     println!("   Username: {}", username);
     println!("   Password: {}", password);
 
-    let pods: Api<Pod> = Api::namespaced(client.clone(), args.namespace.as_str());
+    let pods: Api<Pod> = Api::namespaced(client.clone(), namespace.as_str());
     let pod_list = pods
         .list(&ListParams::default().labels("app=cloudflared"))
         .await
@@ -85,14 +97,14 @@ pub async fn status(args: &crate::cli::StatusArgs) -> Result<()> {
         if let Some(url) = extract_cloudflare_url(&logs) {
             let base = url.trim_end_matches('/');
             println!("☁️ Cloudflare URL: {}", base);
-            println!("   Keycloak login: {}/realms/{}", base, args.namespace);
+            println!("   Keycloak login: {}/realms/{}", base, namespace);
         } else {
             println!("☁️ Cloudflare URL: (not found in recent logs – is the tunnel running?)");
         }
     } else {
         println!(
             "☁️ Cloudflare deployment not found in namespace '{}'",
-            args.namespace
+            namespace
         );
     }
 

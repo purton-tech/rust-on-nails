@@ -43,8 +43,8 @@ pub async fn init(initializer: &crate::cli::Initializer) -> Result<()> {
     if !initializer.disable_ingress {
         install_nginx_operator(&client).await?;
     }
-    create_namespace(&client, &initializer.operator_namespace).await?;
-    create_crd(&client).await?;
+    ensure_namespace(&client, &initializer.operator_namespace).await?;
+    ensure_stackapp_crd(&client).await?;
     create_roles(&client, &initializer.operator_namespace).await?;
     if !initializer.no_operator {
         create_operator(&client, &initializer.operator_namespace).await?;
@@ -144,7 +144,7 @@ async fn install_postgres_operator(client: &Client) -> Result<()> {
 
 async fn install_keycloak_operator(client: &Client) -> Result<()> {
     println!("🛡️ Installing Keycloak Operator");
-    create_namespace(client, keycloak::KEYCLOAK_NAMESPACE).await?;
+    ensure_namespace(client, keycloak::KEYCLOAK_NAMESPACE).await?;
 
     super::apply::apply(client, KEYCLOAK_CRD_KEYCLOAKS, None).await?;
     super::apply::apply(client, KEYCLOAK_CRD_REALM_IMPORTS, None).await?;
@@ -305,7 +305,7 @@ async fn create_roles(client: &Client, operator_namespace: &str) -> Result<()> {
     Ok(())
 }
 
-async fn create_crd(client: &Client) -> Result<(), Error> {
+pub(crate) async fn ensure_stackapp_crd(client: &Client) -> Result<(), Error> {
     println!("📜 Installing StackApp CRD");
     let crd = StackApp::crd();
     let crds: Api<CustomResourceDefinition> = Api::all(client.clone());
@@ -328,7 +328,7 @@ async fn create_crd(client: &Client) -> Result<(), Error> {
     Ok(())
 }
 
-async fn create_namespace(client: &Client, namespace: &str) -> Result<Namespace> {
+pub(crate) async fn ensure_namespace(client: &Client, namespace: &str) -> Result<Namespace> {
     println!("📦 Creating namespace {}", namespace);
     // Define the API object for Namespace
     let namespaces: Api<Namespace> = Api::all(client.clone());

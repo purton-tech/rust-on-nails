@@ -3,13 +3,13 @@ mod finalizer;
 mod reconcile;
 use anyhow::Result;
 use crd::StackApp;
-use futures_util::stream::StreamExt;
+use futures_util::{pin_mut, StreamExt};
 use kube::{api::Api, Client};
 use kube_runtime::{watcher::Config, Controller};
 use reconcile::ContextData;
 use std::sync::Arc;
 
-pub async fn operator() -> Result<()> {
+pub async fn operator(run_once: bool) -> Result<()> {
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
         .init();
@@ -25,19 +25,31 @@ pub async fn operator() -> Result<()> {
     // - `kube::runtime::watcher::Config` can be adjusted for precise filtering of StackApp resources before the actual reconciliation, e.g. by label,
     // - `reconcile` function with reconciliation logic to be called each time a resource of StackApp kind is created/updated/deleted,
     // - `on_error` function to call whenever reconciliation fails.
-    Controller::new(crd_api.clone(), Config::default())
-        .run(reconcile::reconcile, reconcile::on_error, context)
-        .for_each(|reconciliation_result| async move {
-            match reconciliation_result {
-                Ok(echo_resource) => {
-                    println!("Reconciliation successful. Resource: {:?}", echo_resource);
-                }
-                Err(reconciliation_err) => {
-                    eprintln!("Reconciliation error: {:?}", reconciliation_err)
-                }
+    let controller_stream = Controller::new(crd_api.clone(), Config::default()).run(
+        reconcile::reconcile,
+        reconcile::on_error,
+        context,
+    );
+
+    let handle_result = |reconciliation_result| async move {
+        match reconciliation_result {
+            Ok(echo_resource) => {
+                println!("Reconciliation successful. Resource: {:?}", echo_resource);
             }
-        })
-        .await;
+            Err(reconciliation_err) => {
+                eprintln!("Reconciliation error: {:?}", reconciliation_err)
+            }
+        }
+    };
+
+    if run_once {
+        pin_mut!(controller_stream);
+        if let Some(result) = controller_stream.next().await {
+            handle_result(result).await;
+        }
+    } else {
+        controller_stream.for_each(handle_result).await;
+    }
 
     Ok(())
 }

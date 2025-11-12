@@ -18,17 +18,14 @@ async fn main() -> Result<()> {
         cli::Commands::Init(initializer) => {
             cli::init::init(initializer).await?;
         }
-        cli::Commands::Operator {} => {
-            operator::operator().await?;
+        cli::Commands::Operator(args) => {
+            operator::operator(args.once).await?;
         }
         cli::Commands::Cloudflare(installer) => {
             services::cloudflare::install(installer).await?;
         }
         cli::Commands::Status(args) => {
             cli::status::status(args).await?;
-        }
-        cli::Commands::SignLicence(opts) => {
-            cli::licence::sign(opts)?;
         }
     }
 

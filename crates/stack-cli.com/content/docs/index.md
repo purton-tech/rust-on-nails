@@ -49,22 +49,22 @@ Stack is a developer platform that layers identity, networking, databases, and t
 
 ## Chapter: Expose traffic with Cloudflare
 
-Stack can open your cluster to the internet through Cloudflare tunnels. You have two options:
+Stack can open your cluster to the internet through Cloudflare tunnels directly from your manifest:
 
-- **Quick tunnel (no Cloudflare account).** Skip the `--token` flag and Stack will create a temporary tunnel that prints an accessible URL in `stack status`.
+- **Quick tunnel (no Cloudflare account).** Omit `--token` and Stack spins up a temporary tunnel that prints an accessible URL once `stack status --manifest demo-stack-app.yaml` runs.
 - **Authenticated tunnel.** Generate a Cloudflare tunnel token and run:
 
   ```bash
   stack cloudflare \
+    --manifest demo-stack-app.yaml \
     --token "$CLOUDFLARE_TUNNEL_TOKEN" \
-    --name stack \
-    --namespace stack-demo
+    --name stack
   ```
 
-Every tunnel points at the nginx instance Stack already deployed, so your app, Keycloak, and OAuth2 Proxy immediately become reachable. Update your `StackApp` manifest with `auth.hostname-url` to enable Keycloak redirects over the new hostname.
+Every tunnel points at the nginx instance Stack already deployed, so your app, Keycloak, and OAuth2 Proxy immediately become reachable. Because the command reads the `StackApp` manifest you pass in, the tunnel installs directly into the same namespace. Update your `StackApp` manifest with `auth.hostname-url` to enable Keycloak redirects over the new hostname.
 
 ## What's next?
 
 - `stack operator` lets you run the reconciliation loop locally for rapid debugging.
-- `stack status` shows Cloudflare URLs, Keycloak credentials, and other platform details.
+- `stack status --manifest demo-stack-app.yaml` shows Cloudflare URLs, Keycloak credentials, and other platform details for that namespace.
 - Use the generated CRDs (`stackapps.stack-cli.dev`) from your own automation pipelines to manage namespaces and applications at scale.

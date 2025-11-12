@@ -1,7 +1,9 @@
 use crate::cli::apply;
+use crate::operator::crd::StackApp;
 use crate::services::nginx::{NGINX_NAME, NGINX_PORT};
-use anyhow::Result;
-use kube::Client;
+use anyhow::{anyhow, Context, Result};
+use kube::{Client, ResourceExt};
+use std::fs;
 
 const CLOUDFLARE_YAML: &str = include_str!("../../config/cloudflare.yaml");
 const CLOUDFLARE_QUICK_YAML: &str = r#"---
@@ -57,16 +59,34 @@ pub async fn deploy(
 }
 
 pub async fn install(installer: &crate::cli::CloudflareInstaller) -> Result<()> {
+    println!("📄 Reading StackApp manifest...");
+    let manifest_raw = fs::read_to_string(&installer.manifest).with_context(|| {
+        format!(
+            "Failed to read manifest at {}",
+            installer.manifest.display()
+        )
+    })?;
+
+    let stack_app: StackApp =
+        serde_yaml::from_str(&manifest_raw).context("Failed to parse StackApp manifest")?;
+
+    let namespace = stack_app
+        .namespace()
+        .ok_or_else(|| anyhow!("StackApp manifest is missing metadata.namespace"))?;
+
     println!("Connecting to the cluster...");
     let client = Client::try_default().await?;
     println!("Connected");
     deploy(
         &client,
-        &installer.namespace,
+        &namespace,
         &installer.name,
-        Some(installer.token.as_str()),
+        installer.token.as_deref(),
     )
     .await?;
-    println!("Cloudflare tunnel installed");
+    println!(
+        "Cloudflare tunnel installed in namespace `{}` targeting nginx service.",
+        namespace
+    );
     Ok(())
 }
