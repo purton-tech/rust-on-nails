@@ -1,0 +1,11 @@
+{
+    "id": "rust-on-nails",
+    "version": "1.0.0",
+    "name": "Rust on Nails",
+    "description": "Build full stack web applications in Rust https://rust-on-nails.com",
+    "documentationURL": "https://rust-on-nails.com",
+    "licenseURL": "https://github.com/purton-tech/rust-on-nails/blob/main/LICENCE.md",
+    "platforms": [
+        "Any"
+    ]
+}

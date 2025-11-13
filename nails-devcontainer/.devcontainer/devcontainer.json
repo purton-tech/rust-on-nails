@@ -3,17 +3,14 @@
 {
 	"name": "Rust on Nails",
 	"dockerComposeFile": [
-		"docker-compose.yml",
-		"docker-compose.postgres.yml"
+		"docker-compose.yml"
 	],
-	"service": "app",
+	"service": "development",
 	"workspaceFolder": "/workspace",
-	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-	],
+		
+	// Set *default* container specific settings.json values on container create.
 	"customizations": {
 		"vscode": {
-			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"lldb.executable": "/usr/bin/lldb",
 				// VS Code don't watch files under ./target
@@ -26,14 +23,27 @@
 			"extensions": [
 				"vadimcn.vscode-lldb",
 				"mutantdino.resourcemonitor",
-				"matklad.rust-analyzer",
+				"rust-lang.rust-analyzer",
 				"tamasfe.even-better-toml",
 				"fill-labs.dependi"
 			]
 		}
 	},
+
 	"remoteEnv": {
+		// You can create env vars on your local machine and they will get passed into your container.
+		"EMAIL": "${localEnv:EMAIL}",
+		"NAME": "${localEnv:NAME}",
+		// Pass in the host directory for Docker mount commands from inside the container
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
 	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [5432],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "rustc --version",
+
+	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }

@@ -1,0 +1,3 @@
+[submodule "rust-on-nails.com/themes/tech-startup-theme"]
+	path = rust-on-nails.com/themes/tech-startup-theme
+	url = https://github.com/purton-tech/tech-startup-theme

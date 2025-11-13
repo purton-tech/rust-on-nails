@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vscode"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  development:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    
+    volumes:
+      - ..:/workspace:cached
+      # Give access to ssh keys on the host (Is there a better way to do this?)
+      - ~/.ssh:/home/host-ssh:cached
+      # We need this so docker in docker works
+      - /var/run/docker.sock:/var/run/docker.sock
+      - target:/workspace/target # Set target as a volume for performance. 
+      # Uncomment the next line to improve performance when using node.
+      #- node_modules:/workspace/crates/asset-pipeline/node_modules 
+
+    environment:
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/postgres?sslmode=disable
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    working_dir: /workspace
+    
+    depends_on:
+      - db
+
+volumes:
+  target:
+  node_modules:
