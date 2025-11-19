@@ -56,6 +56,7 @@ ARG MOLD_VERSION=2.34.1
 ARG EARTHLY_VERSION=0.8.15
 ARG DOCKER_COMPOSE_VERSION=2.23.0
 ARG POSTGRES_CLIENT_VERSION=16
+ARG K9S_VERSION=v0.50.16
 
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
@@ -144,7 +145,7 @@ RUN apt-get update && \
 RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/earthly-linux-${TARGETARCH} -O /usr/local/bin/earthly \
     && chmod +x /usr/local/bin/earthly \
     # K9s
-    && curl -L -s https://github.com/derailed/k9s/releases/download/v0.32.4/k9s_Linux_${TARGETARCH}.tar.gz | tar xvz -C /tmp \
+    && curl -L -s https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_${TARGETARCH}.tar.gz | tar xvz -C /tmp \
     && mv /tmp/k9s /usr/bin \
     && rm -rf k9s_Linux_*.tar.gz \
     # Kubectl
