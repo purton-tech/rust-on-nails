@@ -50,4 +50,4 @@ spec:
       serviceAccountName: stack-operator-service-account
       containers:
       - name: stack-operator
-        image: purtontech/stack-operator:1.3.30
+        image: purtontech/stack-operator:1.3.31
