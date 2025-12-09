@@ -1,0 +1,251 @@
+# Auth Schema
+
+Use this Postgres `auth` schema to enable flexible external authentication with JWT claims, typically coming from providers such as Keycloak. The schema expects your application to push verified claims JSON into the `row_level_security.jwt` setting before running queries.
+
+## Full schema
+
+Copy/paste the block below into a migration file to create the schema, table, and helper functions in one shot.
+
+```sql
+-- ===========================================
+-- SCHEMA
+-- ===========================================
+CREATE SCHEMA IF NOT EXISTS auth;
+
+-- ===========================================
+-- TABLE: auth.users
+-- ===========================================
+CREATE TABLE IF NOT EXISTS auth.users (
+  id           bigserial PRIMARY KEY,       -- tight internal ID
+  external_id  text UNIQUE NOT NULL,        -- Keycloak sub
+  email        text UNIQUE,
+  first_name   text,
+  last_name    text,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_users_external_id ON auth.users (external_id);
+CREATE INDEX IF NOT EXISTS idx_auth_users_email       ON auth.users (email);
+
+-- ===========================================
+-- FUNCTION: auth.jwt()
+-- ===========================================
+CREATE OR REPLACE FUNCTION auth.jwt()
+RETURNS jsonb
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT
+    CASE
+      WHEN current_setting('row_level_security.jwt', true) IS NULL
+        THEN '{}'::jsonb
+      ELSE current_setting('row_level_security.jwt', true)::jsonb
+    END;
+$$;
+
+-- ===========================================
+-- FUNCTION: auth.me()
+-- ===========================================
+CREATE OR REPLACE FUNCTION auth.me()
+RETURNS auth.users
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _claims     jsonb := auth.jwt();
+  _sub        text;
+  _email      text;
+  _first_name text;
+  _last_name  text;
+  _user       auth.users;
+BEGIN
+  _sub := _claims->>'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  _email      := _claims->>'email';
+  _first_name := COALESCE(_claims->>'given_name', _claims->>'first_name');
+  _last_name  := COALESCE(_claims->>'family_name', _claims->>'last_name');
+
+  INSERT INTO auth.users (external_id, email, first_name, last_name)
+  VALUES (
+    _sub,
+    _email,
+    _first_name,
+    _last_name
+  )
+  ON CONFLICT (external_id) DO UPDATE
+    SET email      = COALESCE(EXCLUDED.email, auth.users.email),
+        first_name = COALESCE(EXCLUDED.first_name, auth.users.first_name),
+        last_name  = COALESCE(EXCLUDED.last_name, auth.users.last_name),
+        updated_at = now()
+  RETURNING * INTO _user;
+
+  RETURN _user;
+END;
+$$;
+
+-- ===========================================
+-- FUNCTION: auth.id()
+-- ===========================================
+CREATE OR REPLACE FUNCTION auth.id()
+RETURNS bigint
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+  _sub text;
+  _id  bigint;
+BEGIN
+  _sub := auth.jwt() ->> 'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  SELECT u.id
+  INTO _id
+  FROM auth.users u
+  WHERE u.external_id = _sub;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'No auth.users row for sub=%, call auth.me() first', _sub;
+  END IF;
+
+  RETURN _id;
+END;
+$$;
+```
+
+The rest of this chapter calls out the important pieces if you want to tweak or extend the schema.
+
+- `auth.users` stores one row per Keycloak subject (`sub`). We keep both the opaque `external_id` and a dense `id` for joins inside the app schema.
+- The optional indexes make typical lookup paths explicit (Keycloak subjects or email).
+
+## Example usage
+
+Once the schema is installed, start each request or job by setting the JWT and calling the helpers:
+
+```sql
+BEGIN;
+
+SET LOCAL row_level_security.jwt = $${
+  "sub": "1234567890abcdef",
+  "email": "daniel@example.com",
+  "given_name": "Daniel",
+  "family_name": "Purton"
+}$$;
+
+SELECT auth.jwt();
+SELECT * FROM auth.me();
+SELECT auth.id();  -- should now work too, since user row exists
+
+COMMIT;
+```
+
+## Helper functions
+
+### `auth.jwt()`
+
+```sql
+CREATE OR REPLACE FUNCTION auth.jwt()
+RETURNS jsonb
+LANGUAGE sql    
+STABLE
+AS $$
+  SELECT
+    CASE
+      WHEN current_setting('row_level_security.jwt', true) IS NULL
+        THEN '{}'::jsonb
+      ELSE current_setting('row_level_security.jwt', true)::jsonb
+    END;
+$$;
+```
+
+`auth.jwt()` reads the JSON claims payload injected with `SET LOCAL row_level_security.jwt = '<claims>'`. Returning `{}` instead of `NULL` lets calling functions safely destructure the result with `->>` accessors.
+
+### `auth.me()`
+
+```sql
+CREATE OR REPLACE FUNCTION auth.me()
+RETURNS auth.users
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _claims     jsonb := auth.jwt();
+  _sub        text;
+  _email      text;
+  _first_name text;
+  _last_name  text;
+  _user       auth.users;
+BEGIN
+  _sub := _claims->>'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  _email      := _claims->>'email';
+  _first_name := COALESCE(_claims->>'given_name', _claims->>'first_name');
+  _last_name  := COALESCE(_claims->>'family_name', _claims->>'last_name');
+
+  INSERT INTO auth.users (external_id, email, first_name, last_name)
+  VALUES (
+    _sub,
+    _email,
+    _first_name,
+    _last_name
+  )
+  ON CONFLICT (external_id) DO UPDATE
+    SET email      = COALESCE(EXCLUDED.email, auth.users.email),
+        first_name = COALESCE(EXCLUDED.first_name, auth.users.first_name),
+        last_name  = COALESCE(EXCLUDED.last_name, auth.users.last_name),
+        updated_at = now()
+  RETURNING * INTO _user;
+
+  RETURN _user;
+END;
+$$;
+```
+
+Call `SELECT auth.me();` at the start of a request (or in your connection bootstrapper) to upsert the user and cache the refreshed row for the rest of the transaction. We treat Keycloak as the source of truth for names and email, so updates only occur when new claim data is present.
+
+### `auth.id()`
+
+```sql
+CREATE OR REPLACE FUNCTION auth.id()
+RETURNS bigint
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+  _sub text;
+  _id  bigint;
+BEGIN
+  _sub := auth.jwt() ->> 'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  SELECT u.id
+  INTO _id
+  FROM auth.users u
+  WHERE u.external_id = _sub;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'No auth.users row for sub=%, call auth.me() first', _sub;
+  END IF;
+
+  RETURN _id;
+END;
+$$;
+```
+
+`auth.id()` bridges your request context with database‑side RLS policies. After you call `auth.me()` once, `auth.id()` gives you the dense bigint to use inside policies (`current_setting('row_level_security.user_id') := auth.id()`), auditing tables, or other helper functions.
+
+## Usage notes
+
+- Set `row_level_security.jwt` for every transaction; leaving it `NULL` makes helper functions throw, which protects you from running queries without an authenticated user.
+- When you add more profile fields, extend both the table and the `auth.me()` upsert. The conflict handler is already wired to `COALESCE` so optional attributes remain untouched.
+- This schema is intentionally slim: keep organization or permission data in separate modules and join using `auth.id()` when building row‑level policies.

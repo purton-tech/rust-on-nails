@@ -73,6 +73,23 @@ pub fn summary() -> Summary {
                 ],
             },
             Category {
+                name: "Common Schemas".to_string(),
+                pages: vec![
+                    Page {
+                        date: "",
+                        title: "Auth Schema",
+                        description: "Reusable authentication schema snippets",
+                        folder: "docs/common-schemas/auth/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/auth/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                ],
+            },
+            Category {
                 name: "Web Development".to_string(),
                 pages: vec![
                     Page {
