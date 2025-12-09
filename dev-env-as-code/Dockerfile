@@ -117,6 +117,16 @@ RUN apt-get update && \
     && curl -OL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 \
     && chmod +x tailwindcss-extra-linux-x64 \
     && mv tailwindcss-extra-linux-x64 /usr/local/bin/tailwind-extra \
+        
+    # Rainfrog (latest)
+    && curl -s https://api.github.com/repos/achristmascarl/rainfrog/releases/latest \
+      | grep "browser_download_url.*x86_64-unknown-linux-musl.tar.gz" \
+      | cut -d '"' -f 4 \
+      | xargs -n1 -P1 curl -OL \
+    && tar -xzf rainfrog-*-x86_64-unknown-linux-musl.tar.gz \
+    && chmod +x rainfrog \
+    && mv rainfrog /usr/local/bin/rainfrog \
+    && rm rainfrog-*-x86_64-unknown-linux-musl.tar.gz \
 
     # Create a non-root user
     && groupadd --gid $USER_GID $USERNAME \
