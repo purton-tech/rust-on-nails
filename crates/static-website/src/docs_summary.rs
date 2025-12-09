@@ -87,6 +87,30 @@ pub fn summary() -> Summary {
                         author_image: None,
                         author: None,
                     },
+                    Page {
+                        date: "",
+                        title: "Teams Schema",
+                        description: "Collaborative teams modeled inside the auth schema",
+                        folder: "docs/common-schemas/teams/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/teams/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "RBAC Schema",
+                        description: "Roles, permissions, and helpers that build on auth.me()",
+                        folder: "docs/common-schemas/rbac/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/rbac/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
                 ],
             },
             Category {

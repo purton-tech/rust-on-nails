@@ -1,0 +1,239 @@
+# RBAC Schema
+
+Role Based Access Control (RBAC) lets you describe what users may do inside a team without hard-coding permission checks in Rust. This schema lives alongside the `auth` module and leans on `auth.me()` to ensure a user row exists before roles or permissions are granted. The final function in this chapter **replaces** the earlier `auth.me()` implementation so callers automatically receive roles and permissions alongside the user and team context.
+
+## Full schema
+
+Paste this block after applying the Auth and Teams snippets. It creates the RBAC tables plus helpers that expose the current user's roles and permissions.
+
+```sql
+-- ===========================================
+-- SCHEMA
+-- ===========================================
+CREATE SCHEMA IF NOT EXISTS rbac;
+
+-- ===========================================
+-- TABLE: rbac.roles
+-- ===========================================
+CREATE TABLE IF NOT EXISTS rbac.roles (
+  id          bigserial PRIMARY KEY,
+  name        text UNIQUE NOT NULL,
+  description text
+);
+
+-- ===========================================
+-- TABLE: rbac.permissions
+-- ===========================================
+CREATE TABLE IF NOT EXISTS rbac.permissions (
+  id          bigserial PRIMARY KEY,
+  name        text UNIQUE NOT NULL,
+  description text
+);
+
+-- ===========================================
+-- TABLE: rbac.role_permissions
+-- ===========================================
+CREATE TABLE IF NOT EXISTS rbac.role_permissions (
+  role_id       bigint NOT NULL REFERENCES rbac.roles(id) ON DELETE CASCADE,
+  permission_id bigint NOT NULL REFERENCES rbac.permissions(id) ON DELETE CASCADE,
+  PRIMARY KEY (role_id, permission_id)
+);
+
+-- ===========================================
+-- TABLE: rbac.user_roles
+-- ===========================================
+CREATE TABLE IF NOT EXISTS rbac.user_roles (
+  user_id bigint NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role_id bigint NOT NULL REFERENCES rbac.roles(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, role_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rbac_user_roles_user ON rbac.user_roles (user_id);
+
+-- ===========================================
+-- FUNCTION: rbac.grant_role()
+-- ===========================================
+CREATE OR REPLACE FUNCTION rbac.grant_role(p_user_id bigint, p_role_name text)
+RETURNS VOID
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _role_id bigint;
+BEGIN
+  SELECT id INTO _role_id FROM rbac.roles WHERE name = p_role_name;
+  IF _role_id IS NULL THEN
+    RAISE EXCEPTION 'Unknown role=%', p_role_name;
+  END IF;
+
+  INSERT INTO rbac.user_roles (user_id, role_id)
+  VALUES (p_user_id, _role_id)
+  ON CONFLICT DO NOTHING;
+END;
+$$;
+
+-- ===========================================
+-- FUNCTION: rbac.revoke_role()
+-- ===========================================
+CREATE OR REPLACE FUNCTION rbac.revoke_role(p_user_id bigint, p_role_name text)
+RETURNS VOID
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _role_id bigint;
+BEGIN
+  SELECT id INTO _role_id FROM rbac.roles WHERE name = p_role_name;
+  IF _role_id IS NULL THEN
+    RETURN;
+  END IF;
+
+  DELETE FROM rbac.user_roles
+  WHERE user_id = p_user_id
+    AND role_id = _role_id;
+END;
+$$;
+
+-- ===========================================
+-- FUNCTION: auth.me(p_team_id)
+-- Extends the base helper to include roles and permissions
+-- ===========================================
+CREATE OR REPLACE FUNCTION auth.me(p_team_id bigint DEFAULT NULL)
+RETURNS TABLE (
+  user_row   auth.users,
+  team_id    bigint,
+  roles      text[],
+  permissions text[]
+)
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _claims     jsonb := auth.jwt();
+  _sub        text;
+  _email      text;
+  _first_name text;
+  _last_name  text;
+  _user       auth.users;
+  _team_id    bigint;
+  _team_name  text;
+BEGIN
+  _sub := _claims->>'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  _email      := _claims->>'email';
+  _first_name := COALESCE(_claims->>'given_name', _claims->>'first_name');
+  _last_name  := COALESCE(_claims->>'family_name', _claims->>'last_name');
+
+  INSERT INTO auth.users (external_id, email, first_name, last_name)
+  VALUES (
+    _sub,
+    _email,
+    _first_name,
+    _last_name
+  )
+  ON CONFLICT (external_id) DO UPDATE
+    SET email      = COALESCE(EXCLUDED.email, auth.users.email),
+        first_name = COALESCE(EXCLUDED.first_name, auth.users.first_name),
+        last_name  = COALESCE(EXCLUDED.last_name, auth.users.last_name),
+        updated_at = now()
+  RETURNING * INTO _user;
+
+  IF p_team_id IS NOT NULL THEN
+    _team_id := p_team_id;
+  ELSE
+    SELECT tm.team_id
+    INTO _team_id
+    FROM auth.team_members tm
+    WHERE tm.user_id = _user.id
+    ORDER BY tm.joined_at
+    LIMIT 1;
+  END IF;
+
+  IF _team_id IS NULL THEN
+    _team_name := format('%s''s team', COALESCE(NULLIF(trim(_first_name), ''), 'My'));
+
+    INSERT INTO auth.teams (name, created_by)
+    VALUES (_team_name, _user.id)
+    RETURNING id INTO _team_id;
+
+    INSERT INTO auth.team_members (team_id, user_id, role)
+    VALUES (_team_id, _user.id, 'Owner')
+    ON CONFLICT (team_id, user_id) DO NOTHING;
+  ELSE
+    INSERT INTO auth.team_members (team_id, user_id, role)
+    VALUES (_team_id, _user.id, 'Member')
+    ON CONFLICT (team_id, user_id) DO NOTHING;
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    _user,
+    _team_id,
+    COALESCE((
+      SELECT array_agg(r.name ORDER BY r.name)
+      FROM rbac.user_roles ur
+      JOIN rbac.roles r ON r.id = ur.role_id
+      WHERE ur.user_id = _user.id
+    ), ARRAY[]::text[]),
+    COALESCE((
+      SELECT array_agg(DISTINCT p.name ORDER BY p.name)
+      FROM rbac.user_roles ur
+      JOIN rbac.role_permissions rp ON rp.role_id = ur.role_id
+      JOIN rbac.permissions p ON p.id = rp.permission_id
+      WHERE ur.user_id = _user.id
+    ), ARRAY[]::text[]);
+END;
+$$;
+```
+
+## How it works
+
+- Roles and permissions live in their own schema so you can manage them independently from `auth`.
+- `rbac.grant_role()` and `rbac.revoke_role()` are thin wrappers over `rbac.user_roles`. Use them in migrations or admin panels to keep logic in one place.
+- `auth.me()` is now the single entry point for authentication, team membership, and RBAC context, returning `user_row`, `team_id`, `roles`, and `permissions` columns you can destructure anywhere in SQL.
+
+## Example workflow
+
+```sql
+BEGIN;
+
+SET LOCAL row_level_security.jwt = $${
+  "sub": "1234567890abcdef",
+  "email": "daniel@example.com",
+  "given_name": "Daniel",
+  "family_name": "Purton"
+}$$;
+
+-- Make sure the user exists and capture RBAC context
+SELECT * FROM auth.me(); -- columns: user_row, team_id, roles, permissions
+
+-- Map a role to permissions
+INSERT INTO rbac.roles (name) VALUES ('Administrator')
+ON CONFLICT DO NOTHING;
+INSERT INTO rbac.permissions (name) VALUES ('ManageTeam')
+ON CONFLICT DO NOTHING;
+INSERT INTO rbac.role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM rbac.roles r, rbac.permissions p
+WHERE r.name = 'Administrator' AND p.name = 'ManageTeam'
+ON CONFLICT DO NOTHING;
+
+-- Grant the role to the current user
+SELECT rbac.grant_role(auth.id(), 'Administrator');
+
+-- Hydrate roles + permissions again (now includes Administrator/ManageTeam)
+SELECT * FROM auth.me();
+
+COMMIT;
+```
+
+Tie the results into row-level policies or feature flags with a quick CTE:
+
+```sql
+WITH ctx AS (SELECT * FROM auth.me())
+SELECT 'ManageTeam' = ANY(ctx.permissions)
+FROM ctx;
+```

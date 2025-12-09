@@ -1,0 +1,165 @@
+# Teams Schema
+
+Teams let you keep customer data, billing, and RBAC boundaries aligned with the people who collaborate inside your product. This schema extends the `auth` module, so all tables live under `auth.*` and reuse the user IDs created by `auth.me()`.
+
+## Full schema
+
+Run this block after installing the Auth schema. It adds the team tables and replaces `auth.me()` so it can accept an optional team context.
+
+```sql
+-- ===========================================
+-- TYPE: auth.team_role
+-- ===========================================
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE t.typname = 'team_role'
+      AND n.nspname = 'auth'
+  ) THEN
+    CREATE TYPE auth.team_role AS ENUM ('Owner', 'Member');
+  END IF;
+END;
+$$;
+
+-- ===========================================
+-- TABLE: auth.teams
+-- ===========================================
+CREATE TABLE IF NOT EXISTS auth.teams (
+  id          bigserial PRIMARY KEY,
+  name        text NOT NULL,
+  created_by  bigint NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_teams_created_by ON auth.teams (created_by);
+
+-- ===========================================
+-- TABLE: auth.team_members
+-- ===========================================
+CREATE TABLE IF NOT EXISTS auth.team_members (
+  team_id   bigint NOT NULL REFERENCES auth.teams(id) ON DELETE CASCADE,
+  user_id   bigint NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role      auth.team_role NOT NULL DEFAULT 'Member',
+  joined_at timestamptz NOT NULL DEFAULT now(),
+
+  PRIMARY KEY (team_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_team_members_user ON auth.team_members (user_id);
+
+-- ===========================================
+-- FUNCTION: auth.me(p_team_id)
+-- ===========================================
+CREATE OR REPLACE FUNCTION auth.me(p_team_id bigint DEFAULT NULL)
+RETURNS auth.users
+LANGUAGE plpgsql
+VOLATILE
+AS $$
+DECLARE
+  _claims     jsonb := auth.jwt();
+  _sub        text;
+  _email      text;
+  _first_name text;
+  _last_name  text;
+  _user       auth.users;
+  _team_id    bigint;
+  _team_name  text;
+BEGIN
+  _sub := _claims->>'sub';
+  IF _sub IS NULL THEN
+    RAISE EXCEPTION 'JWT missing sub claim';
+  END IF;
+
+  _email      := _claims->>'email';
+  _first_name := COALESCE(_claims->>'given_name', _claims->>'first_name');
+  _last_name  := COALESCE(_claims->>'family_name', _claims->>'last_name');
+
+  INSERT INTO auth.users (external_id, email, first_name, last_name)
+  VALUES (
+    _sub,
+    _email,
+    _first_name,
+    _last_name
+  )
+  ON CONFLICT (external_id) DO UPDATE
+    SET email      = COALESCE(EXCLUDED.email, auth.users.email),
+        first_name = COALESCE(EXCLUDED.first_name, auth.users.first_name),
+        last_name  = COALESCE(EXCLUDED.last_name, auth.users.last_name),
+        updated_at = now()
+  RETURNING * INTO _user;
+
+  IF p_team_id IS NOT NULL THEN
+    _team_id := p_team_id;
+  ELSE
+    SELECT tm.team_id
+    INTO _team_id
+    FROM auth.team_members tm
+    WHERE tm.user_id = _user.id
+    ORDER BY tm.joined_at
+    LIMIT 1;
+  END IF;
+
+  IF _team_id IS NULL THEN
+    _team_name := format('%s''s team', COALESCE(NULLIF(trim(_first_name), ''), 'My'));
+
+    INSERT INTO auth.teams (name, created_by)
+    VALUES (_team_name, _user.id)
+    RETURNING id INTO _team_id;
+
+    INSERT INTO auth.team_members (team_id, user_id, role)
+    VALUES (_team_id, _user.id, 'Owner')
+    ON CONFLICT (team_id, user_id) DO NOTHING;
+  ELSE
+    INSERT INTO auth.team_members (team_id, user_id, role)
+    VALUES (_team_id, _user.id, 'Member')
+    ON CONFLICT (team_id, user_id) DO NOTHING;
+  END IF;
+
+  RETURN _user;
+END;
+$$;
+```
+
+## How it works
+
+- Every user rows retains a private team named after them (for example, “Daniel's team”) unless an application supplies another `team_id`.
+- `auth.team_members` keeps a historic `joined_at` timestamp so you can order permissions or audit invites.
+- `auth.me(p_team_id := …)` reuses the first membership it can find when no team is provided, preventing duplicate team creation when users return.
+
+## Example workflow
+
+```sql
+BEGIN;
+
+SET LOCAL row_level_security.jwt = $${
+  "sub": "1234567890abcdef",
+  "email": "daniel@example.com",
+  "given_name": "Daniel",
+  "family_name": "Purton"
+}$$;
+
+-- Creates/updates the user AND seeds “Daniel's team” if needed.
+SELECT * FROM auth.me();
+
+-- Join an existing team by ID (perhaps looked up by slug elsewhere).
+SELECT * FROM auth.me(p_team_id := 12345);
+
+-- Inspect team memberships for the current user.
+SELECT team_id, role FROM auth.team_members WHERE user_id = auth.id();
+
+COMMIT;
+```
+
+Wire the resulting `team_id` array into your RLS policies to scope data:
+
+```sql
+SET LOCAL row_level_security.team_ids = (
+  SELECT array_agg(team_id)
+  FROM auth.team_members
+  WHERE user_id = auth.id()
+);
+```
