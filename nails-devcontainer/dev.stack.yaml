@@ -1,0 +1,11 @@
+apiVersion: stack-cli.dev/v1
+kind: StackApp
+metadata:
+  name: stack-app
+  namespace: nails-demo
+spec:
+  web:
+    image: traefik/whoami:v1.11
+    port: 80
+  auth:
+    jwt: "1"
