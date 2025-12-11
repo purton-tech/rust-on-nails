@@ -158,6 +158,8 @@ RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/
     && curl -L -s https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_${TARGETARCH}.tar.gz | tar xvz -C /tmp \
     && mv /tmp/k9s /usr/bin \
     && rm -rf k9s_Linux_*.tar.gz \
+    # k3d
+    && curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash \
     # Kubectl
     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" \
     && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
