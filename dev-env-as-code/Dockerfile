@@ -166,6 +166,15 @@ RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/
     # Just
     && curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin \
     && mv ~/bin/just /usr/local/bin
+
+# stack CLI
+RUN RC_TAG=$( \
+      curl -s https://api.github.com/repos/stack-cli/stack-cli/releases \
+        | awk -F '"' '/"tag_name":/ {tag=$4} /"prerelease": true/ {print tag; exit}' \
+    ) \
+    && curl -OL https://github.com/stack-cli/stack-cli/releases/download/${RC_TAG}/stack-cli-linux \
+    && chmod +x ./stack-cli-linux \
+    && mv ./stack-cli-linux /usr/local/bin/stack
     
 USER $USERNAME
 
