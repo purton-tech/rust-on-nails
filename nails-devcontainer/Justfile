@@ -9,7 +9,7 @@ dev-setup:
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
-    k3d kubeconfig write k3d-stack --kubeconfig-merge-default
+    k3d kubeconfig write k3d-nails --kubeconfig-merge-default
     sed -i "s/127\.0\.0\.1/host.docker.internal/g; s/0\.0\.0\.0/host.docker.internal/g" "$HOME/.kube/config"
     # Disable TLS verification for local dev
     sed -i '/certificate-authority-data/d' "$HOME/.kube/config"
