@@ -11,7 +11,7 @@ Looking for a deeper dive? Read the [Stack architecture guide](./architecture/) 
 1. **Grab the CLI.**
 
    ```bash
-   export STACK_VERSION=v1.3.33
+   export STACK_VERSION=v1.3.34
    curl -OL https://github.com/purton-tech/rust-on-nails/releases/download/${STACK_VERSION}/stack-cli \
      && chmod +x ./stack-cli \
      && sudo mv ./stack-cli /usr/local/bin/stack
