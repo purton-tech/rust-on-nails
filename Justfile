@@ -29,10 +29,7 @@ watch:
 tailwind:
     cd /workspace/crates/web-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
 
-stack:
-    cargo run --bin stack-cli
-
-install-codex:
+codex:
     sudo npm install -g @openai/codex
 
 watch-static:
@@ -49,9 +46,3 @@ ws:
 
 wts:
     cd /workspace/crates/static-website && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
-
-wss:
-    cd /workspace/crates/stack-cli.com && cargo watch --workdir /workspace/crates/stack-cli.com -w ./content -w ./src --no-gitignore -x "run --bin stack-cli-website"
-
-wtss:
-    cd /workspace/crates/stack-cli.com && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
