@@ -123,6 +123,18 @@ pub fn summary() -> Summary {
                         author_image: None,
                         author: None,
                     },
+                    Page {
+                        date: "",
+                        title: "Encryption Helpers",
+                        description: "Encrypt/decrypt helpers built on pgcrypto",
+                        folder: "docs/common-schemas/encryption/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/encryption/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
                 ],
             },
             Category {
