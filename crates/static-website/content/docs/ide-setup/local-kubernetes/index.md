@@ -1,5 +1,14 @@
 # Local Kubernetes
 
+<iframe class="w-full aspect-[16/9] mb-6" src="https://www.youtube.com/embed/EJrw3z7m5iQ" title="Local Kubernetes Walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## Why Develop with Kubernetes
+
+- Devcontainer + k3d matches the production target, so fewer surprises when shipping.
+- One platform to learn and operate; we avoid maintaining divergent dev/prod stacks.
+- Local clusters let you exercise the same manifests, operators, and ingress as production.
+- Easier to debug: use `k9s`/`kubectl` locally with the same permissions and objects you expect in prod.
+
 Run Kubernetes inside the devcontainer with [k3d](https://k3d.io/) so your local environment matches how we deploy to real clusters. We develop on Kubernetes because production runs there too—keeping dev and prod aligned means fewer surprises and less duplicated infra to manage.
 
 ## Bootstrap the cluster
