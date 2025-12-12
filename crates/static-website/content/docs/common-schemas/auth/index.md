@@ -258,3 +258,23 @@ $$;
 - Set `row_level_security.jwt` for every transaction; leaving it `NULL` makes helper functions throw, which protects you from running queries without an authenticated user.
 - When you add more profile fields, extend both the table and the `auth.me()` upsert. The conflict handler is already wired to `COALESCE` so optional attributes remain untouched.
 - This schema is intentionally slim: keep organization or permission data in separate modules and join using `auth.id()` when building row‑level policies.
+
+## Example transaction
+
+Call `auth.me()` inside a transaction after setting the JWT claims:
+
+```sql
+BEGIN;
+
+SET LOCAL row_level_security.jwt = $${
+  "sub": "1234567890abcdef",
+  "email": "daniel@example.com",
+  "given_name": "Daniel",
+  "family_name": "Purton"
+}$$;
+
+SELECT * FROM auth.me();
+SELECT auth.id();
+
+COMMIT;
+```
