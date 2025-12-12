@@ -29,6 +29,18 @@ pub fn summary() -> Summary {
                         author_image: None,
                         author: None,
                     },
+                    Page {
+                        date: "",
+                        title: "Local Kubernetes",
+                        description: "Run Kubernetes inside the devcontainer with k3d",
+                        folder: "docs/ide-setup/local-kubernetes",
+                        markdown: include_str!(
+                            "../content/docs/ide-setup/local-kubernetes/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
                 ],
             },
             Category {
