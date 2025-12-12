@@ -32,8 +32,9 @@
 			]
 		}
 	},
-	"remoteEnv": {
-		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
-	},
+  	"remoteEnv": {
+    	"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+    	"DATABASE_URL": "postgresql://db-owner:testpassword@host.docker.internal:30001/stack-app?sslmode=disable"
+  	},
 	"remoteUser": "vscode"
 }
