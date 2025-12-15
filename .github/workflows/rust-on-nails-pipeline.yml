@@ -36,36 +36,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download latest earthly
-        run: sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'
-
-      - name: Earthly version
-        run: earthly --version
-
-      - name: Build Stack CLI
-        run: earthly --allow-privileged --output --ci +stack-cli
-
-      - name: Prepare CLI artifact
-        run: |
-          set -euo pipefail
-          if [ -f "./stack-cli" ]; then
-            echo "Found stack-cli at repository root"
-            chmod +x ./stack-cli
-          else
-            SRC=$(find . -type f -name stack-cli | head -n 1 || true)
-            if [ -z "$SRC" ]; then
-              echo "stack-cli binary not found in the workspace"
-              find . -maxdepth 4 -type f -name stack-cli
-              exit 1
-            fi
-            echo "Copying stack-cli from $SRC"
-            cp "$SRC" ./stack-cli
-            chmod +x ./stack-cli
-          fi
-
-      - name: Build and push operator image (latest)
-        run: earthly --ci --push +stack-operator-image --IMAGE ${OPERATOR_IMAGE_NAME}:latest
-
       - name: Build and push DevContainer image (latest)
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
