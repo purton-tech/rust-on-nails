@@ -57,6 +57,7 @@ ARG EARTHLY_VERSION=0.8.15
 ARG DOCKER_COMPOSE_VERSION=2.23.0
 ARG POSTGRES_CLIENT_VERSION=16
 ARG K9S_VERSION=v0.50.16
+ARG STACK_VERSION=v1.1.0
 
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
@@ -167,14 +168,10 @@ RUN wget https://github.com/earthly/earthly/releases/download/v$EARTHLY_VERSION/
     && curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin \
     && mv ~/bin/just /usr/local/bin
 
-# stack CLI
-RUN RC_TAG=$( \
-      curl -s https://api.github.com/repos/stack-cli/stack-cli/releases \
-        | awk -F '"' '/"tag_name":/ {tag=$4} /"prerelease": true/ {print tag; exit}' \
-    ) \
-    && curl -OL https://github.com/stack-cli/stack-cli/releases/download/${RC_TAG}/stack-cli-linux \
+# stack CLI (fixed release)
+RUN curl -OL https://github.com/stack-cli/stack-cli/releases/download/${STACK_VERSION}/stack-cli-linux \
     && chmod +x ./stack-cli-linux \
-    && mv ./stack-cli-linux /usr/local/bin/stack
+    && sudo mv ./stack-cli-linux /usr/local/bin/stack
     
 USER $USERNAME
 
@@ -194,4 +191,3 @@ RUN cargo binstall --no-confirm cornucopia
 RUN if [ "$TARGETARCH" != "arm64" ]; then \
         cargo binstall --no-confirm clorinde; \
     fi
-
