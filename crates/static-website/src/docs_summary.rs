@@ -74,62 +74,9 @@ pub fn summary() -> Summary {
                         date: "",
                         title: "Database Access",
                         description: "Database Access",
-                        folder: "docs/database-part-1/database-access/",
+                        folder: "docs/database-part-1/clorinde/",
                         markdown: include_str!(
-                            "../content/docs/database-part-1/database-access/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                ],
-            },
-            Category {
-                name: "Common Schemas".to_string(),
-                pages: vec![
-                    Page {
-                        date: "",
-                        title: "Auth Schema",
-                        description: "Reusable authentication schema snippets",
-                        folder: "docs/common-schemas/auth/",
-                        markdown: include_str!(
-                            "../content/docs/common-schemas/auth/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Teams Schema",
-                        description: "Collaborative teams modeled inside the auth schema",
-                        folder: "docs/common-schemas/teams/",
-                        markdown: include_str!(
-                            "../content/docs/common-schemas/teams/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "RBAC Schema",
-                        description: "Roles, permissions, and helpers that build on auth.me()",
-                        folder: "docs/common-schemas/rbac/",
-                        markdown: include_str!(
-                            "../content/docs/common-schemas/rbac/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Encryption Helpers",
-                        description: "Encrypt/decrypt helpers built on pgcrypto",
-                        folder: "docs/common-schemas/encryption/",
-                        markdown: include_str!(
-                            "../content/docs/common-schemas/encryption/index.md"
+                            "../content/docs/database-part-1/clorinde/index.md"
                         ),
                         image: None,
                         author_image: None,
@@ -313,6 +260,59 @@ pub fn summary() -> Summary {
                         folder: "docs/continuous-integration/integration-testing",
                         markdown: include_str!(
                             "../content/docs/continuous-integration/integration-testing/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                ],
+            },
+            Category {
+                name: "Common Schemas".to_string(),
+                pages: vec![
+                    Page {
+                        date: "",
+                        title: "Auth Schema",
+                        description: "Reusable authentication schema snippets",
+                        folder: "docs/common-schemas/auth/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/auth/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Teams Schema",
+                        description: "Collaborative teams modeled inside the auth schema",
+                        folder: "docs/common-schemas/teams/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/teams/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "RBAC Schema",
+                        description: "Roles, permissions, and helpers that build on auth.me()",
+                        folder: "docs/common-schemas/rbac/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/rbac/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Encryption Helpers",
+                        description: "Encrypt/decrypt helpers built on pgcrypto",
+                        folder: "docs/common-schemas/encryption/",
+                        markdown: include_str!(
+                            "../content/docs/common-schemas/encryption/index.md"
                         ),
                         image: None,
                         author_image: None,
