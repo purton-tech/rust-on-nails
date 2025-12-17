@@ -7,7 +7,7 @@ We'll turn our `crates/db` folder into a crate so we can keep all our database l
 Run the following
 
 ```sh
-cargo init --lib crates/db
+cargo init --lib --vcs none crates/db
 ```
 
 ## Creating a SQL definition
