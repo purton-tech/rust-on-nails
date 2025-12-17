@@ -44,26 +44,19 @@ edition = "2024"
 
 [dependencies]
 clorinde = { version = "0.0.0", path = "../clorinde" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
 ## Testing our database crate
 
 ```rust
-/// Connection pool configuration.
-///
-/// This is just a simple example config, please look at
-/// `tokio_postgres` and `deadpool_postgres` for details.
-use clorinde::deadpool_postgres::{Config, CreatePoolError, Pool, Runtime};
-use clorinde::tokio_postgres::NoTls;
+use clorinde::{deadpool_postgres, tokio_postgres};
+use std::str::FromStr;
 
-pub async fn create_pool() -> Result<Pool, CreatePoolError> {
-    let mut cfg = Config::new();
-    cfg.user = Some(String::from("db-owner"));
-    cfg.password = Some(String::from("testpassword"));
-    cfg.host = Some(String::from("host.docker.internal"));
-    cfg.port = Some(30021);
-    cfg.dbname = Some(String::from("stack-app"));
-    cfg.create_pool(Some(Runtime::Tokio1), NoTls)
+pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
+    let config = tokio_postgres::Config::from_str(database_url).unwrap();
+    let manager = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
+    deadpool_postgres::Pool::builder(manager).build().unwrap()
 }
 
 #[cfg(test)]
@@ -72,9 +65,8 @@ mod tests {
     use clorinde::queries::users::get_users;
     #[tokio::test]
     async fn load_users() {
-        // You can learn which database connection types are compatible with Clorinde in the book
-        // https://halcyonnouveau.github.io/clorinde/using_queries/db_connections.html
-        let pool = create_pool().await.unwrap();
+        let db_url = std::env::var("DATABASE_URL").unwrap();
+        let pool = create_pool(&db_url);
         let client = pool.get().await.unwrap();
 
         // The `all` method returns queried rows collected into a `Vec`
