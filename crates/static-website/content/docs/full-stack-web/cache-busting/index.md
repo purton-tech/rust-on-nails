@@ -156,7 +156,7 @@ And update the `crates/web-pages/src/root.rs` so it includes our image.
 
 ```rust
 use crate::{layout::Layout, render};
-use db::User;
+use clorinde::queries::users::User;
 use dioxus::prelude::*;
 use web_assets::files::favicon_svg;
 
