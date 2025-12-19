@@ -6,13 +6,7 @@ We'll add this to our `web-assets` folder and then to our layout. We have pre-in
 
 ## Adding Tailwind
 
-```sh
-cd crates/web-assets
-tailwind-extra init
-```
-This will create a `tailwind.config.js` file.
-
-We also need to create a `input.css` file.
+We need to create a `crates/web-assets/input.css` file.
 
 
 ```css
@@ -54,6 +48,12 @@ let asset_dirs = vec![PathBuf::from("./images"), PathBuf::from("./dist")];
 ```
 
 Update `crates/web-pages/src/layout.rs` and change the stylesheets entry.
+
+from
+
+```rust
+tylesheets: vec![],
+```
 
 ```rust
 stylesheets: vec![web_assets::files::tailwind_css.name.to_string()],
