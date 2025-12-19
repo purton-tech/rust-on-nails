@@ -19,7 +19,7 @@ We can write this same form using Dioxus. Update `crates/web-pages/src/root.rs` 
 
 ```rust
 use crate::{layout::Layout, render};
-use db::User;
+use clorinde::queries::users::User;
 use dioxus::prelude::*;
 use web_assets::files::favicon_svg;
 
@@ -38,6 +38,7 @@ pub fn index(users: Vec<User>) -> String {
                     for user in users {
                         tr {
                             td {
+                                // 👇 We added the image
                                 img {
                                     src: favicon_svg.name,
                                     width: "16",
@@ -54,7 +55,6 @@ pub fn index(users: Vec<User>) -> String {
                     }
                 }
             }
-
             // 👇 this is our new form
             form {
                 action: "/new_user",
@@ -104,13 +104,13 @@ pub struct SignUp {
 
 // 👇 handle form submission
 pub async fn new_user_action(
-    Extension(pool): Extension<db::Pool>,
+    Extension(pool): Extension<Pool>,
     Form(form): Form<SignUp>,
 ) -> Result<Redirect, CustomError> {
     let client = pool.get().await?;
 
     let email = form.email;
-    let _ = db::queries::users::create_user()
+    let _ = clorinde::queries::users::create_user()
         .bind(&client, &email.as_str())
         .await?;
 
