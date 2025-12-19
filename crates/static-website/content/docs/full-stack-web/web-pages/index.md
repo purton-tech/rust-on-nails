@@ -19,7 +19,7 @@ cargo init --lib crates/web-pages
 cd crates/web-pages
 cargo add dioxus@0.6 --no-default-features -F macro,html,signals
 cargo add dioxus-ssr@0.6 --no-default-features
-cargo add --path ../db
+cargo add --path ../clorinde
 ```
 
 ## Creating a Layout Component
@@ -187,9 +187,8 @@ Create a file `crates/web-pages/src/root.rs`. we call it `root.rs` because it's 
 
 ```rust
 use crate::{layout::Layout, render};
-use db::User;
+use clorinde::queries::users::User;
 use dioxus::prelude::*;
-use web_assets::files::favicon_svg;
 
 pub fn index(users: Vec<User>) -> String {
     let page = rsx! {
@@ -251,11 +250,17 @@ Update `crates/web-server/src/root.rs`
 use crate::errors::CustomError;
 use axum::{response::Html, Extension};
 use web_pages::root;
+use clorinde::deadpool_postgres::Pool;
 
-pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Html<String>, CustomError> {
+pub async fn loader(
+    Extension(pool): Extension<Pool>,
+) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
 
-    let users = db::queries::users::get_users().bind(&client).all().await?;
+    let users = clorinde::queries::users::get_users()
+        .bind(&client)
+        .all()
+        .await?;
 
     let html = root::index(users);
 
