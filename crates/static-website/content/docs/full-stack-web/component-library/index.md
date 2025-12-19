@@ -6,24 +6,27 @@ And we can use [Daisy RSX](https://github.com/nails-app/daisy-rsx/) which is a c
 
 ## Install Daisy UI
 
-Update your `tailwind.config.js` so it looks like the following
+Update your `crates/web-assets/input.css` so it looks like the following
 
-```js
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["../web-pages/**/*.rs"],
-  /** We need this because we use daisy-rsx library */
-  safelist: [
-    {
-      pattern: /avatar*|alert*|modal*|btn*|menu*|dropdown*|badge*|card*|input*|select*|textarea*|label*|tab*|tooltip*|flex*|text*|overflow*/
-    }
-  ],
-  theme: {},
-  plugins: [
-    require("daisyui"),
-    require('@tailwindcss/typography')
-  ]
-}
+```css
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+@plugin "daisyui";
+
+@source '../web-pages/**/*.rs';
+@source 'typescript/**/*.ts';
+@source inline("modal modal-box modal-action");
+@source inline("breadcrumbs");
+@source inline("badge badge-neutral badge-primary badge-outline badge-secondary badge-accent badge-info badge-success badge-warning badge-error");
+@source inline("badge-md badge-sm");
+@source inline("btn btn-secondary btn-accent btn-info btn-success btn-warning btn-error btn-outline btn-dash btn-soft btn-ghost btn-link btn-active btn-disabled btn-xs btn-sm btn-md btn-lg btn-xl btn-wide btn-block btn-square btn-circle");
+@source inline("tab tabs tab-content tabs-border");
+@source inline("tooltip tooltip-info");
+@source inline("input input-border");
+@source inline("select select-border");
+@source inline("file-input");
+@source inline("dropdown dropdown-top dropdown-left");
+@source inline("fieldset fieldset-legend label");
 ```
 
 You should see the daisyUI theme being added.
@@ -279,6 +282,62 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
             }
         }
     )
+}
+```
+
+And update `crates/web-pages/root.rs` to the following
+
+```rust
+use crate::{layout::{Layout, SideBar}, render};
+use clorinde::queries::users::User;
+use dioxus::prelude::*;
+use web_assets::files::favicon_svg;
+
+pub fn index(users: Vec<User>) -> String {
+    let page = rsx! {
+        Layout {    // <-- Use our layout
+            title: "Users Table",
+            selected_item: SideBar::Users,
+            table {
+                thead {
+                    tr {
+                        th { "ID" }
+                        th { "Email" }
+                    }
+                }
+                tbody {
+                    for user in users {
+                        tr {
+                            td {
+                                // 👇 We added the image
+                                img {
+                                    src: favicon_svg.name,
+                                    width: "16",
+                                    height: "16"
+                                }
+                                strong {
+                                    "{user.id}"
+                                }
+                            }
+                            td {
+                                "{user.email}"
+                            }
+                        }
+                    }
+                }
+            }
+            // 👇 this is our new form
+            form {
+                action: "/new_user",
+                method: "POST",
+                label { r#for: "user_email", "Email:" }
+                input { id: "user_email", name: "email", r#type: "email", required: "true" }
+                button { "Submit" }
+            }
+        }
+    };
+
+    render(page)
 }
 ```
 
