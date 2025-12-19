@@ -13,6 +13,8 @@ We need to create a `crates/web-assets/input.css` file.
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@source '../web-pages/**/*.rs';
 ```
 
 ## Watching Tailwind
@@ -52,7 +54,7 @@ Update `crates/web-pages/src/layout.rs` and change the stylesheets entry.
 from
 
 ```rust
-tylesheets: vec![],
+stylesheets: vec![],
 ```
 
 ```rust
