@@ -39,7 +39,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use std::fmt;
-use db::{TokioPostgresError, PoolError};
+use clorinde::deadpool_postgres::PoolError;
+use clorinde::tokio_postgres::Error as TokioPostgresError;
 
 #[derive(Debug)]
 pub enum CustomError {
@@ -102,7 +103,7 @@ cargo add tokio@1 --no-default-features -F macros,rt-multi-thread
 cargo add tokio-util@0.7 --no-default-features -F io
 cargo add tower-livereload@0.9
 cargo add serde@1 -F "derive"
-cargo add --path ../db
+cargo add --path ../clorinde
 ```
 
 And replace your `crates/web-server/src/main.rs` with the following
@@ -115,13 +116,22 @@ mod root;
 use std::net::SocketAddr;
 
 use axum::{routing::get, Extension, Router};
+use clorinde::deadpool_postgres::Manager;
+use clorinde::tokio_postgres::NoTls;
 use tower_livereload::LiveReloadLayer;
 
 #[tokio::main]
 async fn main() {
     let config = config::Config::new();
 
-    let pool = db::create_pool(&config.database_url);
+    let pg_config: clorinde::tokio_postgres::Config = config
+        .database_url
+        .parse()
+        .expect("DATABASE_URL is invalid");
+    let manager = Manager::new(pg_config, NoTls);
+    let pool = clorinde::deadpool_postgres::Pool::builder(manager)
+        .build()
+        .expect("Failed to build database pool");
 
     // build our application with a route
     let app = Router::new()
@@ -149,12 +159,17 @@ In this example we will just return JSON for now.
 ```rust
 use crate::errors::CustomError;
 use axum::{Extension, Json};
-use db::User;
+use clorinde::{deadpool_postgres::Pool, queries::users::User};
 
-pub async fn loader(Extension(pool): Extension<db::Pool>) -> Result<Json<Vec<User>>, CustomError> {
+pub async fn loader(
+    Extension(pool): Extension<Pool>,
+) -> Result<Json<Vec<User>>, CustomError> {
     let client = pool.get().await?;
 
-    let users = db::queries::users::get_users().bind(&client).all().await?;
+    let users = clorinde::queries::users::get_users()
+        .bind(&client)
+        .all()
+        .await?;
 
     Ok(Json(users))
 }
