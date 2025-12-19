@@ -13,7 +13,7 @@ Add the code below to `crates/web-pages/src/root.rs`.
 ```rust
 use crate::{layout::{Layout, SideBar}, render};
 use daisy_rsx::*;
-use db::User;
+use clorinde::queries::users::User;
 use dioxus::prelude::*;
 use web_assets::files::favicon_svg;
 

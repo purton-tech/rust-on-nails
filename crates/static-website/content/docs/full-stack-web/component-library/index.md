@@ -14,7 +14,6 @@ Update your `crates/web-assets/input.css` so it looks like the following
 @plugin "daisyui";
 
 @source '../web-pages/**/*.rs';
-@source 'typescript/**/*.ts';
 @source inline("modal modal-box modal-action");
 @source inline("breadcrumbs");
 @source inline("badge badge-neutral badge-primary badge-outline badge-secondary badge-accent badge-info badge-success badge-warning badge-error");
@@ -27,6 +26,8 @@ Update your `crates/web-assets/input.css` so it looks like the following
 @source inline("file-input");
 @source inline("dropdown dropdown-top dropdown-left");
 @source inline("fieldset fieldset-legend label");
+@source inline("menu menu-title");
+@source inline("card card-bordered card-header card-title card-body");
 ```
 
 You should see the daisyUI theme being added.
