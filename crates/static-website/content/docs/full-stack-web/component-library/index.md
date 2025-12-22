@@ -18,7 +18,7 @@ Update your `crates/web-assets/input.css` so it looks like the following
 @source inline("breadcrumbs");
 @source inline("badge badge-neutral badge-primary badge-outline badge-secondary badge-accent badge-info badge-success badge-warning badge-error");
 @source inline("badge-md badge-sm");
-@source inline("btn btn-secondary btn-accent btn-info btn-success btn-warning btn-error btn-outline btn-dash btn-soft btn-ghost btn-link btn-active btn-disabled btn-xs btn-sm btn-md btn-lg btn-xl btn-wide btn-block btn-square btn-circle");
+@source inline("btn btn-primary btn-secondary btn-accent btn-info btn-success btn-warning btn-error btn-outline btn-dash btn-soft btn-ghost btn-link btn-active btn-disabled btn-xs btn-sm btn-md btn-lg btn-xl btn-wide btn-block btn-square btn-circle");
 @source inline("tab tabs tab-content tabs-border");
 @source inline("tooltip tooltip-info");
 @source inline("input input-border");
@@ -28,6 +28,19 @@ Update your `crates/web-assets/input.css` so it looks like the following
 @source inline("fieldset fieldset-legend label");
 @source inline("menu menu-title");
 @source inline("card card-bordered card-header card-title card-body");
+
+/** 
+    An example of changing the style of an exiting component.
+**/
+.card {
+    @apply bg-base-100 border border-base-300;
+    > .card-header {
+        @apply border-b border-base-300 p-4
+    }
+    > .card-body {
+        @apply p-4;
+    }
+}
 ```
 
 You should see the daisyUI theme being added.

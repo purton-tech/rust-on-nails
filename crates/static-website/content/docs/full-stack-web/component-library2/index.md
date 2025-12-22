@@ -28,7 +28,7 @@ pub fn index(users: Vec<User>) -> String {
                 description: "This is just the beginning",
             }
             Card {
-                class: "card-bordered mt-12 has-data-table",
+                class: "card-border mt-12 has-data-table",
                 CardHeader {
                     class: "p-3 border-b",
                     title: "Users"
@@ -62,7 +62,7 @@ pub fn index(users: Vec<User>) -> String {
             }
 
             Card {
-                class: "card-bordered mt-12",
+                class: "card-border mt-12",
                 CardHeader {
                     class: "p-3 border-b",
                     title: "Add User"
