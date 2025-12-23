@@ -190,5 +190,5 @@ RUN cargo binstall --no-confirm cornucopia
 
 RUN if [ "$TARGETARCH" != "arm64" ]; then \
         cargo binstall --no-confirm clorinde; \
-        cargo binstall --no-confirm wasm-bindgen; \
+        cargo binstall --no-confirm wasm-bindgen-cli; \
     fi
