@@ -32,23 +32,118 @@ It's a big one as I've added some styling which we won't use until later.
 
 ```rust
 #![allow(non_snake_case)]
+use daisy_rsx::*;
 use dioxus::prelude::*;
+use web_assets::files::*;
 
-#[component]
-pub fn Layout(title: String, children: Element) -> Element {
-    rsx! {
-        BaseLayout { 
-            title,
-            stylesheets: vec![],
-            header: rsx!(),
-            sidebar: rsx!(),
-            sidebar_header: rsx!(),
-            sidebar_footer: rsx!(),
-            children,
-        }
+#[derive(PartialEq, Clone, Eq, Debug)]
+pub enum SideBar {
+    Users,
+}
+
+impl std::fmt::Display for SideBar {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        std::fmt::Debug::fmt(self, f)
     }
 }
 
+#[component]
+pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Element {
+    rsx! {
+        BaseLayout {
+            title,
+            //web_assembly: (
+            //    web_assets::statics::web_islands_js.name.into(),
+            //    web_assets::statics::web_islands_bg_wasm.name.into()
+            //),
+            stylesheets: vec![tailwind_css.name.to_string()],
+            header: rsx!(
+                nav {
+                    aria_label: "breadcrumb",
+                    ol {
+                        class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
+                        li {
+                            class: "ml-3 items-center gap-1.5 hidden md:block",
+                            "Your Application"
+                        }
+                        li {
+                            ">"
+                        }
+                        li {
+                            "Users"
+                        }
+                    }
+                }
+            ),
+            sidebar: rsx!(
+                NavGroup {
+                    heading: "Your Menu",
+                    content:  rsx!(
+                        NavItem {
+                            id: SideBar::Users.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: "/",
+                            icon: favicon_svg.name,
+                            title: "Users"
+                        }
+                    )
+                }
+            ),
+            sidebar_header: rsx!(
+                div {
+                    class: "flex aspect-square size-8 items-center justify-center rounded-lg bg-neutral text-neutral-content",
+                    svg {
+                        xmlns: "http://www.w3.org/2000/svg",
+                        width: "24",
+                        height: "24",
+                        view_box: "0 0 24 24",
+                        fill: "none",
+                        stroke: "currentColor",
+                        stroke_width: "2",
+                        stroke_linecap: "round",
+                        stroke_linejoin: "round",
+                        class: "lucide lucide-gallery-vertical-end size-4",
+                        path {
+                            d: "M7 2h10",
+                        }
+                        path {
+                            d: "M5 6h14",
+                        }
+                        rect {
+                            width: "18",
+                            height: "12",
+                            x: "3",
+                            y: "10",
+                            rx: "2",
+                        }
+                    }
+                }
+                div {
+                    class: "ml-3 flex flex-col gap-0.5 leading-none",
+                    span {
+                        class: "font-semibold uppercase",
+                        "Your Application"
+                    }
+                    span {
+                        class: "",
+                        "v1.0.1"
+                    }
+                }
+            ),
+            sidebar_footer: rsx!(
+                div {
+                    class: "text-center text-sm",
+                    "data-alert": "",
+                    "You can place items at the bottom"
+                }
+            ),
+            div {
+                class: "px-4 h-full",
+                {children}
+            }
+        }
+    }
+}
 
 #[derive(Props, Clone, PartialEq)]
 pub struct BaseLayoutProps {
@@ -56,6 +151,7 @@ pub struct BaseLayoutProps {
     fav_icon_src: Option<String>,
     stylesheets: Vec<String>,
     js_href: Option<String>,
+    web_assembly: Option<(String, String)>,
     header: Element,
     children: Element,
     sidebar: Element,
@@ -64,6 +160,16 @@ pub struct BaseLayoutProps {
 }
 
 pub fn BaseLayout(props: BaseLayoutProps) -> Element {
+    // Do we need to handle web assembly?
+    let hydrate: Option<String> = if let Some((js, wasm)) = props.web_assembly {
+        Some(format!(
+            "import init, {{ hydrate }} from '{}'; await init('{}');hydrate();",
+            js, wasm
+        ))
+    } else {
+        None
+    };
+
     rsx!(
         head {
             title {
@@ -98,6 +204,12 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                     rel: "icon",
                     "type": "image/svg+xml",
                     href: "{fav_icon_src}"
+                }
+            }
+            if let Some(hydrate) = hydrate {
+                script {
+                    "type": "module",
+                    dangerous_inner_html: hydrate
                 }
             }
         }

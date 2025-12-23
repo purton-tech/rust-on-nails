@@ -167,21 +167,11 @@ pub fn summary() -> Summary {
                     },
                     Page {
                         date: "",
-                        title: "HTMX and Interactivity",
-                        description: "HTMX and Interactivity",
-                        folder: "docs/full-stack-web/htmx",
-                        markdown: include_str!("../content/docs/full-stack-web/htmx/index.md"),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "More Interactivity (Webassembly)",
-                        description: "More Interactivity (Webassembly)",
-                        folder: "docs/full-stack-web/more-interactivity",
+                        title: "Web Islands (Webassembly)",
+                        description: "Web Islands (Webassembly)",
+                        folder: "docs/full-stack-web/web-islands",
                         markdown: include_str!(
-                            "../content/docs/full-stack-web/more-interactivity/index.md"
+                            "../content/docs/full-stack-web/web-islands/index.md"
                         ),
                         image: None,
                         author_image: None,
@@ -189,11 +179,11 @@ pub fn summary() -> Summary {
                     },
                     Page {
                         date: "",
-                        title: "More Interactivity (Typescript)",
-                        description: "More Interactivity (Typescript)",
-                        folder: "docs/full-stack-web/more-interactivity-ts",
+                        title: "Web Islands (Typescript)",
+                        description: "Web Islands (Typescript)",
+                        folder: "docs/full-stack-web/web-islands-ts",
                         markdown: include_str!(
-                            "../content/docs/full-stack-web/more-interactivity-ts/index.md"
+                            "../content/docs/full-stack-web/web-islands-ts/index.md"
                         ),
                         image: None,
                         author_image: None,

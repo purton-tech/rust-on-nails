@@ -1,6 +1,8 @@
 ## Build (Doesn't work)
 
+```sh
 docker build --build-arg TARGETARCH=amd64 --build-arg BUILDPLATFORM=linux/amd64 .
+```
 
 ## Run the Arm image
 
