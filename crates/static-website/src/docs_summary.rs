@@ -221,7 +221,19 @@ pub fn summary() -> Summary {
                 pages: vec![
                     Page {
                         date: "",
-                        title: "Build Our Containers",
+                        title: "Build Our Containers (Dagger)",
+                        description: "Build Our Containers",
+                        folder: "docs/continuous-integration/dagger",
+                        markdown: include_str!(
+                            "../content/docs/continuous-integration/dagger/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Build Our Containers (Earthly)",
                         description: "Build Our Containers",
                         folder: "docs/continuous-integration/build",
                         markdown: include_str!(

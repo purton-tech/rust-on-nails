@@ -18,7 +18,7 @@ Create an Earthfile with the below contents.
 VERSION 0.6
 
 # We use our devcontainer as it has all the tools we need
-FROM purtontech/rust-on-nails-devcontainer:1.1.2
+FROM purtontech/rust-on-nails-devcontainer:1.3.36
 
 ARG APP_NAME=app
 ARG APP_FOLDER=app
