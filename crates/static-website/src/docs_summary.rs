@@ -233,6 +233,18 @@ pub fn summary() -> Summary {
                     },
                     Page {
                         date: "",
+                        title: "Release Automation",
+                        description: "Versioned releases with semantic commits",
+                        folder: "docs/continuous-integration/release",
+                        markdown: include_str!(
+                            "../content/docs/continuous-integration/release/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
                         title: "Integration Testing",
                         description: "Integration Testing",
                         folder: "docs/continuous-integration/integration-testing",

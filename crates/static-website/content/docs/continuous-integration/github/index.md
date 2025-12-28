@@ -1,8 +1,6 @@
 # Running CI on Github
 
-We develop and test our CI pipeline with Earthly, then we can create a Github Action to trigger our earthly build.
-
-Create a file `.github/workflows/ci.yml` and add the following
+We describe our container build in Rust with [Dagger](../dagger/), so GitHub only needs to run the pipeline binary (`cargo run -p infrastructure`) to exercise the full stack in CI. Create `.github/workflows/ci.yml` with the workflow below.
 
 ## Github Action
 
@@ -10,10 +8,10 @@ Create a file `.github/workflows/ci.yml` and add the following
 name: CI
 
 on:
-  push:
-    branches: 
+  push: # build verification for commits landing on main
+    branches:
       - main
-  pull_request:
+  pull_request: # build verification for PRs that target main
     branches:
       - main
 
@@ -21,51 +19,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
     env:
       FORCE_COLOR: 1
     steps:
-    - uses: earthly/actions/setup-earthly@v1
-      with:
-        version: v0.6.0
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v4
 
-    - name: Put back the git branch into git (Earthly uses it for tagging)
-      run: |
-        branch=""
-        if [ -n "$GITHUB_HEAD_REF" ]; then
-          branch="$GITHUB_HEAD_REF"
-        else
-          branch="${GITHUB_REF##*/}"
-        fi
-        git checkout -b "$branch" || true
-
-    - name: Log in to the Container registry
-      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Earthly version
-      run: earthly --version
-
-    - name: Run build
-      # Allow privelaged is required to run docker in docker
-      run: earthly --allow-privileged +all
-
-    - name: Tag and Push Images
-      run: |
-        docker tag rustonnails/app ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
-        docker tag rustonnails/app-migrations ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-migrations
-        docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
-        docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-migrations:latest
+    - name: Run build pipeline # reuses the Dagger build code from the infrastructure crate
+      run: cargo run --release -p infrastructure -- build
 ```
 
-This will run our earthly build and push our docker images to the Github Container Registry.
-
-The images will be renamed to match your Github organisation and project.
+- The workflow checks the repo out and runs on both pushes to `main` and pull requests targeting `main`.
+- It runs the Rust pipeline from [Build Our Containers (Dagger)](../dagger/) directly with `cargo run -- build` so every CI run compiles the web server, WASM artifacts, and Tailwind output.
+- Because this workflow is purely for verification, it never authenticates to registries or publishes artifacts—those steps live in the dedicated release workflow.
 
 ## Packages
 
