@@ -72,8 +72,8 @@ pub fn summary() -> Summary {
                     },
                     Page {
                         date: "",
-                        title: "Database Access",
-                        description: "Database Access",
+                        title: "Database Code Generation",
+                        description: "Database Code Generation",
                         folder: "docs/database-part-1/clorinde/",
                         markdown: include_str!(
                             "../content/docs/database-part-1/clorinde/index.md"
@@ -177,18 +177,6 @@ pub fn summary() -> Summary {
                         author_image: None,
                         author: None,
                     },
-                    Page {
-                        date: "",
-                        title: "Web Islands (Typescript)",
-                        description: "Web Islands (Typescript)",
-                        folder: "docs/full-stack-web/web-islands-ts",
-                        markdown: include_str!(
-                            "../content/docs/full-stack-web/web-islands-ts/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
                 ],
             },
             Category {
@@ -226,18 +214,6 @@ pub fn summary() -> Summary {
                         folder: "docs/continuous-integration/dagger",
                         markdown: include_str!(
                             "../content/docs/continuous-integration/dagger/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Build Our Containers (Earthly)",
-                        description: "Build Our Containers",
-                        folder: "docs/continuous-integration/build",
-                        markdown: include_str!(
-                            "../content/docs/continuous-integration/build/index.md"
                         ),
                         image: None,
                         author_image: None,
@@ -430,6 +406,35 @@ pub fn summary() -> Summary {
                     author_image: None,
                     author: None,
                 }],
+            },
+            Category {
+                name: "Deprecated".to_string(),
+                pages: vec![
+                    Page {
+                        date: "",
+                        title: "Build Our Containers (Earthly)",
+                        description: "Build Our Containers",
+                        folder: "docs/continuous-integration/build",
+                        markdown: include_str!(
+                            "../content/docs/continuous-integration/build/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Web Islands (Typescript)",
+                        description: "Web Islands (Typescript)",
+                        folder: "docs/full-stack-web/web-islands-ts",
+                        markdown: include_str!(
+                            "../content/docs/full-stack-web/web-islands-ts/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                ],
             },
         ],
     }

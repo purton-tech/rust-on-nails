@@ -1,4 +1,4 @@
-# Database Access
+# Database Code Generation
 
 [Clorinde](https://github.com/halcyonnouveau/clorinde) is a code generator that takes small snippets of SQL and turns them into Rust functions.
 
