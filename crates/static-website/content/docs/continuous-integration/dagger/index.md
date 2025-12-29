@@ -24,12 +24,6 @@ const DB_NAME: &str = "postgres";
 #[command(name = "infrastructure")]
 #[command(about = "Dagger pipeline for migrations and the web server")]
 struct Cli {
-    /// Optional tag to publish the migration image (e.g. docker-daemon:local/dbmate:latest)
-    #[arg(long)]
-    migrations_tag: Option<String>,
-    /// Optional tag to publish the web image (e.g. docker-daemon:local/web:latest)
-    #[arg(long)]
-    web_tag: Option<String>,
     #[command(subcommand)]
     command: Commands,
 }
@@ -37,7 +31,14 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Build the migration and web containers
-    Build,
+    Build {
+        /// Optional tag to publish the migration image (e.g. docker-daemon:local/dbmate:latest)
+        #[arg(long)]
+        migrations_tag: Option<String>,
+        /// Optional tag to publish the web image (e.g. docker-daemon:local/web:latest)
+        #[arg(long)]
+        web_tag: Option<String>,
+    },
 }
 
 #[tokio::main]
@@ -45,14 +46,17 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Build => {
+        Commands::Build {
+            migrations_tag,
+            web_tag,
+        } => {
             let database_url = default_database_url();
             dagger_sdk::connect(|client| async move {
                 run_build(
                     &client,
                     &database_url,
-                    cli.migrations_tag.as_deref(),
-                    cli.web_tag.as_deref(),
+                    migrations_tag.as_deref(),
+                    web_tag.as_deref(),
                 )
                 .await
                 .map_err(|e| eyre!(e))?;
@@ -83,7 +87,6 @@ async fn run_build(
     let devcontainer_ctx = client.host().directory(".devcontainer");
 
     let postgres = postgres_service(client);
-    run_migrations(client, &pipeline_db_url, &postgres).await?;
 
     let dev_image = devcontainer_ctx.docker_build_opts(
         DirectoryDockerBuildOptsBuilder::default()
@@ -96,8 +99,10 @@ async fn run_build(
         .with_workdir("/workspace")
         .with_user("root")
         .with_service_binding("postgres", postgres.clone())
+        .with_env_variable("DBMATE_MIGRATIONS_DIR", "/workspace/crates/db/migrations")
         .with_env_variable("DATABASE_URL", pipeline_db_url.clone());
 
+    let builder = run_migrations(builder);
     let builder = generate_client_and_assets(builder, &pipeline_db_url);
     let builder = compile_web_server(builder);
 
@@ -214,39 +219,15 @@ fn postgres_service(client: &Query) -> Service {
         .as_service()
 }
 
-async fn run_migrations(client: &Query, database_url: &str, postgres: &Service) -> Result<()> {
-    let migration_root = client.host().directory("crates/db");
-
-    client
-        .container()
-        .from("ghcr.io/amacneil/dbmate:2")
-        .with_workdir("/db")
-        .with_directory("/db", migration_root)
-        .with_env_variable("DATABASE_URL", database_url)
-        .with_service_binding("postgres", postgres.clone())
-        .with_exec(vec!["ls", "-l", "/db/migrations"])
+fn run_migrations(builder: Container) -> Container {
+    builder
+        .with_exec(vec!["ls", "-l", "crates/db/migrations"])
         .with_exec(vec![
             "dbmate",
-            "-d",
-            "/db/migrations",
-            "-u",
-            database_url,
-            "wait",
-        ])
-        .with_exec(vec![
-            "dbmate",
-            "-d",
-            "/db/migrations",
-            "-u",
-            database_url,
             "up",
         ])
         .with_exec(vec![
             "dbmate",
-            "-d",
-            "/db/migrations",
-            "-u",
-            database_url,
             "status",
         ])
         .with_exec(vec![
@@ -254,10 +235,6 @@ async fn run_migrations(client: &Query, database_url: &str, postgres: &Service) 
             "-c",
             "psql \"$DATABASE_URL\" -Atc \"select to_regclass('public.accounts')\" | grep -q accounts",
         ])
-        .sync()
-        .await?;
-
-    Ok(())
 }
 
 fn default_database_url() -> String {

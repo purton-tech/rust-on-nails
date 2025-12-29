@@ -11,9 +11,6 @@ name: Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   get-version:
