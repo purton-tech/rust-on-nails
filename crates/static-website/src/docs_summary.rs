@@ -258,6 +258,35 @@ pub fn summary() -> Summary {
                 ],
             },
             Category {
+                name: "Continuous Deliver / Deployment".to_string(),
+                pages: vec![
+                    Page {
+                        date: "",
+                        title: "Deploying to Kubernetes",
+                        description: "Deploying to Kubernetes",
+                        folder: "docs/continous-deployment/kubernetes",
+                        markdown: include_str!(
+                            "../content/docs/continous-deployment/kubernetes/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Cloudflare as Ingress",
+                        description: "Cloudflare as Ingress",
+                        folder: "docs/continous-deployment/cloudflare",
+                        markdown: include_str!(
+                            "../content/docs/continous-deployment/cloudflare/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                ],
+            },
+            Category {
                 name: "Common Schemas".to_string(),
                 pages: vec![
                     Page {
@@ -352,59 +381,6 @@ pub fn summary() -> Summary {
                 ],
             },
             Category {
-                name: "Continuous Deliver / Deployment".to_string(),
-                pages: vec![
-                    Page {
-                        date: "",
-                        title: "Deployed Application Topology",
-                        description: "Understand the operator-managed workloads",
-                        folder: "docs/continous-deployment/deployment-architecture",
-                        markdown: include_str!(
-                            "../content/docs/continous-deployment/deployment-architecture/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Deploying to Kubernetes",
-                        description: "Deploying to Kubernetes",
-                        folder: "docs/continous-deployment/kubernetes",
-                        markdown: include_str!(
-                            "../content/docs/continous-deployment/kubernetes/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Infrastructure as Code",
-                        description: "Infrastructure as Code",
-                        folder: "docs/continous-deployment/infra-as-code",
-                        markdown: include_str!(
-                            "../content/docs/continous-deployment/infra-as-code/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "Cloudflare as Ingress",
-                        description: "Cloudflare as Ingress",
-                        folder: "docs/continous-deployment/cloudflare",
-                        markdown: include_str!(
-                            "../content/docs/continous-deployment/cloudflare/index.md"
-                        ),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                ],
-            },
-            Category {
                 name: "Database Part II".to_string(),
                 pages: vec![Page {
                     date: "",
@@ -441,6 +417,18 @@ pub fn summary() -> Summary {
                         folder: "docs/full-stack-web/web-islands-ts",
                         markdown: include_str!(
                             "../content/docs/full-stack-web/web-islands-ts/index.md"
+                        ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "Infrastructure as Code",
+                        description: "Infrastructure as Code",
+                        folder: "docs/continous-deployment/infra-as-code",
+                        markdown: include_str!(
+                            "../content/docs/continous-deployment/infra-as-code/index.md"
                         ),
                         image: None,
                         author_image: None,
