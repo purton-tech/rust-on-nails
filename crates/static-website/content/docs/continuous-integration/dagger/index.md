@@ -221,6 +221,11 @@ fn run_migrations(builder: Container) -> Container {
     builder
         .with_exec(vec!["ls", "-l", "crates/db/migrations"])
         .with_exec(vec![
+            "sh",
+            "-c",
+            "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 <<'SQL'\nDO $$\nBEGIN\n    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'application_user') THEN\n        CREATE ROLE application_user LOGIN PASSWORD 'testpassword';\n    END IF;\nEND\n$$;\nSQL",
+        ])
+        .with_exec(vec![
             "dbmate",
             "up",
         ])
