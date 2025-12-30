@@ -13,7 +13,6 @@ use dagger_sdk::{
     Container, DirectoryDockerBuildOptsBuilder, HostDirectoryOptsBuilder, Query, Service,
 };
 use eyre::eyre;
-use url::Url;
 
 const POSTGRES_IMAGE: &str = "postgres:16-alpine";
 const DB_PASSWORD: &str = "password";
@@ -75,7 +74,6 @@ async fn run_build(
     migrations_tag: Option<&str>,
     web_tag: Option<&str>,
 ) -> Result<()> {
-    let pipeline_db_url = pipeline_database_url(database_url);
 
     let workspace = client.host().directory_opts(
         ".",
@@ -100,10 +98,10 @@ async fn run_build(
         .with_user("root")
         .with_service_binding("postgres", postgres.clone())
         .with_env_variable("DBMATE_MIGRATIONS_DIR", "/workspace/crates/db/migrations")
-        .with_env_variable("DATABASE_URL", pipeline_db_url.clone());
+        .with_env_variable("DATABASE_URL", database_url);
 
     let builder = run_migrations(builder);
-    let builder = generate_client_and_assets(builder, &pipeline_db_url);
+    let builder = generate_client_and_assets(builder, &database_url);
     let builder = compile_web_server(builder);
 
     build_migration_container(client, migrations_tag).await?;
@@ -239,23 +237,5 @@ fn run_migrations(builder: Container) -> Container {
 
 fn default_database_url() -> String {
     format!("postgres://{DB_USER}:{DB_PASSWORD}@postgres:5432/{DB_NAME}?sslmode=disable")
-}
-
-fn pipeline_database_url(original: &str) -> String {
-    if let Ok(mut parsed) = Url::parse(original) {
-        if let Some(host) = parsed.host_str() {
-            if matches!(
-                host,
-                "host.docker.internal" | "localhost" | "127.0.0.1" | "::1"
-            ) {
-                let _ = parsed.set_host(Some("postgres"));
-                // Always point to the service port exposed in the pipeline.
-                let _ = parsed.set_port(Some(5432));
-            }
-        }
-        parsed.to_string()
-    } else {
-        original.to_string()
-    }
 }
 ```
