@@ -97,8 +97,8 @@ impl From<PoolError> for CustomError {
 Make sure you're in the `crates/web-server` folder and add Axum to your `Cargo.toml` using the following command.
 
 ```sh
-cargo add axum@0.7 --no-default-features -F json,http1,tokio
-cargo add axum-extra@0.9 -F form,typed-routing
+cargo add axum@0.8 --no-default-features -F json,http1,tokio
+cargo add axum-extra@0.10 -F form,typed-routing
 cargo add tokio@1 --no-default-features -F macros,rt-multi-thread,fs
 cargo add tokio-util@0.7 --no-default-features -F io
 cargo add tower-livereload@0.9

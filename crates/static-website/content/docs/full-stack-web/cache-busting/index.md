@@ -85,7 +85,7 @@ use tokio_util::io::ReaderStream;
 use web_assets::files::StaticFile;
 
 #[derive(TypedPath, Deserialize)]
-#[typed_path("/static/*path")]
+#[typed_path("/static/{*path}")]
 pub struct StaticFilePath {
     pub path: String,
 }
@@ -132,13 +132,14 @@ pub async fn static_path(StaticFilePath { path }: StaticFilePath) -> impl IntoRe
 And add the following route in `crates/web-server/src/main.rs` in the section where we defined our routes.
 
 ```rust
-.route("/static/*path", get(static_files::static_path))
+.typed_get(static_files::static_path)
 ```
 
 And change the `mod` section so it includes the following.
 
 ```rust
 mod static_files;
+use axum_extra::routing::RouterExt;
 ```
 
 ## Using our image
