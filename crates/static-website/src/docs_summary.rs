@@ -177,27 +177,14 @@ pub fn summary() -> Summary {
                         author_image: None,
                         author: None,
                     },
-                ],
-            },
-            Category {
-                name: "Adding an API".to_string(),
-                pages: vec![
                     Page {
                         date: "",
-                        title: "Integrating gRPC",
-                        description: "Integrating gRPC",
-                        folder: "docs/api/grpc",
-                        markdown: include_str!("../content/docs/api/grpc/index.md"),
-                        image: None,
-                        author_image: None,
-                        author: None,
-                    },
-                    Page {
-                        date: "",
-                        title: "gRPC Web",
-                        description: "gRPC Web",
-                        folder: "docs/api/grpc-web",
-                        markdown: include_str!("../content/docs/api/grpc-web/index.md"),
+                        title: "Authentication",
+                        description: "Authentication",
+                        folder: "docs/full-stack-web/authentication",
+                        markdown: include_str!(
+                            "../content/docs/full-stack-web/authentication/index.md"
+                        ),
                         image: None,
                         author_image: None,
                         author: None,
@@ -280,6 +267,31 @@ pub fn summary() -> Summary {
                         markdown: include_str!(
                             "../content/docs/continous-deployment/cloudflare/index.md"
                         ),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                ],
+            },
+            Category {
+                name: "Adding an API".to_string(),
+                pages: vec![
+                    Page {
+                        date: "",
+                        title: "Integrating gRPC",
+                        description: "Integrating gRPC",
+                        folder: "docs/api/grpc",
+                        markdown: include_str!("../content/docs/api/grpc/index.md"),
+                        image: None,
+                        author_image: None,
+                        author: None,
+                    },
+                    Page {
+                        date: "",
+                        title: "gRPC Web",
+                        description: "gRPC Web",
+                        folder: "docs/api/grpc-web",
+                        markdown: include_str!("../content/docs/api/grpc-web/index.md"),
                         image: None,
                         author_image: None,
                         author: None,
