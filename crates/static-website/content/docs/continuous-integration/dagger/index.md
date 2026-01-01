@@ -1,6 +1,6 @@
 # Dagger
 
-[https://dagger.io](Dagger) allows us to define our build using Rust. It's also based around docker so we can re-use our devcontainer.
+[Dagger](https://dagger.io) allows us to define our build using Rust. It's also based around docker so we can re-use our devcontainer.
 
 ## The Prompt
 
