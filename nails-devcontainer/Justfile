@@ -5,7 +5,7 @@ dev-init:
 
 dev-setup:
     stack init
-    stack install --manifest stack.dev.yaml
+    stack deploy --manifest stack.yaml --profile dev
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:

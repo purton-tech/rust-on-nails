@@ -1,0 +1,21 @@
+apiVersion: stack-cli.dev/v1
+kind: StackApp
+metadata:
+  name: stack-app
+  namespace: stack-demo
+spec:
+  components:
+    db: {}
+  profiles:
+    dev:
+      components:
+        ingress:
+          port: 30000
+        db:
+          expose_db_port: 30001
+          danger_override_password: testpassword
+  services:
+    web:
+      image: mendhak/http-https-echo:latest
+      port: 8080
+      database_url: DATABASE_URL
