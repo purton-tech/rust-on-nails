@@ -57,7 +57,7 @@ ARG EARTHLY_VERSION=0.8.15
 ARG DOCKER_COMPOSE_VERSION=2.23.0
 ARG POSTGRES_CLIENT_VERSION=16
 ARG K9S_VERSION=v0.50.16
-ARG STACK_VERSION=v1.1.13
+ARG STACK_VERSION=v1.1.14
 
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
