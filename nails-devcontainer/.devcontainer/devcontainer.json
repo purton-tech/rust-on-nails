@@ -4,19 +4,15 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-
   "runArgs": [
     "--add-host=host.docker.internal:host-gateway"
   ],
-
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
-
   // Mount the project at /workspace like before
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-
   // Gives access to the ssh keys on the host for git operations.
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
@@ -40,10 +36,8 @@
     }
   },
   "remoteEnv": {
-    "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
-    "SUPERUSER_DATABASE_URL": "postgresql://db-owner:testpassword@host.docker.internal:30051/stack-app?sslmode=disable",
-    "DATABASE_URL": "postgresql://application_user:testpassword@host.docker.internal:30051/stack-app?sslmode=disable",
-    "DEVELOPMENT": "true"
+    "HOST_PROJECT_PATH": "${localWorkspaceFolder}"
   },
+  "postCreateCommand": "chmod +x /workspace/.devcontainer/setup-env.sh && /workspace/.devcontainer/setup-env.sh",
   "remoteUser": "vscode"
 }
