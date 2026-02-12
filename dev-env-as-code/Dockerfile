@@ -1,5 +1,7 @@
+ARG RUST_IMAGE=rust:1.93.0-slim-trixie
+
 # Do all the cargo install stuff
-FROM rust:slim-bookworm as builder
+FROM ${RUST_IMAGE} as builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -43,7 +45,7 @@ RUN case "${TARGETARCH}" in \
     && cp cargo-binstall /usr/local/cargo/bin/ \
     && rm cargo-binstall-${ARCH}.tgz
 
-FROM rust:slim-bookworm
+FROM ${RUST_IMAGE}
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -59,6 +61,8 @@ ARG POSTGRES_CLIENT_VERSION=16
 ARG K9S_VERSION=v0.50.16
 ARG STACK_VERSION=v1.1.14
 
+ARG NODE_MAJOR=24
+ARG PNPM_VERSION=10.29.3
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
@@ -89,8 +93,6 @@ RUN apt-get update && \
         musl \
         musl-dev \
         musl-tools \
-        nodejs \
-        npm \
         protobuf-compiler \
         software-properties-common \
         ssh \
@@ -100,6 +102,18 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/* \
+
+    # Nodejs and pnpm
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+    | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" \
+    > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && corepack enable \
+    && corepack prepare pnpm@${PNPM_VERSION} --activate \
+    && node -v && npm -v && pnpm -v \
 
     # Docker Engine for Earthly. https://docs.docker.com/engine/install/debian/
     && install -m 0755 -d /etc/apt/keyrings \
