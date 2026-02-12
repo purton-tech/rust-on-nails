@@ -82,8 +82,11 @@ RUN apt-get update && \
         gnupg \
         gnupg-agent \
         curl && \
-    echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg && \
+    chmod a+r /etc/apt/keyrings/postgresql.gpg && \
+    . /etc/os-release && \
+    echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $VERSION_CODENAME-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         apt-transport-https \
@@ -94,7 +97,6 @@ RUN apt-get update && \
         musl-dev \
         musl-tools \
         protobuf-compiler \
-        software-properties-common \
         ssh \
         sudo \
         wget \
@@ -102,7 +104,6 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/* \
-
     # Nodejs and pnpm
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
@@ -114,12 +115,10 @@ RUN apt-get update && \
     && corepack enable \
     && corepack prepare pnpm@${PNPM_VERSION} --activate \
     && node -v && npm -v && pnpm -v \
-
     # Docker Engine for Earthly. https://docs.docker.com/engine/install/debian/
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
     && chmod a+r /etc/apt/keyrings/docker.gpg \
-    && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
     && echo \
         "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
         "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
@@ -127,12 +126,10 @@ RUN apt-get update && \
     && apt-get -y update \
     && apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io \
     && apt-get autoremove -y && apt-get clean -y \
-
     # Tailwind binary + extra
     && curl -OL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 \
     && chmod +x tailwindcss-extra-linux-x64 \
     && mv tailwindcss-extra-linux-x64 /usr/local/bin/tailwind-extra \
-        
     # Rainfrog (latest)
     && curl -s https://api.github.com/repos/achristmascarl/rainfrog/releases/latest \
       | grep "browser_download_url.*x86_64-unknown-linux-musl.tar.gz" \
@@ -142,7 +139,6 @@ RUN apt-get update && \
     && chmod +x rainfrog \
     && mv rainfrog /usr/local/bin/rainfrog \
     && rm rainfrog-*-x86_64-unknown-linux-musl.tar.gz \
-
     # Create a non-root user
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
