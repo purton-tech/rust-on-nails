@@ -55,8 +55,10 @@ How you folder structure will look.
     ├── devcontainer.json
     ├── docker-compose.yml
     └── Dockerfile
-└── .gitignore
-└── README.md
+├── .gitignore
+├── AGENTS.md
+├── README.md
+└── stack.yaml
 ```
 
 ## Setting up Git
