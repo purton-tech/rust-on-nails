@@ -48,6 +48,7 @@ How you folder structure will look.
 
 ```sh
 .
+├── AGENTS.md
 └── .devcontainer/
     ├── .bash_aliases
     ├── .githooks/
@@ -56,7 +57,7 @@ How you folder structure will look.
     ├── docker-compose.yml
     └── Dockerfile
 ├── .gitignore
-├── AGENTS.md
+├── Justfile
 ├── README.md
 └── stack.yaml
 ```

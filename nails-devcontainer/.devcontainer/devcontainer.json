@@ -10,7 +10,10 @@
   ],
 
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      // https://github.com/devcontainers/features/issues/1466
+      "moby": false
+    }
   },
 
   // Mount the project at /workspace like before
