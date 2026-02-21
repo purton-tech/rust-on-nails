@@ -4,22 +4,18 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-
   "runArgs": [
     "--add-host=host.docker.internal:host-gateway"
   ],
-
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       // https://github.com/devcontainers/features/issues/1466
       "moby": false
     }
   },
-
   // Mount the project at /workspace like before
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-
   // Gives access to the ssh keys on the host for git operations.
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
@@ -45,5 +41,6 @@
   "remoteEnv": {
     "HOST_PROJECT_PATH": "${localWorkspaceFolder}"
   },
+  "postCreateCommand": "chmod +x /workspace/.devcontainer/setup-env.sh && /workspace/.devcontainer/setup-env.sh",
   "remoteUser": "vscode"
 }
