@@ -48,6 +48,7 @@ How you folder structure will look.
 
 ```sh
 .
+├── AGENTS.md
 └── .devcontainer/
     ├── .bash_aliases
     ├── .githooks/
@@ -55,8 +56,10 @@ How you folder structure will look.
     ├── devcontainer.json
     ├── docker-compose.yml
     └── Dockerfile
-└── .gitignore
-└── README.md
+├── .gitignore
+├── Justfile
+├── README.md
+└── stack.yaml
 ```
 
 ## Setting up Git
