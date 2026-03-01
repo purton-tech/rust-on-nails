@@ -5,7 +5,10 @@ dev-init:
 
 dev-setup:
     stack init
-    stack deploy --manifest stack.yaml --profile dev
+    stack deploy --manifest infra-as-code/stack.yaml --profile dev
+
+dev-secrets:
+    stack secrets --manifest infra-as-code/stack.yaml --db-host host.docker.internal --db-port 30061 >> .env
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
