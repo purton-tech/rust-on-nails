@@ -6,7 +6,10 @@
   },
 
   "runArgs": [
-    "--add-host=host.docker.internal:host-gateway"
+    "--add-host=host.docker.internal:host-gateway",
+    // Without the next 2 lines, codex can't run bubblewrap
+    "--security-opt=seccomp=unconfined",
+    "--security-opt=apparmor=unconfined"
   ],
 
   "features": {
