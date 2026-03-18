@@ -43,7 +43,15 @@
     }
   },
   "remoteEnv": {
-    "HOST_PROJECT_PATH": "${localWorkspaceFolder}"
+    "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+    // If you call the bash alias `gitsetup` it will use these to set your git config.
+    // It's probably good advice to use a github no reply for the emial i.e. <github-username>@users.noreply.github.com
+    // Then all your commits will be associated with the correct account.
+    "EMAIL": "${localEnv:EMAIL}",
+    "NAME": "${localEnv:NAME}",
+    // Psql (via perl) always complains about locales. This makes that go away.
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8"
   },
   "remoteUser": "vscode"
 }

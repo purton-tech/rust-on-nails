@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Generate the typed query crate against the repo's configured database.
+source /workspace/scripts/dev-env
+
+clorinde live -q /workspace/crates/db/queries -d /workspace/crates/db-gen "$@"
+cargo fmt

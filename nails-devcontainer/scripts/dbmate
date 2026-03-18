@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run dbmate against this repo's migrations with the loaded DATABASE_URL.
+source /workspace/scripts/dev-env
+
+exec dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations "$@"

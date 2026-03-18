@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Open psql with the repo's configured DATABASE_URL.
+source /workspace/scripts/dev-env
+
+exec psql "${DATABASE_URL}" "$@"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Load the repo's database environment for other helper scripts.
+WORKSPACE_ROOT="/workspace"
+ENV_FILE="${WORKSPACE_ROOT}/.env"
+
+if [[ ! -f "${ENV_FILE}" ]]; then
+  echo "Missing ${ENV_FILE}. Run 'just dev-secrets' first." >&2
+  exit 1
+fi
+
+set -a
+source "${ENV_FILE}"
+set +a
+
+export DATABASE_URL="${DATABASE_URL:-${MIGRATIONS_URL:-}}"
+
+if [[ -z "${DATABASE_URL}" ]]; then
+  echo "DATABASE_URL is not set. Check ${ENV_FILE}." >&2
+  exit 1
+fi
