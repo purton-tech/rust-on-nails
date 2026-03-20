@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+PROJECT_NAME="${PROJECT_NAME:-one-runtime}"
+ISLANDS_PACKAGE="${ISLANDS_PACKAGE:-${PROJECT_NAME}-islands}"
+ISLANDS_WASM="${ISLANDS_WASM:-${PROJECT_NAME//-/_}_islands}"
+DIST_DIR="${REPO_ROOT}/crates/${PROJECT_NAME}-assets/dist"
+WASM_PATH="${REPO_ROOT}/target/wasm32-unknown-unknown/release/${ISLANDS_WASM}.wasm"
+
+if ! command -v wasm-bindgen >/dev/null 2>&1; then
+  echo "Missing wasm-bindgen. Install it with:" >&2
+  echo "  cargo install wasm-bindgen-cli" >&2
+  exit 1
+fi
+
+mkdir -p "${DIST_DIR}"
+
+rustup target add wasm32-unknown-unknown
+
+cargo build \
+  -p "${ISLANDS_PACKAGE}" \
+  --target wasm32-unknown-unknown \
+  --release
+
+wasm-bindgen \
+  "${WASM_PATH}" \
+  --target web \
+  --out-dir "${DIST_DIR}"
