@@ -4,25 +4,21 @@
     "dockerfile": "Dockerfile",
     "context": "."
   },
-
   "runArgs": [
     "--add-host=host.docker.internal:host-gateway",
     // Without the next 2 lines, codex can't run bubblewrap
     "--security-opt=seccomp=unconfined",
     "--security-opt=apparmor=unconfined"
   ],
-
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       // https://github.com/devcontainers/features/issues/1466
       "moby": false
     }
   },
-
   // Mount the project at /workspace like before
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-
   // Gives access to the ssh keys on the host for git operations.
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
@@ -56,5 +52,6 @@
     "LANG": "C.UTF-8",
     "LC_ALL": "C.UTF-8"
   },
+  "postCreateCommand": "chmod +x /workspace/.devcontainer/setup-env.sh && /workspace/.devcontainer/setup-env.sh",
   "remoteUser": "vscode"
 }
