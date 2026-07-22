@@ -1,4 +1,4 @@
-ARG RUST_IMAGE=rust:1.93.0-slim-trixie
+ARG RUST_IMAGE=rust:1.97.1-slim-trixie
 
 # Do all the cargo install stuff
 FROM ${RUST_IMAGE} as builder
